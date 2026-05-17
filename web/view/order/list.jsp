@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="title" value="Lịch Sử Đơn Hàng Rửa Xe" scope="request" />
+<c:set var="title" value="Car Wash Order History" scope="request" />
 <jsp:include page="/view/layout/header.jsp">
     <jsp:param name="title" value="${title}"/>
 </jsp:include>
@@ -9,26 +9,26 @@
 <div class="main-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h1 style="color: var(--primary); font-weight: 800; font-size: 2rem;">📋 Lịch Sử Đơn Hàng Của Bạn</h1>
-            <p style="color: var(--text-light); margin-top: 0.25rem; font-size: 1rem;">Theo dõi trạng thái và lịch hẹn các gói dịch vụ rửa xe</p>
+            <h1 style="color: var(--primary); font-weight: 800; font-size: 2rem;">📋 Your Order History</h1>
+            <p style="color: var(--text-light); margin-top: 0.25rem; font-size: 1rem;">Track status and appointments for your wash packages</p>
         </div>
         <a href="${pageContext.request.contextPath}/order/book" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
-            ➕ Đặt Lịch Mới
+            ➕ New Appointment
         </a>
     </div>
 
     <jsp:include page="/view/components/alert.jsp">
-        <jsp:param name="successMsg" value="Đặt lịch rửa xe thành công! Đơn hàng của bạn đang được hệ thống xử lý."/>
+        <jsp:param name="successMsg" value="Appointment booked successfully! Your order is being processed by the system."/>
     </jsp:include>
 
     <c:choose>
         <c:when test="${empty orders}">
             <div class="card" style="padding: 4rem 2rem; text-align: center;">
                 <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">Bạn Chưa Có Đơn Hàng Nào</h3>
-                <p style="color: var(--text-light); max-width: 500px; margin: 0 auto 2rem auto; line-height: 1.5;">Hãy bắt đầu trải nghiệm hệ thống rửa xe thông minh tự động ngay hôm nay bằng việc đặt lịch rửa xe đầu tiên của bạn.</p>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">You Don't Have Any Orders Yet</h3>
+                <p style="color: var(--text-light); max-width: 500px; margin: 0 auto 2rem auto; line-height: 1.5;">Start experiencing our smart automated car wash system today by booking your first wash appointment.</p>
                 <a href="${pageContext.request.contextPath}/order/book" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.05rem;">
-                    🚗 Đặt Lịch Rửa Xe Ngay
+                    🚗 Book a Wash Now
                 </a>
             </div>
         </c:when>
@@ -37,12 +37,12 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Mã Đơn</th>
-                            <th>Dịch Vụ</th>
-                            <th>Biển Số Xe</th>
-                            <th>Thời Gian Hẹn</th>
-                            <th>Giá Tiền</th>
-                            <th>Trạng Thái</th>
+                            <th>Order ID</th>
+                            <th>Service</th>
+                            <th>License Plate</th>
+                            <th>Appointment Time</th>
+                            <th>Price</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,13 +56,13 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${order.status == 'COMPLETED'}">
-                                            <span class="badge badge-completed">✓ Đã Hoàn Thành</span>
+                                            <span class="badge badge-completed">✓ Completed</span>
                                         </c:when>
                                         <c:when test="${order.status == 'CANCELLED'}">
-                                            <span class="badge badge-cancelled">✗ Đã Hủy</span>
+                                            <span class="badge badge-cancelled">✗ Cancelled</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="badge badge-pending">⏳ Chờ Mang Xe Đến</span>
+                                            <span class="badge badge-pending">⏳ Pending Arrival</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
