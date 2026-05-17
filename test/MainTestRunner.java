@@ -2,7 +2,7 @@ public class MainTestRunner {
     public static void main(String[] args) {
         System.out.println("[TEST RUNNER] Bắt đầu chạy bộ kiểm thử Unit Test...");
 
-        int totalTests = 2;
+        int totalTests = 3;
         int passedTests = 0;
 
         if (DBContextTest.runTests()) {
@@ -10,6 +10,10 @@ public class MainTestRunner {
         }
 
         if (UserRepositoryTest.runTests()) {
+            passedTests++;
+        }
+
+        if (AuthServiceTest.runTests()) {
             passedTests++;
         }
 
