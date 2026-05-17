@@ -57,6 +57,12 @@ public class ProfileServlet extends HttpServlet {
             String fullname = req.getParameter("fullname");
             String phone = req.getParameter("phone");
 
+            if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
+                session.setAttribute("flashError", "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)");
+                res.sendRedirect(req.getContextPath() + "/profile/view");
+                return;
+            }
+
             try {
                 userRepo.updateProfile(currentUser.getId(), fullname != null ? fullname.trim() : "", phone != null ? phone.trim() : "");
                 // Cập nhật lại thông tin user trong session

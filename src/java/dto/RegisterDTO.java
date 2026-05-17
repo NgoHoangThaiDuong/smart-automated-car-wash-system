@@ -35,8 +35,8 @@ public class RegisterDTO {
         if (confirmPassword == null || !confirmPassword.equals(password)) {
             return "Mật khẩu xác nhận không khớp";
         }
-        if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("\\d{9,15}")) {
-            return "Số điện thoại không hợp lệ (phải chứa từ 9-15 số)";
+        if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
+            return "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)";
         }
         return null;
     }

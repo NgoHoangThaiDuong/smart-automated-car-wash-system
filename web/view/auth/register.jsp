@@ -30,7 +30,7 @@
                 <div class="form-group">
                     <label for="phone" class="form-label">Số điện thoại</label>
                     <input type="tel" id="phone" name="phone" class="form-control"
-                           value="<c:out value="${dto != null ? dto.phone : param.phone}"/>" placeholder="Nhập số điện thoại (9-15 số)">
+                           value="<c:out value="${dto != null ? dto.phone : param.phone}"/>" placeholder="Nhập số điện thoại (10 số, bắt đầu bằng 0)" pattern="0[0-9]{9}" maxlength="10">
                 </div>
 
                 <div class="form-group">
