@@ -1,32 +1,24 @@
 package repository;
 
-import config.DBContext;
 import model.Order;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OrderRepository {
+public class OrderRepository extends BaseRepository<Order> {
 
     public void createOrder(int userId, int serviceId, String carPlate, Date bookDate) {
         String sql = "INSERT INTO orders (user_id, service_id, car_plate, book_date, status) VALUES (?, ?, ?, ?, 'PENDING')";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        int rows = executeUpdate(sql, ps -> {
             ps.setInt(1, userId);
             ps.setInt(2, serviceId);
             ps.setString(3, carPlate);
             ps.setTimestamp(4, new Timestamp(bookDate.getTime()));
-            int rows = ps.executeUpdate();
-            if (rows <= 0) {
-                throw new SQLException("Insert order failed");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi truy xuất CSDL khi tạo đơn hàng mới", e);
+        });
+        if (rows <= 0) {
+            throw new RuntimeException("Lỗi truy xuất CSDL khi tạo đơn hàng mới: Insert failed");
         }
     }
 
@@ -38,19 +30,7 @@ public class OrderRepository {
                      "JOIN users u ON o.user_id = u.id " +
                      "WHERE o.user_id = ? " +
                      "ORDER BY o.book_date DESC, o.id DESC";
-        List<Order> list = new ArrayList<>();
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi truy xuất danh sách đơn hàng của user", e);
-        }
-        return list;
+        return query(sql, ps -> ps.setInt(1, userId), this::mapRow);
     }
 
     public List<Order> findAll() {
@@ -60,17 +40,7 @@ public class OrderRepository {
                      "JOIN services s ON o.service_id = s.id " +
                      "JOIN users u ON o.user_id = u.id " +
                      "ORDER BY o.book_date DESC, o.id DESC";
-        List<Order> list = new ArrayList<>();
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi truy xuất toàn bộ danh sách đơn hàng", e);
-        }
-        return list;
+        return query(sql, null, this::mapRow);
     }
 
     private Order mapRow(ResultSet rs) throws SQLException {
