@@ -82,7 +82,7 @@ public class AuthServlet extends HttpServlet {
             HttpSession session = req.getSession();
             session.setAttribute("currentUser", user);
             session.setMaxInactiveInterval(30 * 60); // Session timeout 30 phút
-            res.sendRedirect(req.getContextPath() + "/order/list");
+            res.sendRedirect(req.getContextPath() + "/home");
         } catch (AuthException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", dto.getUsername());
