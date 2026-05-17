@@ -1,0 +1,54 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="title" value="Đăng nhập hệ thống" scope="request" />
+<jsp:include page="/view/layout/header.jsp">
+    <jsp:param name="title" value="${title}"/>
+</jsp:include>
+
+<div style="max-width: 450px; margin: 3rem auto;">
+    <div class="card">
+        <div class="card-header" style="text-align: center;">
+            <h2 style="color: var(--primary); font-weight: 700;">Đăng Nhập</h2>
+            <p style="color: var(--text-light); margin-top: 0.5rem; font-size: 0.95rem;">Truy cập vào tài khoản Smart CarWash của bạn</p>
+        </div>
+        <div class="card-body">
+            <%-- Thông báo đăng ký thành công nếu chuyển từ trang đăng ký --%>
+            <c:if test="${param.reg == 'success'}">
+                <div class="alert alert-success">
+                    🎉 Đăng ký tài khoản thành công! Hãy đăng nhập.
+                </div>
+            </c:if>
+
+            <%-- Hiển thị thông báo lỗi từ Controller --%>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger">
+                    ⚠️ <c:out value="${error}"/>
+                </div>
+            </c:if>
+
+            <form method="POST" action="${pageContext.request.contextPath}/auth/login">
+                <div class="form-group">
+                    <label for="username" class="form-label">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" class="form-control"
+                           value="<c:out value="${not empty username ? username : param.username}"/>" placeholder="Nhập username" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="Nhập mật khẩu" required>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Đăng Nhập</button>
+                </div>
+            </form>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.95rem; color: var(--text-light);">
+                Chưa có tài khoản? <a href="${pageContext.request.contextPath}/auth/register" style="color: var(--primary); font-weight: 600; text-decoration: none;">Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="/view/layout/footer.jsp"/>
