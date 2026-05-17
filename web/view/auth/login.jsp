@@ -23,8 +23,11 @@
 
                 <div class="form-group">
                     <label for="password" class="form-label">Mật khẩu</label>
-                    <input type="password" id="password" name="password" class="form-control"
-                           placeholder="Nhập mật khẩu" required>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="Nhập mật khẩu" required>
+                        <span class="password-toggle" onclick="togglePassword('password', this)" title="Hiển thị mật khẩu">👁️</span>
+                    </div>
                 </div>
 
                 <div style="margin-top: 2rem;">
@@ -38,5 +41,20 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+        icon.innerText = "🙈";
+        icon.title = "Ẩn mật khẩu";
+    } else {
+        input.type = "password";
+        icon.innerText = "👁️";
+        icon.title = "Hiển thị mật khẩu";
+    }
+}
+</script>
 
 <jsp:include page="/view/layout/footer.jsp"/>

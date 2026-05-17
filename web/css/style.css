@@ -449,3 +449,29 @@ input[type="datetime-local"].form-control {
     background-color: #fef2f2;
     color: #dc2626;
 }
+
+/* Password Toggle Icon */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    padding-right: 3rem;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-light);
+    font-size: 1.25rem;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--primary);
+}
