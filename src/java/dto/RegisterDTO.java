@@ -16,27 +16,27 @@ public class RegisterDTO {
     }
 
     /**
-     * Kiểm tra tính hợp lệ của dữ liệu form đăng ký.
-     * @return null nếu hợp lệ, chuỗi thông báo lỗi nếu không hợp lệ
+     * Validate registration form data.
+     * @return null if valid, error message string if invalid
      */
     public String validate() {
         if (username == null || username.trim().isEmpty()) {
-            return "Tên đăng nhập không được để trống";
+            return "Username is required";
         }
         if (username.trim().length() < 3 || username.trim().length() > 50) {
-            return "Tên đăng nhập phải từ 3 đến 50 ký tự";
+            return "Username must be between 3 and 50 characters";
         }
         if (password == null || password.trim().isEmpty()) {
-            return "Mật khẩu không được để trống";
+            return "Password is required";
         }
         if (password.length() < 6) {
-            return "Mật khẩu phải có ít nhất 6 ký tự";
+            return "Password must be at least 6 characters";
         }
         if (confirmPassword == null || !confirmPassword.equals(password)) {
-            return "Mật khẩu xác nhận không khớp";
+            return "Passwords do not match";
         }
         if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
-            return "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)";
+            return "Invalid phone number (must start with 0 and contain exactly 10 digits)";
         }
         return null;
     }

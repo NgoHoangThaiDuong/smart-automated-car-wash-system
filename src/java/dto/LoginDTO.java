@@ -10,20 +10,20 @@ public class LoginDTO {
     }
 
     /**
-     * Kiểm tra tính hợp lệ của dữ liệu đầu vào.
-     * @return null nếu hợp lệ, chuỗi thông báo lỗi nếu không hợp lệ
+     * Validate input data for login.
+     * @return null if valid, error message string if invalid
      */
     public String validate() {
         if (username == null || username.trim().isEmpty()) {
-            return "Tên đăng nhập không được để trống";
+            return "Username is required";
         }
         if (password == null || password.trim().isEmpty()) {
-            return "Mật khẩu không được để trống";
+            return "Password is required";
         }
         if (password.length() < 6) {
-            return "Mật khẩu phải có ít nhất 6 ký tự";
+            return "Password must be at least 6 characters";
         }
-        return null; // Dữ liệu hợp lệ
+        return null;
     }
 
     public String getUsername() {

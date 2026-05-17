@@ -10,20 +10,20 @@ public class AuthService {
 
     public User login(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
-            throw new AuthException("Tên đăng nhập không được để trống");
+            throw new AuthException("Username is required");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new AuthException("Mật khẩu không được để trống");
+            throw new AuthException("Password is required");
         }
 
         User user = userRepo.findByUsername(username.trim());
         if (user == null) {
-            throw new AuthException("Tên đăng nhập không tồn tại");
+            throw new AuthException("Invalid username or password");
         }
 
         String hashed = hashMD5(password);
         if (!hashed.equals(user.getPassword())) {
-            throw new AuthException("Mật khẩu không đúng");
+            throw new AuthException("Invalid username or password");
         }
 
         return user;
@@ -31,15 +31,14 @@ public class AuthService {
 
     public void register(String username, String password, String fullname, String phone) {
         if (username == null || username.trim().isEmpty()) {
-            throw new AuthException("Tên đăng nhập không được để trống");
+            throw new AuthException("Username is required");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new AuthException("Mật khẩu không được để trống");
+            throw new AuthException("Password is required");
         }
 
-        // Kiểm tra xem username đã tồn tại chưa
         if (userRepo.findByUsername(username.trim()) != null) {
-            throw new AuthException("Tên đăng nhập đã tồn tại trong hệ thống");
+            throw new AuthException("Username already exists");
         }
 
         String hashedPassword = hashMD5(password);
@@ -56,7 +55,7 @@ public class AuthService {
             }
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi mã hóa MD5", e);
+            throw new RuntimeException("MD5 encryption error", e);
         }
     }
 }

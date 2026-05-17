@@ -15,12 +15,12 @@
 
 <c:if test="${param.success == '1'}">
     <div class="alert alert-success">
-        ✅ <c:out value="${not empty param.successMsg ? param.successMsg : 'Thao tác hoàn tất thành công!'}"/>
+        ✅ <c:out value="${not empty param.successMsg ? param.successMsg : 'Operation completed successfully!'}"/>
     </div>
 </c:if>
 
 <c:if test="${param.reg == 'success'}">
     <div class="alert alert-success">
-        🎉 Đăng ký tài khoản thành công! Hãy đăng nhập để tiếp tục.
+        🎉 Account registered successfully! Please log in to continue.
     </div>
 </c:if>

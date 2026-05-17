@@ -106,7 +106,7 @@ public class AuthServlet extends HttpServlet {
             session.setAttribute("flashUsername", dto.getUsername());
             res.sendRedirect(req.getContextPath() + "/auth/login");
         } catch (Exception e) {
-            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashError", "System error occurred: " + e.getMessage());
             session.setAttribute("flashUsername", dto.getUsername());
             res.sendRedirect(req.getContextPath() + "/auth/login");
         }
@@ -138,7 +138,7 @@ public class AuthServlet extends HttpServlet {
             session.setAttribute("flashDto", dto);
             res.sendRedirect(req.getContextPath() + "/auth/register");
         } catch (Exception e) {
-            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashError", "System error occurred: " + e.getMessage());
             session.setAttribute("flashDto", dto);
             res.sendRedirect(req.getContextPath() + "/auth/register");
         }
