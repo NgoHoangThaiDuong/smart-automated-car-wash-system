@@ -17,11 +17,9 @@
         </a>
     </div>
 
-    <c:if test="${param.success == '1'}">
-        <div class="alert alert-success">
-            🎉 Đặt lịch rửa xe thành công! Đơn hàng của bạn đang được hệ thống xử lý.
-        </div>
-    </c:if>
+    <jsp:include page="/view/components/alert.jsp">
+        <jsp:param name="successMsg" value="Đặt lịch rửa xe thành công! Đơn hàng của bạn đang được hệ thống xử lý."/>
+    </jsp:include>
 
     <c:choose>
         <c:when test="${empty orders}">

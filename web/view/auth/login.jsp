@@ -12,19 +12,7 @@
             <p style="color: var(--text-light); margin-top: 0.5rem; font-size: 0.95rem;">Truy cập vào tài khoản Smart CarWash của bạn</p>
         </div>
         <div class="card-body">
-            <%-- Thông báo đăng ký thành công nếu chuyển từ trang đăng ký --%>
-            <c:if test="${param.reg == 'success'}">
-                <div class="alert alert-success">
-                    🎉 Đăng ký tài khoản thành công! Hãy đăng nhập.
-                </div>
-            </c:if>
-
-            <%-- Hiển thị thông báo lỗi từ Controller --%>
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger">
-                    ⚠️ <c:out value="${error}"/>
-                </div>
-            </c:if>
+            <jsp:include page="/view/components/alert.jsp"/>
 
             <form method="POST" action="${pageContext.request.contextPath}/auth/login">
                 <div class="form-group">

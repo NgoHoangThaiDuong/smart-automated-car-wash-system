@@ -16,19 +16,9 @@
             <span class="admin-badge" style="font-size: 0.95rem; padding: 0.4rem 0.8rem;">Vai trò: <c:out value="${sessionScope.currentUser.role}"/></span>
         </div>
         <div class="card-body">
-            <%-- Thông báo cập nhật thành công --%>
-            <c:if test="${param.success == '1'}">
-                <div class="alert alert-success">
-                    ✅ Cập nhật thông tin hồ sơ thành công!
-                </div>
-            </c:if>
-
-            <%-- Hiển thị thông báo lỗi nếu có --%>
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger">
-                    ⚠️ <c:out value="${error}"/>
-                </div>
-            </c:if>
+            <jsp:include page="/view/components/alert.jsp">
+                <jsp:param name="successMsg" value="Cập nhật thông tin hồ sơ thành công!"/>
+            </jsp:include>
 
             <div style="background-color: #f1f5f9; padding: 1.25rem; border-radius: 12px; margin-bottom: 2rem; display: flex; gap: 1.5rem; align-items: center;">
                 <div style="width: 64px; height: 64px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 700;">

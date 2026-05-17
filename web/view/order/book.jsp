@@ -13,11 +13,7 @@
             <p style="color: var(--text-light); margin-top: 0.25rem; font-size: 0.95rem;">Lựa chọn dịch vụ và thời gian phù hợp với bạn</p>
         </div>
         <div class="card-body">
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger">
-                    ⚠️ <c:out value="${error}"/>
-                </div>
-            </c:if>
+            <jsp:include page="/view/components/alert.jsp"/>
 
             <form method="POST" action="${pageContext.request.contextPath}/order/book">
                 <div class="form-group">

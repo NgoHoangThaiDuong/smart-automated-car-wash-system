@@ -12,12 +12,7 @@
             <p style="color: var(--text-light); margin-top: 0.5rem; font-size: 0.95rem;">Tạo tài khoản mới để trải nghiệm dịch vụ rửa xe tự động</p>
         </div>
         <div class="card-body">
-            <%-- Hiển thị thông báo lỗi từ Controller --%>
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger">
-                    ⚠️ <c:out value="${error}"/>
-                </div>
-            </c:if>
+            <jsp:include page="/view/components/alert.jsp"/>
 
             <form method="POST" action="${pageContext.request.contextPath}/auth/register">
                 <div class="form-group">
