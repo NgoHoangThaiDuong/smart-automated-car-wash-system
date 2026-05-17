@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 public class DBContext {
     private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=CarWashDB";
     private static final String USER = "sa";
-    private static final String PASS = "123456";
+    private static final String PASS = "Car@Wash";
 
     private static Connection connection;
 
