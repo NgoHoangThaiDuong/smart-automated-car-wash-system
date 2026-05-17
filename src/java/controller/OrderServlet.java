@@ -102,7 +102,7 @@ public class OrderServlet extends HttpServlet {
             session.setAttribute("flashBookDate", bookDateStr);
             res.sendRedirect(req.getContextPath() + "/order/book");
         } catch (Exception e) {
-            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashError", "System error occurred: " + e.getMessage());
             session.setAttribute("flashServiceId", serviceId);
             session.setAttribute("flashCarPlate", carPlate);
             session.setAttribute("flashBookDate", bookDateStr);

@@ -58,7 +58,7 @@ public class ProfileServlet extends HttpServlet {
             String phone = req.getParameter("phone");
 
             if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
-                session.setAttribute("flashError", "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)");
+                session.setAttribute("flashError", "Invalid phone number (must start with 0 and contain exactly 10 digits)");
                 res.sendRedirect(req.getContextPath() + "/profile/view");
                 return;
             }
@@ -70,7 +70,7 @@ public class ProfileServlet extends HttpServlet {
                 session.setAttribute("currentUser", updatedUser);
                 res.sendRedirect(req.getContextPath() + "/profile/view?success=1");
             } catch (Exception e) {
-                session.setAttribute("flashError", "Lỗi cập nhật hồ sơ: " + e.getMessage());
+                session.setAttribute("flashError", "Failed to update profile: " + e.getMessage());
                 res.sendRedirect(req.getContextPath() + "/profile/view");
             }
         } else {
