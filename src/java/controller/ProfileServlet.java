@@ -28,6 +28,14 @@ public class ProfileServlet extends HttpServlet {
                 res.sendRedirect(req.getContextPath() + "/auth/login");
                 return;
             }
+
+            // Xử lý Flash attribute (PRG Pattern)
+            String flashError = (String) session.getAttribute("flashError");
+            if (flashError != null) {
+                req.setAttribute("error", flashError);
+                session.removeAttribute("flashError");
+            }
+
             req.getRequestDispatcher("/view/profile/view.jsp").forward(req, res);
         } else {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -56,8 +64,8 @@ public class ProfileServlet extends HttpServlet {
                 session.setAttribute("currentUser", updatedUser);
                 res.sendRedirect(req.getContextPath() + "/profile/view?success=1");
             } catch (Exception e) {
-                req.setAttribute("error", "Lỗi cập nhật hồ sơ: " + e.getMessage());
-                req.getRequestDispatcher("/view/profile/view.jsp").forward(req, res);
+                session.setAttribute("flashError", "Lỗi cập nhật hồ sơ: " + e.getMessage());
+                res.sendRedirect(req.getContextPath() + "/profile/view");
             }
         } else {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);

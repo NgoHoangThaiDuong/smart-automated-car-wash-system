@@ -25,6 +25,24 @@ public class AuthServlet extends HttpServlet {
             action = "/login";
         }
 
+        // Xử lý dữ liệu Flash Session (PRG Pattern)
+        HttpSession session = req.getSession();
+        String flashError = (String) session.getAttribute("flashError");
+        if (flashError != null) {
+            req.setAttribute("error", flashError);
+            session.removeAttribute("flashError");
+        }
+        String flashUsername = (String) session.getAttribute("flashUsername");
+        if (flashUsername != null) {
+            req.setAttribute("username", flashUsername);
+            session.removeAttribute("flashUsername");
+        }
+        RegisterDTO flashDto = (RegisterDTO) session.getAttribute("flashDto");
+        if (flashDto != null) {
+            req.setAttribute("dto", flashDto);
+            session.removeAttribute("flashDto");
+        }
+
         switch (action) {
             case "/login":
                 req.getRequestDispatcher("/view/auth/login.jsp").forward(req, res);
@@ -63,37 +81,38 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    private void handleLogin(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleLogin(HttpServletRequest req, HttpServletResponse res) throws IOException {
         LoginDTO dto = new LoginDTO(
                 req.getParameter("username"),
                 req.getParameter("password")
         );
 
+        HttpSession session = req.getSession();
         String err = dto.validate();
         if (err != null) {
-            req.setAttribute("error", err);
-            req.setAttribute("username", dto.getUsername());
-            req.getRequestDispatcher("/view/auth/login.jsp").forward(req, res);
+            session.setAttribute("flashError", err);
+            session.setAttribute("flashUsername", dto.getUsername());
+            res.sendRedirect(req.getContextPath() + "/auth/login");
             return;
         }
 
         try {
             User user = authService.login(dto.getUsername(), dto.getPassword());
-            HttpSession session = req.getSession();
             session.setAttribute("currentUser", user);
             session.setMaxInactiveInterval(30 * 60); // Session timeout 30 phút
             res.sendRedirect(req.getContextPath() + "/home");
         } catch (AuthException e) {
-            req.setAttribute("error", e.getMessage());
-            req.setAttribute("username", dto.getUsername());
-            req.getRequestDispatcher("/view/auth/login.jsp").forward(req, res);
+            session.setAttribute("flashError", e.getMessage());
+            session.setAttribute("flashUsername", dto.getUsername());
+            res.sendRedirect(req.getContextPath() + "/auth/login");
         } catch (Exception e) {
-            req.setAttribute("error", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            req.getRequestDispatcher("/view/auth/login.jsp").forward(req, res);
+            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashUsername", dto.getUsername());
+            res.sendRedirect(req.getContextPath() + "/auth/login");
         }
     }
 
-    private void handleRegister(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleRegister(HttpServletRequest req, HttpServletResponse res) throws IOException {
         RegisterDTO dto = new RegisterDTO(
                 req.getParameter("username"),
                 req.getParameter("password"),
@@ -102,11 +121,12 @@ public class AuthServlet extends HttpServlet {
                 req.getParameter("phone")
         );
 
+        HttpSession session = req.getSession();
         String err = dto.validate();
         if (err != null) {
-            req.setAttribute("error", err);
-            req.setAttribute("dto", dto);
-            req.getRequestDispatcher("/view/auth/register.jsp").forward(req, res);
+            session.setAttribute("flashError", err);
+            session.setAttribute("flashDto", dto);
+            res.sendRedirect(req.getContextPath() + "/auth/register");
             return;
         }
 
@@ -114,13 +134,13 @@ public class AuthServlet extends HttpServlet {
             authService.register(dto.getUsername(), dto.getPassword(), dto.getFullname(), dto.getPhone());
             res.sendRedirect(req.getContextPath() + "/auth/login?reg=success");
         } catch (AuthException e) {
-            req.setAttribute("error", e.getMessage());
-            req.setAttribute("dto", dto);
-            req.getRequestDispatcher("/view/auth/register.jsp").forward(req, res);
+            session.setAttribute("flashError", e.getMessage());
+            session.setAttribute("flashDto", dto);
+            res.sendRedirect(req.getContextPath() + "/auth/register");
         } catch (Exception e) {
-            req.setAttribute("error", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            req.setAttribute("dto", dto);
-            req.getRequestDispatcher("/view/auth/register.jsp").forward(req, res);
+            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashDto", dto);
+            res.sendRedirect(req.getContextPath() + "/auth/register");
         }
     }
 

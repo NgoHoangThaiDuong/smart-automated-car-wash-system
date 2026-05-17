@@ -30,6 +30,19 @@ public class OrderServlet extends HttpServlet {
         }
         User currentUser = (User) session.getAttribute("currentUser");
 
+        // Xử lý dữ liệu Flash Session (PRG Pattern)
+        String flashError = (String) session.getAttribute("flashError");
+        if (flashError != null) {
+            req.setAttribute("error", flashError);
+            session.removeAttribute("flashError");
+            req.setAttribute("selectedServiceId", session.getAttribute("flashServiceId"));
+            session.removeAttribute("flashServiceId");
+            req.setAttribute("carPlate", session.getAttribute("flashCarPlate"));
+            session.removeAttribute("flashCarPlate");
+            req.setAttribute("bookDate", session.getAttribute("flashBookDate"));
+            session.removeAttribute("flashBookDate");
+        }
+
         switch (action) {
             case "/book":
                 req.setAttribute("services", orderBusinessService.getAllServices());
@@ -60,13 +73,13 @@ public class OrderServlet extends HttpServlet {
         User currentUser = (User) session.getAttribute("currentUser");
 
         if ("/book".equals(action)) {
-            handleBookOrder(req, res, currentUser);
+            handleBookOrder(req, res, session, currentUser);
         } else {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
-    private void handleBookOrder(HttpServletRequest req, HttpServletResponse res, User currentUser) throws ServletException, IOException {
+    private void handleBookOrder(HttpServletRequest req, HttpServletResponse res, HttpSession session, User currentUser) throws IOException {
         String serviceIdStr = req.getParameter("serviceId");
         String carPlate = req.getParameter("carPlate");
         String bookDateStr = req.getParameter("bookDate");
@@ -83,19 +96,17 @@ public class OrderServlet extends HttpServlet {
             // Áp dụng PRG Pattern: Redirect sau khi POST thành công
             res.sendRedirect(req.getContextPath() + "/order/list?success=1");
         } catch (ValidationException e) {
-            req.setAttribute("error", e.getMessage());
-            req.setAttribute("selectedServiceId", serviceId);
-            req.setAttribute("carPlate", carPlate);
-            req.setAttribute("bookDate", bookDateStr);
-            req.setAttribute("services", orderBusinessService.getAllServices());
-            req.getRequestDispatcher("/view/order/book.jsp").forward(req, res);
+            session.setAttribute("flashError", e.getMessage());
+            session.setAttribute("flashServiceId", serviceId);
+            session.setAttribute("flashCarPlate", carPlate);
+            session.setAttribute("flashBookDate", bookDateStr);
+            res.sendRedirect(req.getContextPath() + "/order/book");
         } catch (Exception e) {
-            req.setAttribute("error", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
-            req.setAttribute("selectedServiceId", serviceId);
-            req.setAttribute("carPlate", carPlate);
-            req.setAttribute("bookDate", bookDateStr);
-            req.setAttribute("services", orderBusinessService.getAllServices());
-            req.getRequestDispatcher("/view/order/book.jsp").forward(req, res);
+            session.setAttribute("flashError", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("flashServiceId", serviceId);
+            session.setAttribute("flashCarPlate", carPlate);
+            session.setAttribute("flashBookDate", bookDateStr);
+            res.sendRedirect(req.getContextPath() + "/order/book");
         }
     }
 }
