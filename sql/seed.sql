@@ -1,76 +1,76 @@
 -- =======================================================
--- SEED DATA: USERS (Mật khẩu mặc định: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
+-- SEED DATA: USERS (Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
 -- =======================================================
 
--- 1. Quản trị viên (ADMIN)
+-- 1. System Administrator (ADMIN)
 IF NOT EXISTS (SELECT * FROM users WHERE username='admin')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role) 
-    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', N'Quản trị viên Hệ thống', '0901234567', 'ADMIN');
+    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', 'System Administrator', '0901234567', 'ADMIN');
 END;
 
--- 2. Nhân viên (STAFF)
+-- 2. Staff Members (STAFF)
 IF NOT EXISTS (SELECT * FROM users WHERE username='staff1')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role) 
-    VALUES ('staff1', 'e10adc3949ba59abbe56e057f20f883e', N'Nguyễn Văn Thợ', '0912345678', 'STAFF');
+    VALUES ('staff1', 'e10adc3949ba59abbe56e057f20f883e', 'John Washer', '0912345678', 'STAFF');
 END;
 
 IF NOT EXISTS (SELECT * FROM users WHERE username='staff2')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role) 
-    VALUES ('staff2', 'e10adc3949ba59abbe56e057f20f883e', N'Trần Thị Lễ Tân', '0987654321', 'STAFF');
+    VALUES ('staff2', 'e10adc3949ba59abbe56e057f20f883e', 'Sarah Receptionist', '0987654321', 'STAFF');
 END;
 
--- 3. Khách hàng (CUSTOMER)
+-- 3. Customers (CUSTOMER)
 IF NOT EXISTS (SELECT * FROM users WHERE username='customer1')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role) 
-    VALUES ('customer1', 'e10adc3949ba59abbe56e057f20f883e', N'Lê Đại Gia (VIP)', '0999999999', 'CUSTOMER');
+    VALUES ('customer1', 'e10adc3949ba59abbe56e057f20f883e', 'David VIP', '0999999999', 'CUSTOMER');
 END;
 
 IF NOT EXISTS (SELECT * FROM users WHERE username='customer2')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role) 
-    VALUES ('customer2', 'e10adc3949ba59abbe56e057f20f883e', N'Phạm Khách Hàng', '0888888888', 'CUSTOMER');
+    VALUES ('customer2', 'e10adc3949ba59abbe56e057f20f883e', 'Michael Customer', '0888888888', 'CUSTOMER');
 END;
 
 -- =======================================================
--- SEED DATA: SERVICES (Dịch vụ rửa xe)
+-- SEED DATA: SERVICES (Car wash services)
 -- =======================================================
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Rửa xe bọt tuyết cơ bản')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Standard Snow Foam Wash')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Rửa xe bọt tuyết cơ bản', 50000, N'Xịt gầm, rửa bọt tuyết toàn thân xe và lau khô chuyên dụng.');
+    VALUES ('Standard Snow Foam Wash', 50000, 'Underbody spray, full body snow foam wash, and microfiber towel dry.');
 END;
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Rửa xe + Hút bụi nội thất')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Wash & Interior Vacuum')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Rửa xe + Hút bụi nội thất', 80000, N'Rửa bọt tuyết ngoại thất kèm hút bụi toàn bộ ghế và thảm sàn.');
+    VALUES ('Wash & Interior Vacuum', 80000, 'Exterior snow foam wash combined with full interior cabin and carpet vacuuming.');
 END;
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Rửa xe + Phủ Ceramic Nano')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Premium Ceramic Nano Coating')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Rửa xe + Phủ Ceramic Nano', 150000, N'Rửa xe chi tiết, tẩy ố mốc kính và phủ dung dịch bóng Ceramic siêu cấp bảo vệ sơn.');
+    VALUES ('Premium Ceramic Nano Coating', 150000, 'Detailed wash, glass decontamination, and premium Ceramic coating for ultimate paint protection.');
 END;
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Vệ sinh khoang máy chuyên sâu')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Engine Bay Detailing')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Vệ sinh khoang máy chuyên sâu', 300000, N'Làm sạch dầu mỡ khoang động cơ bằng hơi nước nóng, dưỡng nhựa và cao su.');
+    VALUES ('Engine Bay Detailing', 300000, 'Deep steam cleaning of engine compartment grease, finished with plastic and rubber dressing.');
 END;
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Dọn nội thất toàn diện')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Full Interior Detailing')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Dọn nội thất toàn diện', 500000, N'Tháo ghế, giặt thảm trần, khử mùi ozone và dưỡng da cao cấp toàn bộ xe.');
+    VALUES ('Full Interior Detailing', 500000, 'Seat removal, upholstery & carpet shampooing, ozone odor elimination, and premium leather conditioning.');
 END;
 
-IF NOT EXISTS (SELECT * FROM services WHERE name=N'Tẩy ố kính & Đánh bóng đèn pha')
+IF NOT EXISTS (SELECT * FROM services WHERE name='Glass Water Spot Removal & Headlight Restoration')
 BEGIN
     INSERT INTO services (name, price, description) 
-    VALUES (N'Tẩy ố kính & Đánh bóng đèn pha', 200000, N'Loại bỏ cặn canxi trên kính lái, đánh bóng phục hồi đèn pha ố vàng.');
+    VALUES ('Glass Water Spot Removal & Headlight Restoration', 200000, 'Elimination of hard water spots on windshield and dual headlight polish restoration.');
 END;
