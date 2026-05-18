@@ -1,31 +1,35 @@
-# Installation
-## Using docker-compose:
+# Smart Automated Car Wash System (PRJ301)
 
-```
-docker compose up -d
-```
-> **Note**: This docker-compose only spins up the Microsoft SQL Server 2019 database. After it starts, you must execute the SQL scripts in the `sql/` directory (`schema.sql` and `seed.sql`) to initialize tables and dummy data.
+An enterprise Java Web application built with Servlets, JSP, pure JDBC, and MS SQL Server following strict 3-tier MVC architecture.
 
-## Local
-- Requirement:
-  - Windows (recommended) or any OS running NetBeans
-  - JDK 8
-  - Apache Tomcat 9.0+
-  - Apache Ant (bundled with NetBeans)
+## 🚀 Quick Start (NetBeans IDE Workflow)
 
-- Clone this project
-```
-git clone <your-repo-url>
-cd smart-automated-car-wash-system
-```
+### Prerequisites
+- **NetBeans IDE** (version 12.0 or later recommended)
+- **JDK 8** (Java 1.8)
+- **Apache Tomcat 9.0+** configured within NetBeans
+- **Microsoft SQL Server 2019** (running locally or via Docker container)
 
-- Build and package into war file
-```
-ant clean dist
+*(Note: Ensure your database environment credentials and configurations are correctly satisfied based on the sample configuration template before proceeding).*
+
+### 1. Database Setup & Initialization
+If using Docker, start the MS SQL Server container:
+```bash
+docker-compose up -d
 ```
 
-- Move the war file to tomcat webapps folder 
-```
-copy .\dist\smart-automated-car-wash-system.war C:\Path\To\Tomcat9\webapps\
-```
-*(Alternatively, open the project in NetBeans IDE, attach your Tomcat 9 server, and click Run/Deploy)*
+Before running the application for the first time, execute the SQL initialization scripts located in the `sql/` directory against your database instance:
+1. Execute `sql/schema.sql` to build the required relational tables (`users`, `services`, `orders`).
+2. Execute `sql/seed.sql` to insert the initial service catalog and default administrative accounts.
+
+### 2. Build & Deploy in NetBeans
+1. Open the project folder `smart-automated-car-wash-system` inside **NetBeans IDE**.
+2. Right-click the project node and select **Clean and Build** (NetBeans Ant build will compile classes and bundle the web application).
+3. Right-click the project node and select **Run** (or select your configured Apache Tomcat 9.0 server and click the Run icon). NetBeans will automatically deploy the `.war` package and launch your browser.
+
+---
+
+## 🏗️ Project Architecture & Constraints
+- **Architecture**: Strict MVC 3-tier hierarchy (Servlet Controller -> Service Layer -> Repository Layer).
+- **Frontend**: JSP + JSTL + Custom CSS (Fully responsive UI).
+- **Backend**: Pure JDBC PreparedStatement implementation (No ORM frameworks).
