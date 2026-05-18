@@ -9,18 +9,27 @@ public class User {
     private String fullname;
     private String phone;
     private String role;
+    private int tierId;
+    private int pointsBalance;
+    private double lifetimeSpent;
     private Date createdAt;
+
+    // Joined entity
+    private Tier tier;
 
     public User() {
     }
 
-    public User(int id, String username, String password, String fullname, String phone, String role, Date createdAt) {
+    public User(int id, String username, String password, String fullname, String phone, String role, int tierId, int pointsBalance, double lifetimeSpent, Date createdAt) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.fullname = fullname;
         this.phone = phone;
         this.role = role;
+        this.tierId = tierId;
+        this.pointsBalance = pointsBalance;
+        this.lifetimeSpent = lifetimeSpent;
         this.createdAt = createdAt;
     }
 
@@ -72,12 +81,44 @@ public class User {
         this.role = role;
     }
 
+    public int getTierId() {
+        return tierId;
+    }
+
+    public void setTierId(int tierId) {
+        this.tierId = tierId;
+    }
+
+    public int getPointsBalance() {
+        return pointsBalance;
+    }
+
+    public void setPointsBalance(int pointsBalance) {
+        this.pointsBalance = pointsBalance;
+    }
+
+    public double getLifetimeSpent() {
+        return lifetimeSpent;
+    }
+
+    public void setLifetimeSpent(double lifetimeSpent) {
+        this.lifetimeSpent = lifetimeSpent;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Tier getTier() {
+        return tier;
+    }
+
+    public void setTier(Tier tier) {
+        this.tier = tier;
     }
 
     @Override
@@ -88,7 +129,11 @@ public class User {
                 ", fullname='" + fullname + '\'' +
                 ", phone='" + phone + '\'' +
                 ", role='" + role + '\'' +
+                ", tierId=" + tierId +
+                ", pointsBalance=" + pointsBalance +
+                ", lifetimeSpent=" + lifetimeSpent +
                 ", createdAt=" + createdAt +
+                ", tier=" + tier +
                 '}';
     }
 }
