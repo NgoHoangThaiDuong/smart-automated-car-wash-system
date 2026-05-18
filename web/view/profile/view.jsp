@@ -93,59 +93,6 @@
         </div>
     </div>
 
-    <!-- Danh Sách Xe & Lịch Sử Điểm -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem;">
-        <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="font-size: 1.15rem; font-weight: 700;">🚗 Phương tiện của tôi</h3>
-            </div>
-            <div class="card-body" style="padding: 1.5rem;">
-                <c:if test="${empty vehicleList}">
-                    <p style="color: var(--text-light); font-size: 0.95rem; text-align: center; padding: 1rem 0;">Chưa có phương tiện nào được lưu.</p>
-                </c:if>
-                <c:if test="${not empty vehicleList}">
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <c:forEach var="v" items="${vehicleList}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background-color: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
-                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--primary);"><c:out value="${v.licensePlate}"/></span>
-                                <c:if test="${v.defaultVehicle}">
-                                    <span class="badge badge-completed">Mặc định</span>
-                                </c:if>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </c:if>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h3 style="font-size: 1.15rem; font-weight: 700;">⭐ Lịch sử điểm thưởng</h3>
-            </div>
-            <div class="card-body" style="padding: 1.5rem; max-height: 350px; overflow-y: auto;">
-                <c:if test="${empty historyList}">
-                    <p style="color: var(--text-light); font-size: 0.95rem; text-align: center; padding: 1rem 0;">Chưa có biến động điểm thưởng nào.</p>
-                </c:if>
-                <c:if test="${not empty historyList}">
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <c:forEach var="h" items="${historyList}">
-                            <div style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.9rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                                    <span style="font-weight: 600;"><c:out value="${h.reason}"/></span>
-                                    <span style="font-weight: 800; color: ${h.pointsChanged >= 0 ? 'var(--success)' : 'var(--danger)'};">
-                                        ${h.pointsChanged >= 0 ? '+' : ''}${h.pointsChanged} pts
-                                    </span>
-                                </div>
-                                <div style="color: var(--text-light); font-size: 0.8rem;">
-                                    <fmt:formatDate value="${h.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </c:if>
-            </div>
-        </div>
-    </div>
 </div>
 
 <jsp:include page="/view/layout/footer.jsp"/>

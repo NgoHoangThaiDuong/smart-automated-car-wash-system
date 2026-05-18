@@ -73,17 +73,4 @@ GO
 UPDATE users SET tier_id = (SELECT id FROM tiers WHERE name='Member') WHERE tier_id IS NULL;
 GO
 
--- 3. SEED VEHICLES
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-12345')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, is_default)
-    VALUES ((SELECT id FROM users WHERE username='customer1'), '30A-12345', 1);
-END;
-GO
 
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-67890')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, is_default)
-    VALUES ((SELECT id FROM users WHERE username='customer2'), '29B-67890', 1);
-END;
-GO

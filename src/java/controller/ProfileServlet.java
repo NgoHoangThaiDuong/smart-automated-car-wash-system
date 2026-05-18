@@ -1,13 +1,7 @@
 package controller;
 
-import model.LoyaltyHistory;
-import model.Tier;
-import model.User;
-import model.Vehicle;
-import repository.LoyaltyHistoryRepository;
 import repository.TierRepository;
 import repository.UserRepository;
-import repository.VehicleRepository;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,8 +16,6 @@ public class ProfileServlet extends HttpServlet {
 
     private final UserRepository userRepo = new UserRepository();
     private final TierRepository tierRepo = new TierRepository();
-    private final LoyaltyHistoryRepository historyRepo = new LoyaltyHistoryRepository();
-    private final VehicleRepository vehicleRepo = new VehicleRepository();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -53,12 +45,9 @@ public class ProfileServlet extends HttpServlet {
                 session.removeAttribute("flashError");
             }
 
-            List<LoyaltyHistory> historyList = historyRepo.findByUserId(freshestUser.getId());
-            List<Vehicle> vehicleList = vehicleRepo.findByUserId(freshestUser.getId());
-
-            List<Tier> allTiers = tierRepo.findAll();
-            Tier nextTier = null;
-            for (Tier t : allTiers) {
+            List<model.Tier> allTiers = tierRepo.findAll();
+            model.Tier nextTier = null;
+            for (model.Tier t : allTiers) {
                 if (t.getMinSpend() > freshestUser.getLifetimeSpent()) {
                     nextTier = t;
                     break;
@@ -72,9 +61,6 @@ public class ProfileServlet extends HttpServlet {
                 req.setAttribute("progressPercent", progressPercent);
                 req.setAttribute("remainingSpend", remainingSpend);
             }
-
-            req.setAttribute("historyList", historyList);
-            req.setAttribute("vehicleList", vehicleList);
 
             req.getRequestDispatcher("/view/profile/view.jsp").forward(req, res);
         } else {

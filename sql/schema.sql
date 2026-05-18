@@ -56,27 +56,4 @@ BEGIN
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='vehicles' AND xtype='U')
-BEGIN
-    CREATE TABLE vehicles (
-        id INT IDENTITY(1,1) PRIMARY KEY,
-        user_id INT FOREIGN KEY REFERENCES users(id),
-        license_plate VARCHAR(20) UNIQUE NOT NULL,
-        is_default BIT DEFAULT 0
-    );
-END;
-GO
 
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='loyalty_history' AND xtype='U')
-BEGIN
-    CREATE TABLE loyalty_history (
-        id INT IDENTITY(1,1) PRIMARY KEY,
-        user_id INT FOREIGN KEY REFERENCES users(id),
-        points_changed INT NOT NULL,
-        points_remaining INT NOT NULL,
-        reason NVARCHAR(255),
-        created_at DATETIME DEFAULT GETDATE(),
-        expires_at DATETIME
-    );
-END;
-GO
