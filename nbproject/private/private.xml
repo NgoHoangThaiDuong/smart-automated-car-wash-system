@@ -3,7 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/SU26/PRJ301/smart-automated-car-wash-system/web/index.html</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/model/Order.java</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/model/Service.java</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/web/view/profile/view.jsp</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/controller/AuthServlet.java</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/controller/ProfileServlet.java</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/dto/LoginDTO.java</file>
+            <file>file:/D:/Users/Phuc/Desktop/PRJ301/smart-automated-car-wash-system/src/java/model/User.java</file>
         </group>
     </open-files>
 </project-private>
