@@ -40,12 +40,12 @@ public class Vehicle {
         this.licensePlate = licensePlate;
     }
 
-    public boolean isDefault() {
+    public boolean isDefaultVehicle() {
         return isDefault;
     }
 
-    public void setDefault(boolean isDefault) {
-        this.isDefault = isDefault;
+    public void setDefaultVehicle(boolean defaultVehicle) {
+        this.isDefault = defaultVehicle;
     }
 
     @Override

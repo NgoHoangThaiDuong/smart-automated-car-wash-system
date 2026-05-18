@@ -42,7 +42,7 @@ public class VehicleRepository extends BaseRepository<Vehicle> {
         v.setId(rs.getInt("id"));
         v.setUserId(rs.getInt("user_id"));
         v.setLicensePlate(rs.getString("license_plate"));
-        v.setDefault(rs.getBoolean("is_default"));
+        v.setDefaultVehicle(rs.getBoolean("is_default"));
         return v;
     }
 }

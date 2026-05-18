@@ -108,7 +108,7 @@
                         <c:forEach var="v" items="${vehicleList}">
                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background-color: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
                                 <span style="font-weight: 700; font-size: 1.1rem; color: var(--primary);"><c:out value="${v.licensePlate}"/></span>
-                                <c:if test="${v.default}">
+                                <c:if test="${v.defaultVehicle}">
                                     <span class="badge badge-completed">Mặc định</span>
                                 </c:if>
                             </div>
