@@ -74,8 +74,29 @@ public class OrderServlet extends HttpServlet {
 
         if ("/book".equals(action)) {
             handleBookOrder(req, res, session, currentUser);
+        } else if ("/complete".equals(action)) {
+            handleCompleteOrder(req, res, session, currentUser);
         } else {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void handleCompleteOrder(HttpServletRequest req, HttpServletResponse res, HttpSession session, User currentUser) throws IOException {
+        String orderIdStr = req.getParameter("orderId");
+        try {
+            if (orderIdStr != null && !orderIdStr.trim().isEmpty()) {
+                int orderId = Integer.parseInt(orderIdStr);
+                orderBusinessService.completeOrder(orderId);
+                repository.UserRepository userRepo = new repository.UserRepository();
+                User updatedUser = userRepo.findById(currentUser.getId());
+                if (updatedUser != null) {
+                    session.setAttribute("currentUser", updatedUser);
+                }
+            }
+            res.sendRedirect(req.getContextPath() + "/order/list?completed=1");
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.sendRedirect(req.getContextPath() + "/order/list?error=1");
         }
     }
 

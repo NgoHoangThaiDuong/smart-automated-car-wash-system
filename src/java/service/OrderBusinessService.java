@@ -13,6 +13,7 @@ public class OrderBusinessService {
 
     private final OrderRepository orderRepo = new OrderRepository();
     private final ServiceRepository serviceRepo = new ServiceRepository();
+    private final LoyaltyService loyaltyService = new LoyaltyService();
 
     public List<Service> getAllServices() {
         return serviceRepo.findAll();
@@ -64,5 +65,19 @@ public class OrderBusinessService {
         }
 
         orderRepo.createOrder(userId, serviceId, cleanedPlate, bookDate);
+    }
+
+    public void completeOrder(int orderId) {
+        Order o = orderRepo.findById(orderId);
+        if (o == null || "COMPLETED".equals(o.getStatus())) return;
+
+        double basePrice = o.getServicePrice();
+        double discount = (o.getDiscountPercent() > 0) ? (basePrice * o.getDiscountPercent() / 100.0) : 0.0;
+        double finalPrice = basePrice - discount;
+        if (finalPrice < 0) finalPrice = 0.0;
+
+        orderRepo.updateStatus(orderId, "COMPLETED");
+
+        loyaltyService.processOrderCompletion(o.getUserId(), finalPrice);
     }
 }

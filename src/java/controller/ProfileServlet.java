@@ -1,7 +1,13 @@
 package controller;
 
+import model.LoyaltyHistory;
+import model.Tier;
 import model.User;
+import model.Vehicle;
+import repository.LoyaltyHistoryRepository;
+import repository.TierRepository;
 import repository.UserRepository;
+import repository.VehicleRepository;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,11 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/profile/*")
 public class ProfileServlet extends HttpServlet {
 
     private final UserRepository userRepo = new UserRepository();
+    private final TierRepository tierRepo = new TierRepository();
+    private final LoyaltyHistoryRepository historyRepo = new LoyaltyHistoryRepository();
+    private final VehicleRepository vehicleRepo = new VehicleRepository();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -29,12 +39,42 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
-            // Xử lý Flash attribute (PRG Pattern)
+            User sessionUser = (User) session.getAttribute("currentUser");
+            User freshestUser = userRepo.findById(sessionUser.getId());
+            if (freshestUser != null) {
+                session.setAttribute("currentUser", freshestUser);
+            } else {
+                freshestUser = sessionUser;
+            }
+
             String flashError = (String) session.getAttribute("flashError");
             if (flashError != null) {
                 req.setAttribute("error", flashError);
                 session.removeAttribute("flashError");
             }
+
+            List<LoyaltyHistory> historyList = historyRepo.findByUserId(freshestUser.getId());
+            List<Vehicle> vehicleList = vehicleRepo.findByUserId(freshestUser.getId());
+
+            List<Tier> allTiers = tierRepo.findAll();
+            Tier nextTier = null;
+            for (Tier t : allTiers) {
+                if (t.getMinSpend() > freshestUser.getLifetimeSpent()) {
+                    nextTier = t;
+                    break;
+                }
+            }
+
+            if (nextTier != null) {
+                double remainingSpend = nextTier.getMinSpend() - freshestUser.getLifetimeSpent();
+                double progressPercent = Math.min(100.0, (freshestUser.getLifetimeSpent() / nextTier.getMinSpend()) * 100.0);
+                req.setAttribute("nextTier", nextTier);
+                req.setAttribute("progressPercent", progressPercent);
+                req.setAttribute("remainingSpend", remainingSpend);
+            }
+
+            req.setAttribute("historyList", historyList);
+            req.setAttribute("vehicleList", vehicleList);
 
             req.getRequestDispatcher("/view/profile/view.jsp").forward(req, res);
         } else {
@@ -65,7 +105,6 @@ public class ProfileServlet extends HttpServlet {
 
             try {
                 userRepo.updateProfile(currentUser.getId(), fullname != null ? fullname.trim() : "", phone != null ? phone.trim() : "");
-                // Cập nhật lại thông tin user trong session
                 User updatedUser = userRepo.findById(currentUser.getId());
                 session.setAttribute("currentUser", updatedUser);
                 res.sendRedirect(req.getContextPath() + "/profile/view?success=1");

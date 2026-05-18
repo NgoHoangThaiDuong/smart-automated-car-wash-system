@@ -56,13 +56,22 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${order.status == 'COMPLETED'}">
-                                            <span class="badge badge-completed">✓ Completed</span>
+                                            <span class="badge badge-completed">✓ Đã hoàn thành</span>
+                                            <c:if test="${order.finalPrice > 0}">
+                                                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem;"><fmt:formatNumber value="${order.finalPrice}" type="currency" currencySymbol="VNĐ" maxFractionDigits="0"/></div>
+                                            </c:if>
                                         </c:when>
                                         <c:when test="${order.status == 'CANCELLED'}">
-                                            <span class="badge badge-cancelled">✗ Cancelled</span>
+                                            <span class="badge badge-cancelled">✗ Đã hủy</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="badge badge-pending">⏳ Pending Arrival</span>
+                                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                                <span class="badge badge-pending">⏳ Chờ rửa xe</span>
+                                                <form method="POST" action="${pageContext.request.contextPath}/order/complete" style="display: inline;">
+                                                    <input type="hidden" name="orderId" value="${order.id}">
+                                                    <button type="submit" class="btn btn-primary" style="padding: 0.25rem 0.65rem; font-size: 0.85rem;" title="Mô phỏng hoàn thành đơn để tích điểm">✓ Hoàn thành</button>
+                                                </form>
+                                            </div>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
