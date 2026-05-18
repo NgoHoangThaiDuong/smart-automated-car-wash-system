@@ -40,3 +40,4 @@ run_tests.bat
 # Database sensitive configuration
 .env
 src/java/.env
+.db_initialized

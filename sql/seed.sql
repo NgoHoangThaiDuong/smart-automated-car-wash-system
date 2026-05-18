@@ -1,6 +1,8 @@
 -- =======================================================
 -- SEED DATA: USERS (Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
 -- =======================================================
+USE AutoCarWash;
+GO
 
 -- 1. System Administrator (ADMIN)
 IF NOT EXISTS (SELECT * FROM users WHERE username='admin')

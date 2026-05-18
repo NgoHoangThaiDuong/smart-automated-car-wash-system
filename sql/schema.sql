@@ -1,4 +1,13 @@
 -- DDL Schema definition for Smart Automated Car Wash System
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoCarWash')
+BEGIN
+    CREATE DATABASE AutoCarWash;
+END;
+GO
+
+USE AutoCarWash;
+GO
+
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
 BEGIN
     CREATE TABLE users (
