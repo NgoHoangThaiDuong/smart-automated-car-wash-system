@@ -56,63 +56,6 @@ BEGIN
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='services' AND xtype='U')
-BEGIN
-    CREATE TABLE services (
-        id INT IDENTITY(1,1) PRIMARY KEY,
-        name NVARCHAR(100) NOT NULL,
-        price DECIMAL(10,2) NOT NULL,
-        description NVARCHAR(255)
-    );
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='promotions' AND xtype='U')
-BEGIN
-    CREATE TABLE promotions (
-        id INT IDENTITY(1,1) PRIMARY KEY,
-        code VARCHAR(50) UNIQUE NOT NULL,
-        discount_percent INT NOT NULL,
-        min_tier_id INT FOREIGN KEY REFERENCES tiers(id),
-        is_active BIT DEFAULT 1
-    );
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='orders' AND xtype='U')
-BEGIN
-    CREATE TABLE orders (
-        id INT IDENTITY(1,1) PRIMARY KEY,
-        user_id INT FOREIGN KEY REFERENCES users(id),
-        service_id INT FOREIGN KEY REFERENCES services(id),
-        promotion_id INT FOREIGN KEY REFERENCES promotions(id),
-        car_plate VARCHAR(20) NOT NULL,
-        book_date DATETIME NOT NULL,
-        status NVARCHAR(20) DEFAULT 'PENDING',
-        points_used INT DEFAULT 0,
-        final_price DECIMAL(18,2)
-    );
-END;
-GO
-
-IF COL_LENGTH('orders', 'promotion_id') IS NULL
-BEGIN
-    ALTER TABLE orders ADD promotion_id INT FOREIGN KEY REFERENCES promotions(id);
-END;
-GO
-
-IF COL_LENGTH('orders', 'points_used') IS NULL
-BEGIN
-    ALTER TABLE orders ADD points_used INT DEFAULT 0;
-END;
-GO
-
-IF COL_LENGTH('orders', 'final_price') IS NULL
-BEGIN
-    ALTER TABLE orders ADD final_price DECIMAL(18,2);
-END;
-GO
-
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='vehicles' AND xtype='U')
 BEGIN
     CREATE TABLE vehicles (
@@ -135,17 +78,5 @@ BEGIN
         created_at DATETIME DEFAULT GETDATE(),
         expires_at DATETIME
     );
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Orders_UserId' AND object_id = OBJECT_ID('orders'))
-BEGIN
-    CREATE NONCLUSTERED INDEX IX_Orders_UserId ON orders(user_id);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Orders_Status_Date' AND object_id = OBJECT_ID('orders'))
-BEGIN
-    CREATE NONCLUSTERED INDEX IX_Orders_Status_Date ON orders(status, book_date);
 END;
 GO

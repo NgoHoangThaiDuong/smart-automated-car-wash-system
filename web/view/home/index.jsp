@@ -11,11 +11,8 @@
         <p class="hero-subtitle">Welcome to the Smart Automated Car Wash Management & Booking System. Experience premium automotive care today.</p>
         
         <div class="hero-actions">
-            <a href="${pageContext.request.contextPath}/order/book" class="btn-hero btn-hero-primary">
-                🚗 Book a Wash
-            </a>
-            <a href="${pageContext.request.contextPath}/order/list" class="btn-hero btn-hero-secondary">
-                📋 Order History
+            <a href="${pageContext.request.contextPath}/profile/view" class="btn-hero btn-hero-primary">
+                👤 My Profile
             </a>
         </div>
     </div>

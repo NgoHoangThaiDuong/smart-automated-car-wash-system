@@ -17,11 +17,7 @@
         <div class="nav-links">
             <a href="${pageContext.request.contextPath}/" class="nav-item">Home</a>
             <c:if test="${sessionScope.currentUser != null}">
-                <a href="${pageContext.request.contextPath}/order/list" class="nav-item">My Orders</a>
                 <a href="${pageContext.request.contextPath}/profile/view" class="nav-item profile-link">👤 ${sessionScope.currentUser.fullname != null && !sessionScope.currentUser.fullname.isEmpty() ? sessionScope.currentUser.fullname : sessionScope.currentUser.username}</a>
-                <c:if test="${sessionScope.currentUser.role == 'ADMIN'}">
-                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-item admin-badge">Admin Panel</a>
-                </c:if>
                 <a href="${pageContext.request.contextPath}/auth/logout" class="btn btn-outline-danger">Logout</a>
             </c:if>
             <c:if test="${sessionScope.currentUser == null}">
