@@ -1,5 +1,7 @@
 package controller;
 
+import model.Tier;
+import model.User;
 import repository.TierRepository;
 import repository.UserRepository;
 import javax.servlet.ServletException;
@@ -45,9 +47,9 @@ public class ProfileServlet extends HttpServlet {
                 session.removeAttribute("flashError");
             }
 
-            List<model.Tier> allTiers = tierRepo.findAll();
-            model.Tier nextTier = null;
-            for (model.Tier t : allTiers) {
+            List<Tier> allTiers = tierRepo.findAll();
+            Tier nextTier = null;
+            for (Tier t : allTiers) {
                 if (t.getMinSpend() > freshestUser.getLifetimeSpent()) {
                     nextTier = t;
                     break;
