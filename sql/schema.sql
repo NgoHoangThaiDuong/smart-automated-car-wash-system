@@ -42,3 +42,13 @@ BEGIN
         status NVARCHAR(20) DEFAULT 'PENDING'
     );
 END;
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Orders_UserId' AND object_id = OBJECT_ID('orders'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Orders_UserId ON orders(user_id);
+END;
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Orders_Status_Date' AND object_id = OBJECT_ID('orders'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Orders_Status_Date ON orders(status, book_date);
+END;
