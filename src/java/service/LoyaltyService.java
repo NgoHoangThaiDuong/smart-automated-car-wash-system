@@ -2,7 +2,6 @@ package service;
 
 import model.Tier;
 import model.User;
-import mylib.EnvConfig;
 import repository.LoyaltyHistoryRepository;
 import repository.TierRepository;
 import repository.UserRepository;
@@ -15,11 +14,10 @@ public class LoyaltyService {
     private final TierRepository tierRepo = new TierRepository();
     private final LoyaltyHistoryRepository historyRepo = new LoyaltyHistoryRepository();
 
+    private static final double POINT_RATE = 1000.0;
+
     public int calculatePoints(double amountSpent) {
-        String rateStr = EnvConfig.get("POINT_RATE");
-        double rate = (rateStr != null && !rateStr.trim().isEmpty()) ? Double.parseDouble(rateStr.trim()) : 1000.0;
-        if (rate <= 0) rate = 1000.0;
-        return (int) Math.floor(amountSpent / rate);
+        return (int) Math.floor(amountSpent / POINT_RATE);
     }
 
     public synchronized void processOrderCompletion(int userId, double amountSpent) {
