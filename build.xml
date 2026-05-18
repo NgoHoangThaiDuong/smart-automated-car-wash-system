@@ -70,5 +70,31 @@
     -->
     <target name="-post-compile">
         <copy file=".env" todir="${build.classes.dir}"/>
+        <property file=".env" prefix="db"/>
+        <sql driver="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+             url="${db.DB_MASTER_URL}"
+             userid="${db.DB_USER}"
+             password="${db.DB_PASSWORD}"
+             classpath="lib/sqljdbc4.jar"
+             onerror="continue"
+             autocommit="true">
+            IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '${db.DB_NAME}')
+            BEGIN
+                CREATE DATABASE ${db.DB_NAME};
+            END;
+        </sql>
+        <sql driver="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+             url="${db.DB_URL}"
+             userid="${db.DB_USER}"
+             password="${db.DB_PASSWORD}"
+             classpath="lib/sqljdbc4.jar"
+             onerror="continue"
+             encoding="UTF-8"
+             autocommit="true">
+            <fileset dir="sql">
+                <include name="schema.sql"/>
+                <include name="seed.sql"/>
+            </fileset>
+        </sql>
     </target>
 </project>
