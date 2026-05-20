@@ -33,44 +33,60 @@ BEGIN
 END;
 GO
 
--- 2. SEED USERS (Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
-IF NOT EXISTS (SELECT * FROM users WHERE username='admin')
+-- 2. SEED USERS (Each tier has 1 user. Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
+IF NOT EXISTS (SELECT * FROM users WHERE username='member_user')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', 'System Administrator', '0901234567', 'ADMIN', (SELECT id FROM tiers WHERE name='Platinum'), 5000, 15000000);
+    VALUES ('member_user', 'e10adc3949ba59abbe56e057f20f883e', N'Nguyễn Văn Thành Viên', '0911111111', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='staff1')
+IF NOT EXISTS (SELECT * FROM users WHERE username='silver_user')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('staff1', 'e10adc3949ba59abbe56e057f20f883e', 'John Washer', '0912345678', 'STAFF', (SELECT id FROM tiers WHERE name='Member'), 100, 200000);
+    VALUES ('silver_user', 'e10adc3949ba59abbe56e057f20f883e', N'Trần Bạc', '0922222222', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 500, 1200000);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='staff2')
+IF NOT EXISTS (SELECT * FROM users WHERE username='gold_user')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('staff2', 'e10adc3949ba59abbe56e057f20f883e', 'Sarah Receptionist', '0987654321', 'STAFF', (SELECT id FROM tiers WHERE name='Member'), 50, 100000);
+    VALUES ('gold_user', 'e10adc3949ba59abbe56e057f20f883e', N'Lê Hoàng Vàng', '0933333333', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 1500, 4500000);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='customer1')
+IF NOT EXISTS (SELECT * FROM users WHERE username='platinum_user')
 BEGIN
     INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('customer1', 'e10adc3949ba59abbe56e057f20f883e', 'David VIP', '0999999999', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 2500, 5000000);
+    VALUES ('platinum_user', 'e10adc3949ba59abbe56e057f20f883e', N'Phạm Bạch Kim', '0944444444', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 4500, 12000000);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='customer2')
+-- 3. SEED VEHICLES FOR EACH USER
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-11111')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('customer2', 'e10adc3949ba59abbe56e057f20f883e', 'Michael Customer', '0888888888', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 800, 1500000);
+    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
+    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11111', N'Sedan', N'Đỏ');
 END;
 GO
 
--- Update any existing users without a tier to Member
-UPDATE users SET tier_id = (SELECT id FROM tiers WHERE name='Member') WHERE tier_id IS NULL;
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-22222')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
+    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22222', N'SUV', N'Trắng');
+END;
 GO
 
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33333')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33333', N'Crossover', N'Đen');
+END;
+GO
 
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44444')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44444', N'Bán tải', N'Xám');
+END;
+GO
