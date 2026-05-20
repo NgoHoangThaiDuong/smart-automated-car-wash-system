@@ -14,8 +14,7 @@ public class User {
     private double lifetimeSpent;
     private Date createdAt;
 
-    // Joined entity
-    private Tier tier;
+    private LoyaltyTier loyaltyTier;
 
     public User() {
     }
@@ -113,27 +112,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public Tier getTier() {
-        return tier;
+    public LoyaltyTier getLoyaltyTier() {
+        return loyaltyTier;
     }
 
-    public void setTier(Tier tier) {
-        this.tier = tier;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", fullname='" + fullname + '\'' +
-                ", phone='" + phone + '\'' +
-                ", role='" + role + '\'' +
-                ", tierId=" + tierId +
-                ", pointsBalance=" + pointsBalance +
-                ", lifetimeSpent=" + lifetimeSpent +
-                ", createdAt=" + createdAt +
-                ", tier=" + tier +
-                '}';
+    public void setLoyaltyTier(LoyaltyTier loyaltyTier) {
+        this.loyaltyTier = loyaltyTier;
     }
 }
