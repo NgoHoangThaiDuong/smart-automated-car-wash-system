@@ -38,22 +38,14 @@ BEGIN
 END;
 GO
 
-IF COL_LENGTH('users', 'tier_id') IS NULL
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='vehicles' AND xtype='U')
 BEGIN
-    ALTER TABLE users ADD tier_id INT FOREIGN KEY REFERENCES tiers(id);
+    CREATE TABLE vehicles (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        user_id INT FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE,
+        license_plate VARCHAR(20) UNIQUE NOT NULL,
+        vehicle_type NVARCHAR(50),
+        color NVARCHAR(30)
+    );
 END;
 GO
-
-IF COL_LENGTH('users', 'points_balance') IS NULL
-BEGIN
-    ALTER TABLE users ADD points_balance INT DEFAULT 0;
-END;
-GO
-
-IF COL_LENGTH('users', 'lifetime_spent') IS NULL
-BEGIN
-    ALTER TABLE users ADD lifetime_spent DECIMAL(18,2) DEFAULT 0;
-END;
-GO
-
-
