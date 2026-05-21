@@ -1,29 +1,29 @@
-package repository;
+package dao;
 
-import model.Tier;
 import model.User;
+import model.LoyaltyTier;
+import mylib.DBUtils;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
-public class UserRepository extends BaseRepository<User> {
-
-    public void create(String username, String hashedPassword, String role) {
-        create(username, hashedPassword, null, null, role);
-    }
+public class UserRepository {
 
     public void create(String username, String hashedPassword, String fullname, String phone, String role) {
         String sql = "INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) " +
-                     "VALUES (?, ?, ?, ?, ?, (SELECT TOP 1 id FROM tiers WHERE name='Member'), 0, 0)";
-        int rows = executeUpdate(sql, ps -> {
+                     "VALUES (?, ?, ?, ?, ?, (SELECT id FROM tiers WHERE name='Member'), 0, 0.00)";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, fullname);
             ps.setString(4, phone);
             ps.setString(5, role != null ? role : "CUSTOMER");
-        });
-        if (rows <= 0) {
-            throw new RuntimeException("Lỗi truy xuất CSDL khi tạo user: Insert failed");
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error during user registration: " + e.getMessage(), e);
         }
     }
 
@@ -33,7 +33,18 @@ public class UserRepository extends BaseRepository<User> {
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
                      "WHERE u.username = ?";
-        return querySingle(sql, ps -> ps.setString(1, username), this::mapRow);
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding user by username: " + e.getMessage(), e);
+        }
+        return null;
     }
 
     public User findById(int id) {
@@ -42,38 +53,34 @@ public class UserRepository extends BaseRepository<User> {
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
                      "WHERE u.id = ?";
-        return querySingle(sql, ps -> ps.setInt(1, id), this::mapRow);
-    }
-
-    public List<User> findAll() {
-        String sql = "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.lifetime_spent, u.created_at, " +
-                     "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
-                     "FROM users u " +
-                     "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "ORDER BY u.id DESC";
-        return query(sql, null, this::mapRow);
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding user by ID: " + e.getMessage(), e);
+        }
+        return null;
     }
 
     public void updateProfile(int id, String fullname, String phone) {
         String sql = "UPDATE users SET fullname = ?, phone = ? WHERE id = ?";
-        executeUpdate(sql, ps -> {
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullname);
             ps.setString(2, phone);
             ps.setInt(3, id);
-        });
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating user profile: " + e.getMessage(), e);
+        }
     }
 
-    public void updateLoyalty(int id, int tierId, int pointsBalance, double lifetimeSpent) {
-        String sql = "UPDATE users SET tier_id = ?, points_balance = ?, lifetime_spent = ? WHERE id = ?";
-        executeUpdate(sql, ps -> {
-            ps.setInt(1, tierId);
-            ps.setInt(2, pointsBalance);
-            ps.setDouble(3, lifetimeSpent);
-            ps.setInt(4, id);
-        });
-    }
-
-    private User mapRow(ResultSet rs) throws SQLException {
+    private User mapUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
         u.setUsername(rs.getString("username"));
@@ -86,15 +93,15 @@ public class UserRepository extends BaseRepository<User> {
         u.setLifetimeSpent(rs.getDouble("lifetime_spent"));
         u.setCreatedAt(rs.getTimestamp("created_at"));
 
-        if (rs.getObject("tier_name") != null) {
-            Tier t = new Tier();
-            t.setId(rs.getInt("tier_id"));
-            t.setName(rs.getString("tier_name"));
-            t.setPointMultiplier(rs.getDouble("point_multiplier"));
-            t.setBookingWindowDays(rs.getInt("booking_window_days"));
-            t.setMinWashes(rs.getInt("min_washes"));
-            t.setMinSpend(rs.getDouble("min_spend"));
-            u.setTier(t);
+        if (rs.getObject("tier_id") != null) {
+            LoyaltyTier lt = new LoyaltyTier();
+            lt.setId(rs.getInt("tier_id"));
+            lt.setName(rs.getString("tier_name"));
+            lt.setPointMultiplier(rs.getDouble("point_multiplier"));
+            lt.setBookingWindowDays(rs.getInt("booking_window_days"));
+            lt.setMinWashes(rs.getInt("min_washes"));
+            lt.setMinSpend(rs.getDouble("min_spend"));
+            u.setLoyaltyTier(lt);
         }
         return u;
     }
