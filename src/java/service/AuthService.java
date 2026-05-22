@@ -2,7 +2,7 @@ package service;
 
 import exception.AuthException;
 import model.User;
-import repository.UserRepository;
+import dao.UserRepository;
 import java.security.MessageDigest;
 
 public class AuthService {
