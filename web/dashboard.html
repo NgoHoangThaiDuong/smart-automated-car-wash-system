@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ & Quản lý xe - Smart Car Wash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">🚗 Smart CarWash</a>
+            <div class="nav-user">
+                <span class="user-greeting">Xin chào, <span id="nav-fullname">Khách hàng</span>!</span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <div id="tier-card" class="tier-card tier-Member">
+            <div class="tier-info">
+                <span class="tier-label">Hạng thành viên</span>
+                <span id="tier-name" class="tier-name">Member</span>
+            </div>
+            <div class="tier-badge-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 4l3 5 7-6 7 6 3-5v14H2V4zm2 12h16v-2H4v2zm0-4h16V9.8L17.7 7l-5.7 4.9L6.3 7 4 9.8V12z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                Điểm tích lũy
+            </div>
+            <div class="points-display">
+                <div id="points-val" class="points-value">0</div>
+                <div class="points-unit">điểm</div>
+            </div>
+        </div>
+
+        <div id="progression-card" class="card">
+            <div class="card-title">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm-8 4h16M5 11h14a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2z"/>
+                </svg>
+                Phần thưởng tiếp theo
+            </div>
+            <div class="reward-info">
+                <span id="progression-title">Nâng hạng lên ...</span>
+                <span id="progression-badge" class="reward-badge">... điểm nữa</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-track">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="progress-labels">
+                    <span id="label-current">0 điểm</span>
+                    <span id="label-target">0 điểm</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.92 11.01C18.72 10.42 18.16 10 17.5 10H6.5c-.66 0-1.21.42-1.42 1.01L3 17v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 12h10.3l1.04 3H5.81l1.04-3zM6 21c-.83 0-1.5-.67-1.5-1.5S5.17 18 6 18s1.5.67 1.5 1.5S6.83 21 6 21zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                    </svg>
+                    Danh sách xe
+                </div>
+                <button class="btn-add-vehicle" onclick="showAddForm()">+ Thêm xe</button>
+            </div>
+
+            <div id="vehicle-alert" class="alert"></div>
+
+            <div id="addForm" class="sliding-form">
+                <button class="form-close" onclick="closeForms()">&times;</button>
+                <h4 style="font-weight: 700;">Thêm xe mới</h4>
+                <form id="addVehicleForm">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Biển số xe *</label>
+                            <input type="text" id="add-plate" placeholder="29A-12345" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Hãng xe</label>
+                            <input type="text" id="add-brand" placeholder="Toyota">
+                        </div>
+                        <div class="form-field">
+                            <label>Dòng xe</label>
+                            <input type="text" id="add-model" placeholder="Camry">
+                        </div>
+                        <div class="form-field">
+                            <label>Màu xe</label>
+                            <input type="text" id="add-color" placeholder="Trắng">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-form btn-form-cancel" onclick="closeForms()">Hủy</button>
+                        <button type="submit" id="addSubmitBtn" class="btn-form btn-form-submit">
+                            <span class="spinner" id="addSpinner"></span>
+                            <span id="addBtnText">✓ Thêm</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="editForm" class="sliding-form edit-mode">
+                <button class="form-close" onclick="closeForms()">&times;</button>
+                <h4 style="font-weight: 700; color: #b45309;">Cập nhật xe</h4>
+                <form id="editVehicleForm">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Biển số xe *</label>
+                            <input type="text" id="edit-plate" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Hãng xe</label>
+                            <input type="text" id="edit-brand">
+                        </div>
+                        <div class="form-field">
+                            <label>Dòng xe</label>
+                            <input type="text" id="edit-model">
+                        </div>
+                        <div class="form-field">
+                            <label>Màu xe</label>
+                            <input type="text" id="edit-color">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-form btn-form-cancel" onclick="closeForms()">Hủy</button>
+                        <button type="submit" id="editSubmitBtn" class="btn-form btn-form-submit" style="background: #d97706;">
+                            <span class="spinner" id="editSpinner"></span>
+                            <span id="editBtnText">Cập nhật</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="vehicles-container" class="vehicle-list"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Thông tin cá nhân
+            </div>
+
+            <div id="profile-alert" class="alert"></div>
+
+            <form id="profileForm">
+                <div class="account-grid">
+                    <div class="form-field">
+                        <label>Tên tài khoản (Không thể thay đổi)</label>
+                        <input type="text" id="acc-username" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                    </div>
+                    <div class="form-field">
+                        <label>Vai trò</label>
+                        <input type="text" id="acc-role" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                    </div>
+                    <div class="form-field">
+                        <label>Họ và Tên hiển thị</label>
+                        <input type="text" id="acc-fullname" required>
+                    </div>
+                    <div class="form-field">
+                        <label>Số điện thoại</label>
+                        <input type="tel" id="acc-phone" pattern="0[0-9]{9}" maxlength="10" required>
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top: 1rem;">
+                    <button type="submit" id="profileSubmitBtn" class="btn-form btn-form-submit" style="padding: 0.6rem 1.2rem;">
+                        <span class="spinner" id="profileSpinner"></span>
+                        <span id="profileBtnText">Lưu Thay Đổi</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        const alertBox = document.getElementById('alert');
+
+        const tierCard = document.getElementById('tier-card');
+        tierCard.addEventListener('click', function() {
+            const style = tierCard.style;
+            style.transform = 'translateY(-2px) scale(0.98)';
+            setTimeout(() => {
+                style.transform = '';
+            }, 150);
+        });
+
+        function loadDashboard() {
+            fetch('api/profile')
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return;
+                
+                if (data.success) {
+                    const user = data.user;
+                    document.getElementById('nav-fullname').textContent = user.fullname || user.username;
+                    document.getElementById('acc-username').value = user.username;
+                    document.getElementById('acc-role').value = user.role;
+                    document.getElementById('acc-fullname').value = user.fullname || '';
+                    document.getElementById('acc-phone').value = user.phone || '';
+
+                    const tierName = user.loyaltyTier ? user.loyaltyTier.name : 'Member';
+                    const tierCard = document.getElementById('tier-card');
+                    tierCard.className = `tier-card tier-${tierName}`;
+                    document.getElementById('tier-name').textContent = tierName;
+
+                    document.getElementById('points-val').textContent = user.pointsBalance.toLocaleString('vi-VN');
+
+                    const progressionCard = document.getElementById('progression-card');
+                    if (data.nextTier) {
+                        progressionCard.style.display = 'flex';
+                        document.getElementById('progression-title').textContent = `Nâng hạng lên ${data.nextTier.name}`;
+                        
+                        const remPoints = data.remainingSpend;
+                        document.getElementById('progression-badge').textContent = `${remPoints.toLocaleString('vi-VN')} điểm nữa`;
+                        document.getElementById('progress-fill').style.width = `${data.progressPercent}%`;
+                        document.getElementById('label-current').textContent = `${user.lifetimeSpent.toLocaleString('vi-VN')} điểm`;
+                        document.getElementById('label-target').textContent = `${data.nextTier.minSpend.toLocaleString('vi-VN')} điểm`;
+                    } else {
+                        progressionCard.style.display = 'none';
+                    }
+
+                    loadVehicles();
+                } else {
+                    showAlert('profile-alert', 'alert-danger', data.message);
+                }
+            })
+            .catch(() => {
+                showAlert('profile-alert', 'alert-danger', 'Lỗi khi tải thông tin hồ sơ!');
+            });
+        }
+
+        function loadVehicles() {
+            fetch('api/vehicles/list')
+            .then(res => res.json())
+            .then(list => {
+                const container = document.getElementById('vehicles-container');
+                container.innerHTML = '';
+                
+                if (list.length === 0) {
+                    container.innerHTML = `<p style="color: var(--text-light); text-align: center; padding: 1.5rem 0; font-style: italic;">Bạn chưa đăng ký phương tiện nào.</p>`;
+                    return;
+                }
+
+                list.forEach(v => {
+                    let brand = '';
+                    let model = '';
+                    const parts = v.vehicleType.split(' ');
+                    if (parts.length > 0) brand = parts[0];
+                    if (parts.length > 1) model = parts.slice(1).join(' ');
+
+                    const item = document.createElement('div');
+                    item.className = 'vehicle-item';
+                    item.innerHTML = `
+                        <div class="vehicle-meta">
+                            <div class="vehicle-avatar">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.92 11.01C18.72 10.42 18.16 10 17.5 10H6.5c-.66 0-1.21.42-1.42 1.01L3 17v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 12h10.3l1.04 3H5.81l1.04-3zM6 21c-.83 0-1.5-.67-1.5-1.5S5.17 18 6 18s1.5.67 1.5 1.5S6.83 21 6 21zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                                </svg>
+                            </div>
+                            <div class="vehicle-text">
+                                <span class="vehicle-plate">${v.licensePlate}</span>
+                                <span class="vehicle-type">${v.vehicleType} • ${v.color}</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-actions">
+                            <button class="btn-icon btn-edit" title="Sửa thông tin xe" onclick="showEditForm(${v.id}, '${v.licensePlate}', '${brand}', '${model}', '${v.color}')">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon btn-delete" title="Xóa xe" onclick="deleteVehicle(${v.id}, '${v.licensePlate}')">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            })
+            .catch(() => {});
+        }
+
+        function showAddForm() {
+            closeForms();
+            document.getElementById('addForm').style.display = 'block';
+            document.getElementById('add-plate').focus();
+        }
+
+        function showEditForm(id, plate, brand, model, color) {
+            closeForms();
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-plate').value = plate;
+            document.getElementById('edit-brand').value = brand;
+            document.getElementById('edit-model').value = model;
+            document.getElementById('edit-color').value = color;
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('edit-plate').focus();
+        }
+
+        function closeForms() {
+            document.getElementById('addForm').style.display = 'none';
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('addVehicleForm').reset();
+            document.getElementById('editVehicleForm').reset();
+        }
+
+        const addSubmitBtn = document.getElementById('addSubmitBtn');
+        const addSpinner = document.getElementById('addSpinner');
+        const addBtnText = document.getElementById('addBtnText');
+
+        document.getElementById('addVehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const plate = document.getElementById('add-plate').value;
+            const brand = document.getElementById('add-brand').value;
+            const model = document.getElementById('add-model').value;
+            const color = document.getElementById('add-color').value;
+
+            addSpinner.style.display = 'inline-block';
+            addBtnText.textContent = 'Đang thêm...';
+            addSubmitBtn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('licensePlate', plate);
+            params.append('brand', brand);
+            params.append('model', model);
+            params.append('color', color);
+
+            fetch('api/vehicles/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(res => res.json())
+            .then(data => {
+                addSpinner.style.display = 'none';
+                addBtnText.textContent = '✓ Thêm';
+                addSubmitBtn.disabled = false;
+
+                if (data.success) {
+                    showAlert('vehicle-alert', 'alert-success', data.message);
+                    closeForms();
+                    loadVehicles();
+                    loadDashboard();
+                } else {
+                    showAlert('vehicle-alert', 'alert-danger', data.message);
+                }
+            })
+            .catch(() => {
+                addSpinner.style.display = 'none';
+                addBtnText.textContent = '✓ Thêm';
+                addSubmitBtn.disabled = false;
+                showAlert('vehicle-alert', 'alert-danger', 'Lỗi kết nối máy chủ!');
+            });
+        });
+
+        const editSubmitBtn = document.getElementById('editSubmitBtn');
+        const editSpinner = document.getElementById('editSpinner');
+        const editBtnText = document.getElementById('editBtnText');
+
+        document.getElementById('editVehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const plate = document.getElementById('edit-plate').value;
+            const brand = document.getElementById('edit-brand').value;
+            const model = document.getElementById('edit-model').value;
+            const color = document.getElementById('edit-color').value;
+
+            editSpinner.style.display = 'inline-block';
+            editBtnText.textContent = 'Đang cập nhật...';
+            editSubmitBtn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('vehicleId', id);
+            params.append('licensePlate', plate);
+            params.append('brand', brand);
+            params.append('model', model);
+            params.append('color', color);
+
+            fetch('api/vehicles/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(res => res.json())
+            .then(data => {
+                editSpinner.style.display = 'none';
+                editBtnText.textContent = 'Cập nhật';
+                editSubmitBtn.disabled = false;
+
+                if (data.success) {
+                    showAlert('vehicle-alert', 'alert-success', data.message);
+                    closeForms();
+                    loadVehicles();
+                } else {
+                    showAlert('vehicle-alert', 'alert-danger', data.message);
+                }
+            })
+            .catch(() => {
+                editSpinner.style.display = 'none';
+                editBtnText.textContent = 'Cập nhật';
+                editSubmitBtn.disabled = false;
+                showAlert('vehicle-alert', 'alert-danger', 'Lỗi kết nối máy chủ!');
+            });
+        });
+
+        function deleteVehicle(id, plate) {
+            if (!confirm(`Bạn chắc chắn muốn xóa xe biển số ${plate}?`)) {
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('vehicleId', id);
+
+            fetch('api/vehicles/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('vehicle-alert', 'alert-success', data.message);
+                    loadVehicles();
+                } else {
+                    showAlert('vehicle-alert', 'alert-danger', data.message);
+                }
+            })
+            .catch(() => {
+                showAlert('vehicle-alert', 'alert-danger', 'Lỗi kết nối máy chủ!');
+            });
+        }
+
+        const profileSubmitBtn = document.getElementById('profileSubmitBtn');
+        const profileSpinner = document.getElementById('profileSpinner');
+        const profileBtnText = document.getElementById('profileBtnText');
+
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fullname = document.getElementById('acc-fullname').value;
+            const phone = document.getElementById('acc-phone').value;
+
+            profileSpinner.style.display = 'inline-block';
+            profileBtnText.textContent = 'Đang lưu...';
+            profileSubmitBtn.disabled = true;
+
+            const params = new URLSearchParams();
+            params.append('fullname', fullname);
+            params.append('phone', phone);
+
+            fetch('api/profile/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(res => res.json())
+            .then(data => {
+                profileSpinner.style.display = 'none';
+                profileBtnText.textContent = 'Lưu Thay Đổi';
+                profileSubmitBtn.disabled = false;
+
+                if (data.success) {
+                    showAlert('profile-alert', 'alert-success', data.message);
+                    loadDashboard();
+                } else {
+                    showAlert('profile-alert', 'alert-danger', data.message);
+                }
+            })
+            .catch(() => {
+                profileSpinner.style.display = 'none';
+                profileBtnText.textContent = 'Lưu Thay Đổi';
+                profileSubmitBtn.disabled = false;
+                showAlert('profile-alert', 'alert-danger', 'Lỗi kết nối máy chủ!');
+            });
+        });
+
+        function showAlert(alertId, type, message) {
+            const box = document.getElementById(alertId);
+            if (!box) return;
+            box.style.display = 'none';
+            box.className = `alert ${type}`;
+            box.textContent = message;
+            box.style.display = 'block';
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 4000);
+        }
+
+        function logout() {
+            fetch('api/auth/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
