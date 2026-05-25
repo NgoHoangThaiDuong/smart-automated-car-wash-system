@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserRepository {
+public class UserDAO {
 
     public void create(String username, String hashedPassword, String fullname, String phone, String role) {
         String sql = "INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) " +

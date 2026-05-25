@@ -1,6 +1,6 @@
 package controller;
 
-import dao.VehicleRepository;
+import dao.VehicleDAO;
 import model.User;
 import model.Vehicle;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @WebServlet("/api/vehicles/*")
 public class VehicleServlet extends HttpServlet {
 
-    private final VehicleRepository vehicleRepo = new VehicleRepository();
+    private final VehicleDAO vehicleRepo = new VehicleDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

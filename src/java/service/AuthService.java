@@ -2,11 +2,11 @@ package service;
 
 import exception.AuthException;
 import model.User;
-import dao.UserRepository;
+import dao.UserDAO;
 import java.security.MessageDigest;
 
 public class AuthService {
-    private final UserRepository userRepo = new UserRepository();
+    private final UserDAO userRepo = new UserDAO();
 
     public User login(String username, String password) {
         if (username == null || username.trim().isEmpty()) {

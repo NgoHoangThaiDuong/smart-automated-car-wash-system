@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleRepository {
+public class VehicleDAO {
 
     public void create(int userId, String licensePlate, String vehicleType, String color) {
         String sql = "INSERT INTO vehicles (user_id, license_plate, vehicle_type, color) VALUES (?, ?, ?, ?)";

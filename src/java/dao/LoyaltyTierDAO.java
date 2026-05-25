@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoyaltyTierRepository {
+public class LoyaltyTierDAO {
 
     public List<LoyaltyTier> findAll() {
         List<LoyaltyTier> list = new ArrayList<>();

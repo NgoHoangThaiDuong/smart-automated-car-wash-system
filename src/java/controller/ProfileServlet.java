@@ -1,7 +1,7 @@
 package controller;
 
-import dao.UserRepository;
-import dao.LoyaltyTierRepository;
+import dao.UserDAO;
+import dao.LoyaltyTierDAO;
 import model.User;
 import model.LoyaltyTier;
 
@@ -18,8 +18,8 @@ import java.util.List;
 @WebServlet("/api/profile/*")
 public class ProfileServlet extends HttpServlet {
 
-    private final UserRepository userRepo = new UserRepository();
-    private final LoyaltyTierRepository tierRepo = new LoyaltyTierRepository();
+    private final UserDAO userRepo = new UserDAO();
+    private final LoyaltyTierDAO tierRepo = new LoyaltyTierDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
