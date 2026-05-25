@@ -1,3 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -5,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Smart Car Wash</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 </head>
 <body>
 
@@ -19,7 +21,7 @@
         <h1>Smart Car Wash</h1>
         <p class="subtitle">Hệ thống rửa xe thông minh</p>
 
-        <form id="loginForm">
+        <form method="POST" action="${pageContext.request.contextPath}/auth/login">
             <div class="form-group">
                 <label class="form-label" for="username">Tài khoản</label>
                 <div class="input-wrapper">
@@ -28,7 +30,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </span>
-                    <input type="text" id="username" class="form-control" placeholder="Nhập tài khoản" required autocomplete="username">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="<c:out value="${username}"/>" required autocomplete="username">
                 </div>
             </div>
 
@@ -40,8 +42,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
                     </span>
-                    <input type="password" id="password" class="form-control" placeholder="Nhập mật khẩu" required autocomplete="current-password">
-                    <button type="button" id="togglePasswordBtn" class="toggle-password" title="Ẩn/Hiện mật khẩu">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                    <button type="button" id="togglePasswordBtn" class="toggle-password" title="Show/Hide password">
                         <svg id="eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -50,28 +52,31 @@
                 </div>
             </div>
 
-            <div id="alert" class="alert"></div>
+            <div id="alert" class="alert">
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" style="display:block;">
+                        <c:out value="${error}"/>
+                    </div>
+                </c:if>
+                <c:if test="${param.reg eq 'success'}">
+                    <div class="alert alert-success" style="display:block;">
+                        Đăng ký thành công! Vui lòng đăng nhập.
+                    </div>
+                </c:if>
+            </div>
 
             <button type="submit" id="submitBtn" class="btn-submit">
-                <span class="spinner" id="btnSpinner"></span>
+                <span class="spinner" id="btnSpinner" style="display:none;"></span>
                 <span id="btnText">Đăng nhập</span>
             </button>
         </form>
 
         <p class="footer-text">
-            Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+            Chưa có tài khoản? <a href="${pageContext.request.contextPath}/auth/register">Đăng ký ngay</a>
         </p>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const alertBox = document.getElementById('alert');
-        if (urlParams.has('reg') && urlParams.get('reg') === 'success') {
-            alertBox.className = "alert alert-success";
-            alertBox.textContent = "Đăng ký thành công! Vui lòng đăng nhập.";
-            alertBox.style.display = "block";
-        }
-
         const passwordInput = document.getElementById('password');
         const toggleBtn = document.getElementById('togglePasswordBtn');
         const eyeIcon = document.getElementById('eye-icon');
@@ -84,67 +89,21 @@
                 eyeIcon.innerHTML = `
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                 `;
-                toggleBtn.setAttribute('title', 'Ẩn mật khẩu');
+                toggleBtn.setAttribute('title', 'Hide password');
             } else {
                 eyeIcon.innerHTML = `
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 `;
-                toggleBtn.setAttribute('title', 'Hiện mật khẩu');
+                toggleBtn.setAttribute('title', 'Show password');
             }
         });
 
-        const loginForm = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnSpinner = document.getElementById('btnSpinner');
-        const btnText = document.getElementById('btnText');
-
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const usernameVal = document.getElementById('username').value;
-            const passwordVal = document.getElementById('password').value;
-            
-            alertBox.style.display = "none";
-            
-            btnSpinner.style.display = "inline-block";
-            btnText.textContent = "Đang xử lý...";
-            submitBtn.disabled = true;
-
-            const params = new URLSearchParams();
-            params.append('username', usernameVal);
-            params.append('password', passwordVal);
-
-            fetch('api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: params
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    btnSpinner.style.display = "none";
-                    btnText.textContent = "Đăng nhập";
-                    submitBtn.disabled = false;
-                    
-                    alertBox.className = "alert alert-danger";
-                    alertBox.textContent = data.message;
-                    alertBox.style.display = "block";
-                }
-            })
-            .catch(() => {
-                btnSpinner.style.display = "none";
-                btnText.textContent = "Đăng nhập";
-                submitBtn.disabled = false;
-                
-                alertBox.className = "alert alert-danger";
-                alertBox.textContent = "Không thể kết nối đến máy chủ!";
-                alertBox.style.display = "block";
-            });
+        // Show spinner on form submit
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('btnSpinner').style.display = 'inline-block';
+            document.getElementById('btnText').textContent = 'Đang đăng nhập...';
+            document.getElementById('submitBtn').disabled = true;
         });
     </script>
 </body>
