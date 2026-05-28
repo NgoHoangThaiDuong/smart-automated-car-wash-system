@@ -58,7 +58,7 @@
                         <c:out value="${error}"/>
                     </div>
                 </c:if>
-                <c:if test="${param.reg eq 'success'}">
+                <c:if test="${param.success eq 'register'}">
                     <div class="alert alert-success" style="display:block;">
                         Đăng ký thành công! Vui lòng đăng nhập.
                     </div>

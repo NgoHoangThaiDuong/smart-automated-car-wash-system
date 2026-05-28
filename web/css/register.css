@@ -253,3 +253,12 @@ h1 {
     color: var(--primary-hover);
     text-decoration: underline;
 }
+
+.alert-success{
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}

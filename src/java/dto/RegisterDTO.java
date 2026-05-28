@@ -1,6 +1,10 @@
 package dto;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RegisterDTO {
+
     private String username;
     private String password;
     private String confirmPassword;
@@ -15,30 +19,58 @@ public class RegisterDTO {
         this.phone = phone;
     }
 
-    /**
-     * Validate registration form data.
-     * @return null if valid, error message string if invalid
-     */
-    public String validate() {
+    public Map<String, String> validate() {
+
+        Map<String, String> errors = new HashMap<>();
+
+        // username
         if (username == null || username.trim().isEmpty()) {
-            return "Username is required";
+
+            errors.put("usernameError",
+                    "Username is required");
+
+        } else if (username.trim().length() < 3
+                || username.trim().length() > 50) {
+
+            errors.put("usernameError",
+                    "Username must be 3-50 characters");
         }
-        if (username.trim().length() < 3 || username.trim().length() > 50) {
-            return "Username must be between 3 and 50 characters";
-        }
+        // password
         if (password == null || password.trim().isEmpty()) {
-            return "Password is required";
+
+            errors.put("passwordError",
+                    "Password is required");
+
+        } else if (password.length() < 6) {
+
+            errors.put("passwordError",
+                    "Password must be at least 6 characters");
         }
-        if (password.length() < 6) {
-            return "Password must be at least 6 characters";
+        // confirm pass
+        if (confirmPassword == null
+                || !confirmPassword.equals(password)) {
+
+            errors.put("confirmPasswordError",
+                    "Passwords do not match");
         }
-        if (confirmPassword == null || !confirmPassword.equals(password)) {
-            return "Passwords do not match";
+        // fullname
+        if (fullname == null || fullname.trim().isEmpty()) {
+
+            errors.put("fullnameError",
+                    "Fullname is required");
         }
-        if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
-            return "Invalid phone number (must start with 0 and contain exactly 10 digits)";
+
+        // phone
+        if (phone != null
+                && !phone.trim().isEmpty()
+                && !phone.trim().matches("^0\\d{9}$")) {
+
+            errors.put("phoneError",
+                    "Phone must contain exactly 10 digits");
         }
-        return null;
+
+        return errors;
+
     }
 
     public String getUsername() {
