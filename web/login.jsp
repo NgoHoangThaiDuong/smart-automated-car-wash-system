@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <div id="alert" class="alert">
+            <div id="alert">
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger" style="display:block;">
                         <c:out value="${error}"/>
