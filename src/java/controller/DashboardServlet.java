@@ -39,7 +39,6 @@ public class DashboardServlet extends HttpServlet {
             freshestUser = sessionUser;
         }
 
-        // Fetch loyalty tiers & calculate next tier progress
         List<LoyaltyTier> allTiers = tierRepo.findAll();
         LoyaltyTier nextTier = null;
         for (LoyaltyTier t : allTiers) {
@@ -57,7 +56,6 @@ public class DashboardServlet extends HttpServlet {
             req.setAttribute("progressPercent", progressPercent);
         }
 
-        // Handle session flash attributes
         String profileError = (String) session.getAttribute("profileError");
         if (profileError != null) {
             req.setAttribute("profileError", profileError);
@@ -70,11 +68,9 @@ public class DashboardServlet extends HttpServlet {
             session.removeAttribute("vehicleError");
         }
 
-        // Fetch user vehicles
         List<Vehicle> vehicles = vehicleRepo.findByUserId(freshestUser.getId());
         req.setAttribute("vehicles", vehicles);
 
-        // Forward to the gorgeous dashboard JSP view
         req.getRequestDispatcher("/dashboard.jsp").forward(req, res);
     }
 }

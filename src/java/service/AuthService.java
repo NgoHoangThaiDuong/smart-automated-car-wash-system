@@ -1,6 +1,5 @@
 package service;
 
-import exception.AuthException;
 import model.User;
 import dao.UserDAO;
 import java.security.MessageDigest;
@@ -10,20 +9,20 @@ public class AuthService {
 
     public User login(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
-            throw new AuthException("Username is required");
+            throw new IllegalArgumentException("Username is required");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new AuthException("Password is required");
+            throw new IllegalArgumentException("Password is required");
         }
 
         User user = userRepo.findByUsername(username.trim());
         if (user == null) {
-            throw new AuthException("Invalid username or password");
+            throw new IllegalArgumentException("Invalid username or password");
         }
 
         String hashed = hashMD5(password);
         if (!hashed.equals(user.getPassword())) {
-            throw new AuthException("Invalid username or password");
+            throw new IllegalArgumentException("Invalid username or password");
         }
 
         return user;
@@ -31,14 +30,14 @@ public class AuthService {
 
     public void register(String username, String password, String fullname, String phone) {
         if (username == null || username.trim().isEmpty()) {
-            throw new AuthException("Username is required");
+            throw new IllegalArgumentException("Username is required");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new AuthException("Password is required");
+            throw new IllegalArgumentException("Password is required");
         }
 
         if (userRepo.findByUsername(username.trim()) != null) {
-            throw new AuthException("Username already exists");
+            throw new IllegalArgumentException("Username already exists");
         }
 
         String hashedPassword = hashMD5(password);

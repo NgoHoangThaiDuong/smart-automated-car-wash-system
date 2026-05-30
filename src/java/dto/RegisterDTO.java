@@ -15,10 +15,6 @@ public class RegisterDTO {
         this.phone = phone;
     }
 
-    /**
-     * Validate registration form data.
-     * @return null if valid, error message string if invalid
-     */
     public String validate() {
         if (username == null || username.trim().isEmpty()) {
             return "Username is required";

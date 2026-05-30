@@ -2,7 +2,6 @@ package controller;
 
 import dto.LoginDTO;
 import dto.RegisterDTO;
-import exception.AuthException;
 import model.User;
 import service.AuthService;
 
@@ -37,7 +36,7 @@ public class AuthServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         String pathInfo = req.getPathInfo();
-        
+
         if ("/login".equals(pathInfo)) {
             handleLogin(req, res);
         } else if ("/register".equals(pathInfo)) {
@@ -53,7 +52,7 @@ public class AuthServlet extends HttpServlet {
 
         LoginDTO dto = new LoginDTO(usernameVal, passwordVal);
         String err = dto.validate();
-        
+
         if (err != null) {
             req.setAttribute("error", err);
             req.setAttribute("username", usernameVal);
@@ -66,10 +65,8 @@ public class AuthServlet extends HttpServlet {
             HttpSession session = req.getSession(true);
             session.setAttribute("currentUser", user);
             session.setMaxInactiveInterval(30 * 60);
-            
-            // Redirect after successful POST (PRG Pattern)
             res.sendRedirect(req.getContextPath() + "/dashboard");
-        } catch (AuthException e) {
+        } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", usernameVal);
             req.getRequestDispatcher("/login.jsp").forward(req, res);
@@ -89,7 +86,7 @@ public class AuthServlet extends HttpServlet {
 
         RegisterDTO dto = new RegisterDTO(usernameVal, passwordVal, confirmPasswordVal, fullnameVal, phoneVal);
         String err = dto.validate();
-        
+
         if (err != null) {
             req.setAttribute("error", err);
             req.setAttribute("username", usernameVal);
@@ -101,10 +98,8 @@ public class AuthServlet extends HttpServlet {
 
         try {
             authService.register(dto.getUsername(), dto.getPassword(), dto.getFullname(), dto.getPhone());
-            
-            // Redirect to login page after successful registration (PRG Pattern)
             res.sendRedirect(req.getContextPath() + "/auth/login?reg=success");
-        } catch (AuthException e) {
+        } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", usernameVal);
             req.setAttribute("fullname", fullnameVal);
