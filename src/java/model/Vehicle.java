@@ -4,17 +4,19 @@ public class Vehicle {
     private int id;
     private int userId;
     private String licensePlate;
-    private String vehicleType;
+    private String brand;
+    private String model;
     private String color;
 
     public Vehicle() {
     }
 
-    public Vehicle(int id, int userId, String licensePlate, String vehicleType, String color) {
+    public Vehicle(int id, int userId, String licensePlate, String brand, String model, String color) {
         this.id = id;
         this.userId = userId;
         this.licensePlate = licensePlate;
-        this.vehicleType = vehicleType;
+        this.brand = brand;
+        this.model = model;
         this.color = color;
     }
 
@@ -42,12 +44,20 @@ public class Vehicle {
         this.licensePlate = licensePlate;
     }
 
-    public String getVehicleType() {
-        return vehicleType;
+    public String getBrand() {
+        return brand;
     }
 
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType;
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     public String getColor() {

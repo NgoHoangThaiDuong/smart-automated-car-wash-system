@@ -44,7 +44,8 @@ BEGIN
         id INT IDENTITY(1,1) PRIMARY KEY,
         user_id INT FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE,
         license_plate VARCHAR(20) UNIQUE NOT NULL,
-        vehicle_type NVARCHAR(50),
+        brand NVARCHAR(50),
+        model NVARCHAR(50),
         color NVARCHAR(30)
     );
 END;
