@@ -4,20 +4,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ *
+ * @author user
+ */
 public class DBUtils {
+    // Do not change this code
+    private static final String DB_NAME = "AutoCarWash";
+    private static final String DB_USER_NAME = "SA";
+    private static final String DB_PASSWORD = "12345";
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
-        String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-        String url = EnvConfig.get("DB_URL");
-        String user = EnvConfig.get("DB_USER");
-        String pass = EnvConfig.get("DB_PASSWORD");
-
-        if (user == null || pass == null) {
-            throw new RuntimeException("CRITICAL: Không tìm thấy DB_USER hoặc DB_PASSWORD trong file .env!");
-        }
-
-        Class.forName(driver);
-
-        return DriverManager.getConnection(url, user, pass);
+        Connection conn = null;
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=" + DB_NAME;
+        conn = DriverManager.getConnection(url, DB_USER_NAME, DB_PASSWORD);
+        return conn;
     }
 }

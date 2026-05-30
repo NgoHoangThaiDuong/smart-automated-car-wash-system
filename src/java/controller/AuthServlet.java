@@ -2,7 +2,6 @@ package controller;
 
 import dto.LoginDTO;
 import dto.RegisterDTO;
-import exception.AuthException;
 import model.User;
 import service.AuthService;
 
@@ -69,7 +68,7 @@ public class AuthServlet extends HttpServlet {
             
             // Redirect after successful POST (PRG Pattern)
             res.sendRedirect(req.getContextPath() + "/dashboard");
-        } catch (AuthException e) {
+        } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", usernameVal);
             req.getRequestDispatcher("/login.jsp").forward(req, res);
@@ -104,7 +103,7 @@ public class AuthServlet extends HttpServlet {
             
             // Redirect to login page after successful registration (PRG Pattern)
             res.sendRedirect(req.getContextPath() + "/auth/login?reg=success");
-        } catch (AuthException e) {
+        } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", usernameVal);
             req.setAttribute("fullname", fullnameVal);

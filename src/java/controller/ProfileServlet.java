@@ -18,7 +18,6 @@ public class ProfileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        // Redirection to dashboard since profile view is integrated in /dashboard
         res.sendRedirect(req.getContextPath() + "/dashboard");
     }
 
@@ -56,7 +55,6 @@ public class ProfileServlet extends HttpServlet {
             User updatedUser = userRepo.findById(currentUser.getId());
             session.setAttribute("currentUser", updatedUser);
             
-            // Redirect after POST with success flag (PRG Pattern)
             res.sendRedirect(req.getContextPath() + "/dashboard?msg=profile_success");
         } catch (Exception e) {
             session.setAttribute("profileError", "Lỗi hệ thống khi cập nhật hồ sơ cá nhân.");
