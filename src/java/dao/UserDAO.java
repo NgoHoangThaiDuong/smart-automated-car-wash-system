@@ -38,7 +38,7 @@ public class UserDAO {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapUser(rs);
+                    return setUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class UserDAO {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapUser(rs);
+                    return setUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class UserDAO {
         }
     }
 
-    private User mapUser(ResultSet rs) throws SQLException {
+    private User setUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
         u.setUsername(rs.getString("username"));
