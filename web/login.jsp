@@ -98,8 +98,7 @@
                 toggleBtn.setAttribute('title', 'Show password');
             }
         });
-
-        // Show spinner on form submit
+        
         document.querySelector('form').addEventListener('submit', function() {
             document.getElementById('btnSpinner').style.display = 'inline-block';
             document.getElementById('btnText').textContent = 'Đang đăng nhập...';

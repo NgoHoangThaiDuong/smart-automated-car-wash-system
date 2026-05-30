@@ -101,7 +101,6 @@
                     </div>
                 </c:if>
             </div>
-
             <button type="submit" id="submitBtn" class="btn-submit">
                 <span class="spinner" id="btnSpinner" style="display:none;"></span>
                 <span id="btnText">Đăng ký</span>
@@ -153,8 +152,6 @@
                 toggleConfirmBtn.setAttribute('title', 'Show password');
             }
         });
-
-        // Client side validation for password match & show spinner on submit
         document.querySelector('form').addEventListener('submit', function(e) {
             const passwordVal = passwordInput.value;
             const confirmPasswordVal = confirmPasswordInput.value;

@@ -65,28 +65,25 @@ GO
 -- 3. SEED VEHICLES FOR EACH USER
 IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-11111')
 BEGIN
-    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11111', N'Sedan', N'Đỏ');
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color)
+    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11111', N'Toyota', N'Vios', N'Đỏ');
 END;
 GO
-
 IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-22222')
 BEGIN
-    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22222', N'SUV', N'Trắng');
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color)
+    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22222', N'Honda', N'CR-V', N'Trắng');
 END;
 GO
-
 IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33333')
 BEGIN
-    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33333', N'Crossover', N'Đen');
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33333', N'Mazda', N'CX-5', N'Đen');
 END;
 GO
-
 IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44444')
 BEGIN
-    INSERT INTO vehicles (user_id, license_plate, vehicle_type, color)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44444', N'Bán tải', N'Xám');
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44444', N'Ford', N'Ranger', N'Xám');
 END;
 GO

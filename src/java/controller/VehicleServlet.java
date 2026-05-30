@@ -52,24 +52,63 @@ public class VehicleServlet extends HttpServlet {
         String model = req.getParameter("model");
         String color = req.getParameter("color");
 
-        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+        licensePlate = licensePlate == null ? "" : licensePlate.trim().toUpperCase();
+        brand = brand == null ? "" : brand.trim();
+        model = model == null ? "" : model.trim();
+        color = color == null ? "" : color.trim();
+
+        if (!brand.isEmpty()) {
+            brand = brand.substring(0, 1).toUpperCase() + brand.substring(1).toLowerCase();
+        }
+
+        if (!model.isEmpty()) {
+            model = model.substring(0, 1).toUpperCase() + model.substring(1).toLowerCase();
+        }
+
+        if (!color.isEmpty()) {
+            color = color.substring(0, 1).toUpperCase() + color.substring(1).toLowerCase();
+        }
+
+        if (licensePlate.isEmpty()) {
             session.setAttribute("vehicleError", "Biển số xe không được để trống!");
             res.sendRedirect(req.getContextPath() + "/dashboard");
             return;
         }
 
-        String brandStr = brand != null ? brand.trim() : "";
-        String modelStr = model != null ? model.trim() : "";
-        String vehicleType = (brandStr + " " + modelStr).trim();
-        if (vehicleType.isEmpty()) {
-            vehicleType = "Khác";
+        if (!licensePlate.matches("^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$")) {
+            session.setAttribute("vehicleError", "Biển số xe không hợp lệ. Ví dụ: 29A-12345");
+            res.sendRedirect(req.getContextPath() + "/dashboard");
+            return;
+        }
+//        if (brand.isEmpty()) {
+//            session.setAttribute("vehicleError", "Hãng xe không được để trống!");
+//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            return;
+//        }
+//
+//        if (model.isEmpty()) {
+//            session.setAttribute("vehicleError", "Dòng xe không được để trống!");
+//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            return;
+//        }
+//
+//        if (color.isEmpty()) {
+//            session.setAttribute("vehicleError", "Màu xe không được để trống!");
+//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            return;
+//        }
+
+        if (vehicleRepo.existsByPlate(licensePlate)) {
+            session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
+            res.sendRedirect(req.getContextPath() + "/dashboard");
+            return;
         }
 
         try {
-            vehicleRepo.create(currentUser.getId(), licensePlate.trim(), vehicleType, color != null ? color.trim() : "");
+            vehicleRepo.create(currentUser.getId(), licensePlate, brand, model, color);
             res.sendRedirect(req.getContextPath() + "/dashboard?msg=vehicle_add_success");
         } catch (Exception e) {
-            session.setAttribute("vehicleError", "Biển số xe đã được đăng ký hoặc xảy ra lỗi hệ thống!");
+            session.setAttribute("vehicleError", "Lỗi khi thêm xe!");
             res.sendRedirect(req.getContextPath() + "/dashboard");
         }
     }
@@ -79,28 +118,59 @@ public class VehicleServlet extends HttpServlet {
 
         try {
             int id = Integer.parseInt(req.getParameter("vehicleId"));
+
             String licensePlate = req.getParameter("licensePlate");
             String brand = req.getParameter("brand");
             String model = req.getParameter("model");
             String color = req.getParameter("color");
 
-            Vehicle v = vehicleRepo.findById(id);
-            if (v != null && v.getUserId() == currentUser.getId()) {
-                String brandStr = brand != null ? brand.trim() : "";
-                String modelStr = model != null ? model.trim() : "";
-                String vehicleType = (brandStr + " " + modelStr).trim();
-                if (vehicleType.isEmpty()) {
-                    vehicleType = "Khác";
-                }
+            licensePlate = licensePlate == null ? "" : licensePlate.trim().toUpperCase();
+            brand = brand == null ? "" : brand.trim();
+            model = model == null ? "" : model.trim();
+            color = color == null ? "" : color.trim();
 
-                vehicleRepo.update(id, licensePlate.trim(), vehicleType, color != null ? color.trim() : "");
+            if (!brand.isEmpty()) {
+                brand = brand.substring(0, 1).toUpperCase() + brand.substring(1).toLowerCase();
+            }
+
+            if (!model.isEmpty()) {
+                model = model.substring(0, 1).toUpperCase() + model.substring(1).toLowerCase();
+            }
+
+            if (!color.isEmpty()) {
+                color = color.substring(0, 1).toUpperCase() + color.substring(1).toLowerCase();
+            }
+
+            if (licensePlate.isEmpty()) {
+                session.setAttribute("vehicleError", "Biển số xe không được để trống!");
+                res.sendRedirect(req.getContextPath() + "/dashboard");
+                return;
+            }
+
+            if (!licensePlate.matches("^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$")) {
+                session.setAttribute("vehicleError", "Biển số xe không hợp lệ. Ví dụ: 29A-12345");
+                res.sendRedirect(req.getContextPath() + "/dashboard");
+                return;
+            }
+
+            if (vehicleRepo.existsByPlateExceptId(licensePlate, id)) {
+                session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
+                res.sendRedirect(req.getContextPath() + "/dashboard");
+                return;
+            }
+
+            Vehicle v = vehicleRepo.findById(id);
+
+            if (v != null && v.getUserId() == currentUser.getId()) {
+                vehicleRepo.update(id, licensePlate, brand, model, color);
                 res.sendRedirect(req.getContextPath() + "/dashboard?msg=vehicle_update_success");
             } else {
-                session.setAttribute("vehicleError", "Không có quyền sửa đổi phương tiện này!");
+                session.setAttribute("vehicleError", "Không có quyền sửa xe này!");
                 res.sendRedirect(req.getContextPath() + "/dashboard");
             }
+
         } catch (Exception e) {
-            session.setAttribute("vehicleError", "Lỗi khi cập nhật xe: " + e.getMessage());
+            session.setAttribute("vehicleError", "Lỗi khi cập nhật xe!");
             res.sendRedirect(req.getContextPath() + "/dashboard");
         }
     }
