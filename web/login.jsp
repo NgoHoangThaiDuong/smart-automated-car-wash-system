@@ -30,7 +30,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </span>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="<c:out value="${username}"/>" required autocomplete="username">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="${username}" required autocomplete="username">
                 </div>
             </div>
 
@@ -56,11 +56,6 @@
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger" style="display:block;">
                         <c:out value="${error}"/>
-                    </div>
-                </c:if>
-                <c:if test="${param.reg eq 'success'}">
-                    <div class="alert alert-success" style="display:block;">
-                        Đăng ký thành công! Vui lòng đăng nhập.
                     </div>
                 </c:if>
             </div>

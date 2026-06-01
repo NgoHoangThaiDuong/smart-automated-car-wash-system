@@ -245,19 +245,19 @@
                     <div class="account-grid">
                         <div class="form-field">
                             <label>Tên tài khoản (Không thể thay đổi)</label>
-                            <input type="text" id="acc-username" value="<c:out value="${currentUser.username}"/>" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                            <input type="text" id="acc-username" value="${currentUser.username}" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
                         </div>
                         <div class="form-field">
                             <label>Vai trò</label>
-                            <input type="text" id="acc-role" value="<c:out value="${currentUser.role}"/>" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                            <input type="text" id="acc-role" value="${currentUser.role}" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
                         </div>
                         <div class="form-field">
                             <label>Họ và Tên hiển thị</label>
-                            <input type="text" id="acc-fullname" name="fullname" value="<c:out value="${currentUser.fullname}"/>" required>
+                            <input type="text" id="acc-fullname" name="fullname" value="${currentUser.fullname}" required>
                         </div>
                         <div class="form-field">
                             <label>Số điện thoại</label>
-                            <input type="tel" id="acc-phone" name="phone" value="<c:out value="${currentUser.phone}"/>" pattern="0[0-9]{9}" maxlength="10" required>
+                            <input type="tel" id="acc-phone" name="phone" value="${currentUser.phone}" pattern="0[0-9]{9}" maxlength="10" required>
                         </div>
                     </div>
                     <div class="form-actions" style="margin-top: 1rem;">
@@ -287,7 +287,7 @@
                 document.getElementById('add-plate').focus();
             }
 
-            function showEditForm(id, plate, type, color) {
+            function showEditForm(id, plate, brand, model, color) {
                 closeForms();
                 document.getElementById('edit-id').value = id;
                 document.getElementById('edit-plate').value = plate;

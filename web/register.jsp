@@ -30,7 +30,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </span>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="<c:out value="${username}"/>" required autocomplete="username">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="${username}" required autocomplete="username">
                 </div>
             </div>
 
@@ -78,7 +78,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                     </span>
-                    <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Nhập họ và tên hiển thị" value="<c:out value="${fullname}"/>" required>
+                    <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Nhập họ và tên hiển thị" value="${fullname}" required>
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
                     </span>
-                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="0901234567" pattern="0[0-9]{9}" maxlength="10" value="<c:out value="${phone}"/>" required>
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="0901234567" pattern="0[0-9]{9}" maxlength="10" value="${phone}" required>
                 </div>
             </div>
 
