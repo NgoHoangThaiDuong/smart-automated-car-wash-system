@@ -8,16 +8,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Hồ sơ & Quản lý xe - Smart Car Wash</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
+        <link rel="stylesheet" href="<c:url value='/css/dashboard.css'/>">
     </head>
     <body>
 
         <nav class="navbar">
             <div class="nav-container">
-                <a href="#" class="nav-logo">🚗 Smart CarWash</a>
+                <a href="#" class="nav-logo">Smart CarWash</a>
                 <div class="nav-user">
                     <span class="user-greeting">Xin chào, <span id="nav-fullname"><c:out value="${not empty currentUser.fullname ? currentUser.fullname : currentUser.username}"/></span>!</span>
-                    <a href="${pageContext.request.contextPath}/auth/logout" class="btn-logout" style="text-decoration: none; display: inline-block;">Đăng xuất</a>
+                    <a href="<c:url value='/auth/logout'/>" class="btn-logout" style="text-decoration: none; display: inline-block;">Đăng xuất</a>
                 </div>
             </div>
         </nav>
@@ -111,7 +111,7 @@
                 <div id="addForm" class="sliding-form">
                     <button class="form-close" onclick="closeForms()">&times;</button>
                     <h4 style="font-weight: 700;">Thêm xe mới</h4>
-                    <form id="addVehicleForm" method="POST" action="${pageContext.request.contextPath}/vehicles/add">
+                    <form id="addVehicleForm" method="POST" action="<c:url value='/vehicles/add'/>">
                         <div class="form-grid">
                             <div class="form-field">
                                 <label>Biển số xe *</label>
@@ -143,7 +143,7 @@
                 <div id="editForm" class="sliding-form edit-mode">
                     <button class="form-close" onclick="closeForms()">&times;</button>
                     <h4 style="font-weight: 700; color: #b45309;">Cập nhật xe</h4>
-                    <form id="editVehicleForm" method="POST" action="${pageContext.request.contextPath}/vehicles/update">
+                    <form id="editVehicleForm" method="POST" action="<c:url value='/vehicles/update'/>">
                         <input type="hidden" id="edit-id" name="vehicleId">
                         <div class="form-grid">
                             <div class="form-field">
@@ -207,7 +207,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
                                         </button>
-                                        <form method="POST" action="${pageContext.request.contextPath}/vehicles/delete" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa xe biển số ${v.licensePlate}?');">
+                                        <form method="POST" action="<c:url value='/vehicles/delete'/>" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa xe biển số ${v.licensePlate}?');">
                                             <input type="hidden" name="vehicleId" value="${v.id}">
                                             <button type="submit" class="btn-icon btn-delete" title="Delete vehicle">
                                                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -241,23 +241,23 @@
                     </c:if>
                 </div>
 
-                <form id="profileForm" method="POST" action="${pageContext.request.contextPath}/profile/update">
+                <form id="profileForm" method="POST" action="<c:url value='/profile/update'/>">
                     <div class="account-grid">
                         <div class="form-field">
                             <label>Tên tài khoản (Không thể thay đổi)</label>
-                            <input type="text" id="acc-username" value="<c:out value="${currentUser.username}"/>" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                            <input type="text" id="acc-username" value="${currentUser.username}" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
                         </div>
                         <div class="form-field">
                             <label>Vai trò</label>
-                            <input type="text" id="acc-role" value="<c:out value="${currentUser.role}"/>" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
+                            <input type="text" id="acc-role" value="${currentUser.role}" disabled style="background-color: #F3F4F6; color: var(--text-light); cursor: not-allowed;">
                         </div>
                         <div class="form-field">
                             <label>Họ và Tên hiển thị</label>
-                            <input type="text" id="acc-fullname" name="fullname" value="<c:out value="${currentUser.fullname}"/>" required>
+                            <input type="text" id="acc-fullname" name="fullname" value="${currentUser.fullname}" required>
                         </div>
                         <div class="form-field">
                             <label>Số điện thoại</label>
-                            <input type="tel" id="acc-phone" name="phone" value="<c:out value="${currentUser.phone}"/>" pattern="0[0-9]{9}" maxlength="10" required>
+                            <input type="tel" id="acc-phone" name="phone" value="${currentUser.phone}" pattern="0[0-9]{9}" maxlength="10" required>
                         </div>
                     </div>
                     <div class="form-actions" style="margin-top: 1rem;">
@@ -287,7 +287,7 @@
                 document.getElementById('add-plate').focus();
             }
 
-            function showEditForm(id, plate, type, color) {
+            function showEditForm(id, plate, brand, model, color) {
                 closeForms();
                 document.getElementById('edit-id').value = id;
                 document.getElementById('edit-plate').value = plate;

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Smart Car Wash</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+    <link rel="stylesheet" href="<c:url value='/css/login.css'/>">
 </head>
 <body>
 
@@ -21,7 +21,7 @@
         <h1>Smart Car Wash</h1>
         <p class="subtitle">Hệ thống rửa xe thông minh</p>
 
-        <form method="POST" action="${pageContext.request.contextPath}/auth/login">
+        <form method="POST" action="<c:url value='/auth/login'/>">
             <div class="form-group">
                 <label class="form-label" for="username">Tài khoản</label>
                 <div class="input-wrapper">
@@ -30,7 +30,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </span>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="<c:out value="${username}"/>" required autocomplete="username">
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" value="${username}" required autocomplete="username">
                 </div>
             </div>
 
@@ -58,11 +58,6 @@
                         <c:out value="${error}"/>
                     </div>
                 </c:if>
-                <c:if test="${param.reg eq 'success'}">
-                    <div class="alert alert-success" style="display:block;">
-                        Đăng ký thành công! Vui lòng đăng nhập.
-                    </div>
-                </c:if>
             </div>
 
             <button type="submit" id="submitBtn" class="btn-submit">
@@ -72,7 +67,7 @@
         </form>
 
         <p class="footer-text">
-            Chưa có tài khoản? <a href="${pageContext.request.contextPath}/auth/register">Đăng ký ngay</a>
+            Chưa có tài khoản? <a href="<c:url value='/auth/register'/>">Đăng ký ngay</a>
         </p>
     </div>
 
