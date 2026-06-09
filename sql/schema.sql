@@ -50,3 +50,52 @@ BEGIN
     );
 END;
 GO
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='wash_services' AND xtype='U')
+BEGIN
+    CREATE TABLE wash_services (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        name NVARCHAR(100) NOT NULL,
+        description NVARCHAR(500),
+        price DECIMAL(18,2) NOT NULL,
+        duration_minutes INT NOT NULL DEFAULT 30,
+        is_active BIT DEFAULT 1
+    );
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='bookings' AND xtype='U')
+BEGIN
+    CREATE TABLE bookings (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        user_id INT FOREIGN KEY REFERENCES users(id),
+        vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
+        service_id INT FOREIGN KEY REFERENCES wash_services(id),
+        booking_date DATE NOT NULL,
+        time_slot VARCHAR(20) NOT NULL,
+        booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
+        payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
+        payment_method VARCHAR(20),
+        total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+		points_earned INT DEFAULT 0,
+        notes NVARCHAR(500),
+        created_at DATETIME DEFAULT GETDATE(),
+        completed_at DATETIME NULL
+    );
+END;
+GO
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='wash_history' AND xtype='U')
+BEGIN
+    CREATE TABLE wash_history (
+       id INT IDENTITY(1,1) PRIMARY KEY,
+       booking_id INT FOREIGN KEY REFERENCES bookings(id),
+       user_id INT FOREIGN KEY REFERENCES users(id),
+       vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
+	   service_id INT FOREIGN KEY REFERENCES wash_services(id),
+	   wash_date DATETIME NOT NULL,
+       amount_paid DECIMAL(18,2) NOT NULL,
+       points_earned INT DEFAULT 0,
+       feedback NVARCHAR(500),
+       created_at DATETIME DEFAULT GETDATE()
+    );
+END;
+GO
