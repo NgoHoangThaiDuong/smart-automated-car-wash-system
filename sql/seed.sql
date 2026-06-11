@@ -97,35 +97,35 @@ END;
 GO
 
 -- 5. SEED WASH SERVICES
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name='Rửa xe cơ bản')
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cơ bản')
 BEGIN
     INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
     VALUES (N'Rửa xe cơ bản', N'Rửa thân xe bên ngoài bằng nước và xà phòng', 50000, 20, 1);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name='Rửa xe + Hút bụi nội thất')
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất')
 BEGIN
     INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
     VALUES (N'Rửa xe + Hút bụi nội thất', N'Rửa thân xe và hút bụi toàn bộ khoang nội thất', 100000, 35, 1);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name='Rửa xe cao cấp (Wax + Đánh bóng)')
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)')
 BEGIN
     INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
     VALUES (N'Rửa xe cao cấp (Wax + Đánh bóng)', N'Rửa xe, đánh bóng và phủ wax bảo vệ sơn xe', 250000, 60, 1);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name='Vệ sinh khoang máy')
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Vệ sinh khoang máy')
 BEGIN
     INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
     VALUES (N'Vệ sinh khoang máy', N'Vệ sinh và làm sạch khoang động cơ', 150000, 30, 1);
 END;
 GO
 
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name='Gói chăm sóc toàn diện')
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Gói chăm sóc toàn diện')
 BEGIN
     INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
     VALUES (N'Gói chăm sóc toàn diện', N'Rửa xe, hút bụi nội thất, vệ sinh khoang máy, đánh bóng và phủ wax', 400000, 90, 1);
@@ -183,7 +183,7 @@ GO
 
 IF NOT EXISTS (SELECT * FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20')
 BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, payment_status, payment_method, total_amount, points_earned, notes, completed_at)
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, payment_status, payment_method, total_amount, points_earned, notes)
     VALUES (
         (SELECT id FROM users WHERE username='member_user'),
         (SELECT id FROM vehicles WHERE license_plate='30A-11111'),
