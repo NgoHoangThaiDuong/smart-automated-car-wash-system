@@ -26,12 +26,8 @@ public class ProfileServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
 
         HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("currentUser") == null) {
-            res.sendRedirect(req.getContextPath() + "/auth/login");
-            return;
-        }
-
         String pathInfo = req.getPathInfo();
+
         if ("/update".equals(pathInfo)) {
             handleUpdate(req, res, session);
         } else {

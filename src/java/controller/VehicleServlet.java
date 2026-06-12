@@ -27,12 +27,8 @@ public class VehicleServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
 
         HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("currentUser") == null) {
-            res.sendRedirect(req.getContextPath() + "/auth/login");
-            return;
-        }
-
         String pathInfo = req.getPathInfo();
+
         if ("/add".equals(pathInfo)) {
             handleAdd(req, res, session);
         } else if ("/update".equals(pathInfo)) {

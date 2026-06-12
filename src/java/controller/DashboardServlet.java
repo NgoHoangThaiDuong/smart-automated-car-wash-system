@@ -26,12 +26,9 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("currentUser") == null) {
-            res.sendRedirect(req.getContextPath() + "/auth/login");
-            return;
-        }
-
         User sessionUser = (User) session.getAttribute("currentUser");
+
+
         User freshestUser = userRepo.findById(sessionUser.getId());
         if (freshestUser != null) {
             session.setAttribute("currentUser", freshestUser);
