@@ -19,7 +19,7 @@ public class VehicleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        res.sendRedirect(req.getContextPath() + "/dashboard");
+        res.sendRedirect(req.getContextPath() + "/profile");
     }
 
     @Override
@@ -36,7 +36,7 @@ public class VehicleServlet extends HttpServlet {
         } else if ("/delete".equals(pathInfo)) {
             handleDelete(req, res, session);
         } else {
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
         }
     }
 
@@ -67,45 +67,45 @@ public class VehicleServlet extends HttpServlet {
 
         if (licensePlate.isEmpty()) {
             session.setAttribute("vehicleError", "Biển số xe không được để trống!");
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
 
         if (!licensePlate.matches("^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$")) {
             session.setAttribute("vehicleError", "Biển số xe không hợp lệ. Ví dụ: 29A-12345");
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
 //        if (brand.isEmpty()) {
 //            session.setAttribute("vehicleError", "Hãng xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            res.sendRedirect(req.getContextPath() + "/profile");
 //            return;
 //        }
 //
 //        if (model.isEmpty()) {
 //            session.setAttribute("vehicleError", "Dòng xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            res.sendRedirect(req.getContextPath() + "/profile");
 //            return;
 //        }
 //
 //        if (color.isEmpty()) {
 //            session.setAttribute("vehicleError", "Màu xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/dashboard");
+//            res.sendRedirect(req.getContextPath() + "/profile");
 //            return;
 //        }
 
         if (vehicleRepo.existsByPlate(licensePlate)) {
             session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
 
         try {
             vehicleRepo.create(currentUser.getId(), licensePlate, brand, model, color);
-            res.sendRedirect(req.getContextPath() + "/dashboard?msg=vehicle_add_success");
+            res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_add_success");
         } catch (Exception e) {
             session.setAttribute("vehicleError", "Lỗi khi thêm xe!");
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
         }
     }
 
@@ -139,19 +139,19 @@ public class VehicleServlet extends HttpServlet {
 
             if (licensePlate.isEmpty()) {
                 session.setAttribute("vehicleError", "Biển số xe không được để trống!");
-                res.sendRedirect(req.getContextPath() + "/dashboard");
+                res.sendRedirect(req.getContextPath() + "/profile");
                 return;
             }
 
             if (!licensePlate.matches("^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$")) {
                 session.setAttribute("vehicleError", "Biển số xe không hợp lệ. Ví dụ: 29A-12345");
-                res.sendRedirect(req.getContextPath() + "/dashboard");
+                res.sendRedirect(req.getContextPath() + "/profile");
                 return;
             }
 
             if (vehicleRepo.existsByPlateExceptId(licensePlate, id)) {
                 session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
-                res.sendRedirect(req.getContextPath() + "/dashboard");
+                res.sendRedirect(req.getContextPath() + "/profile");
                 return;
             }
 
@@ -159,15 +159,15 @@ public class VehicleServlet extends HttpServlet {
 
             if (v != null && v.getUserId() == currentUser.getId()) {
                 vehicleRepo.update(id, licensePlate, brand, model, color);
-                res.sendRedirect(req.getContextPath() + "/dashboard?msg=vehicle_update_success");
+                res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_update_success");
             } else {
                 session.setAttribute("vehicleError", "Không có quyền sửa xe này!");
-                res.sendRedirect(req.getContextPath() + "/dashboard");
+                res.sendRedirect(req.getContextPath() + "/profile");
             }
 
         } catch (Exception e) {
             session.setAttribute("vehicleError", "Lỗi khi cập nhật xe!");
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
         }
     }
 
@@ -179,14 +179,14 @@ public class VehicleServlet extends HttpServlet {
             Vehicle v = vehicleRepo.findById(id);
             if (v != null && v.getUserId() == currentUser.getId()) {
                 vehicleRepo.delete(id);
-                res.sendRedirect(req.getContextPath() + "/dashboard?msg=vehicle_delete_success");
+                res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_delete_success");
             } else {
                 session.setAttribute("vehicleError", "Không có quyền xóa phương tiện này hoặc không tìm thấy!");
-                res.sendRedirect(req.getContextPath() + "/dashboard");
+                res.sendRedirect(req.getContextPath() + "/profile");
             }
         } catch (Exception e) {
             session.setAttribute("vehicleError", "Lỗi khi xóa phương tiện: " + e.getMessage());
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+            res.sendRedirect(req.getContextPath() + "/profile");
         }
     }
 }
