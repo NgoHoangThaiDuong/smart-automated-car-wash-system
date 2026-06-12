@@ -64,8 +64,11 @@ public class AuthServlet extends HttpServlet {
             User user = authService.login(dto.getUsername(), dto.getPassword());
             HttpSession session = req.getSession(true);
             session.setAttribute("currentUser", user);
-            session.setMaxInactiveInterval(30 * 60);
-            res.sendRedirect(req.getContextPath() + "/dashboard");
+
+            String redirectUrl = "ADMIN".equals(user.getRole())
+                    ? "/admin/dashboard"
+                    : "/dashboard";
+            res.sendRedirect(req.getContextPath() + redirectUrl);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("username", usernameVal);
