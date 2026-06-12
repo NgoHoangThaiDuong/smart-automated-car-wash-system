@@ -27,21 +27,6 @@ public class BookingDAO {
         "JOIN vehicles v ON b.vehicle_id = v.id " +
         "JOIN wash_services ws ON b.service_id = ws.id ";
 
-    public List<Booking> findAll() {
-        List<Booking> list = new ArrayList<>();
-        String sql = BASE_SELECT + "ORDER BY b.created_at DESC";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error listing all bookings: " + e.getMessage(), e);
-        }
-        return list;
-    }
-
     public List<Booking> findByFilter(String search, String status, String date) {
         List<Booking> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(BASE_SELECT + "WHERE 1=1 ");
