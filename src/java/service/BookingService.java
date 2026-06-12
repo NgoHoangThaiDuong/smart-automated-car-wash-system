@@ -10,7 +10,7 @@ public class BookingService {
     private final BookingDAO bookingDAO = new BookingDAO();
 
     public List<Booking> getAllBookings(String search, String status, String date) {
-        return bookingDAO.findByFilter(search, status, date);
+        return bookingDAO.searchBookings(search, status, date);
     }
 
     public Booking getBookingById(int id) {

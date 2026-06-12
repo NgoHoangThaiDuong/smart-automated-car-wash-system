@@ -27,7 +27,7 @@ public class BookingDAO {
         "JOIN vehicles v ON b.vehicle_id = v.id " +
         "JOIN wash_services ws ON b.service_id = ws.id ";
 
-    public List<Booking> findByFilter(String search, String status, String date) {
+    public List<Booking> searchBookings(String search, String status, String date) {
         List<Booking> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(BASE_SELECT + "WHERE 1=1 ");
 
