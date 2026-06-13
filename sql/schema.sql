@@ -32,6 +32,7 @@ BEGIN
         role VARCHAR(20) DEFAULT 'CUSTOMER',
         tier_id INT FOREIGN KEY REFERENCES tiers(id),
         points_balance INT DEFAULT 0,
+	    total_washes INT DEFAULT 0,
         lifetime_spent DECIMAL(18,2) DEFAULT 0,
         created_at DATETIME DEFAULT GETDATE()
     );
@@ -92,6 +93,8 @@ BEGIN
        vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
 	   service_id INT FOREIGN KEY REFERENCES wash_services(id),
 	   wash_date DATETIME NOT NULL,
+	   payment_method VARCHAR(20),
+       payment_status VARCHAR(20) DEFAULT 'PAID',
        amount_paid DECIMAL(18,2) NOT NULL,
        points_earned INT DEFAULT 0,
        feedback NVARCHAR(500),
