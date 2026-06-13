@@ -15,21 +15,21 @@ GO
 IF NOT EXISTS (SELECT * FROM tiers WHERE name='Silver')
 BEGIN
     INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Silver', 1.10, 10, 5, 1000000);
+    VALUES ('Silver', 1.10, 10, 5, 2000000);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM tiers WHERE name='Gold')
 BEGIN
     INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Gold', 1.20, 12, 15, 3000000);
+    VALUES ('Gold', 1.20, 12, 15, 6000000);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM tiers WHERE name='Platinum')
 BEGIN
     INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Platinum', 1.30, 14, 30, 10000000);
+    VALUES ('Platinum', 1.30, 14, 30, 15000000);
 END;
 GO
 
