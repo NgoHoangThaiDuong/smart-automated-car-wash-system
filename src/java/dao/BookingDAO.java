@@ -14,63 +14,63 @@ import java.util.List;
 
 public class BookingDAO {
 
-    private static final String BASE_SELECT =
-        "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
-        "       b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-        "       b.payment_method, b.total_amount, b.points_earned, b.notes, " +
-        "       b.created_at, b.completed_at, " +
-        "       u.username, u.fullname, u.phone, " +
-        "       v.license_plate, v.brand, v.model, v.color, " +
-        "       ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
-        "FROM bookings b " +
-        "JOIN users u ON b.user_id = u.id " +
-        "JOIN vehicles v ON b.vehicle_id = v.id " +
-        "JOIN wash_services ws ON b.service_id = ws.id ";
-
     public List<Booking> searchBookings(String search, String status, String date) {
+        String sql =
+            "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+            "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
+            "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+            "b.created_at, b.completed_at, " +
+            "u.username, u.fullname, u.phone, " +
+            "v.license_plate, v.brand, v.model, v.color, " +
+            "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+            "FROM bookings b " +
+            "JOIN users u ON b.user_id = u.id " +
+            "JOIN vehicles v ON b.vehicle_id = v.id " +
+            "JOIN wash_services ws ON b.service_id = ws.id " +
+            "WHERE (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+            "AND (? IS NULL OR b.booking_status = ?) " +
+            "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
+            "ORDER BY b.created_at DESC";
+
+        String likeSearch = (search == null || search.trim().isEmpty()) ? null : "%" + search.trim() + "%";
+        String statusVal  = (status == null || status.trim().isEmpty()) ? null : status.trim();
+        String dateVal    = (date == null || date.trim().isEmpty()) ? null : date.trim();
+
         List<Booking> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(BASE_SELECT + "WHERE 1=1 ");
-
-        if (search != null && !search.trim().isEmpty()) {
-            sql.append("AND (CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) ");
-        }
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND b.booking_status = ? ");
-        }
-        if (date != null && !date.trim().isEmpty()) {
-            sql.append("AND CAST(b.booking_date AS DATE) = ? ");
-        }
-        sql.append("ORDER BY b.created_at DESC");
-
         try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int idx = 1;
-            if (search != null && !search.trim().isEmpty()) {
-                String like = "%" + search.trim() + "%";
-                ps.setString(idx++, like);
-                ps.setString(idx++, like);
-                ps.setString(idx++, like);
-                ps.setString(idx++, like);
-            }
-            if (status != null && !status.trim().isEmpty()) {
-                ps.setString(idx++, status.trim());
-            }
-            if (date != null && !date.trim().isEmpty()) {
-                ps.setString(idx++, date.trim());
-            }
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, likeSearch);
+            ps.setString(2, likeSearch);
+            ps.setString(3, likeSearch);
+            ps.setString(4, likeSearch);
+            ps.setString(5, likeSearch);
+            ps.setString(6, statusVal);
+            ps.setString(7, statusVal);
+            ps.setString(8, dateVal);
+            ps.setString(9, dateVal);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
+                while (rs.next()) list.add(mapRow(rs));
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error filtering bookings: " + e.getMessage(), e);
+            throw new RuntimeException("Error searching bookings: " + e.getMessage(), e);
         }
         return list;
     }
 
     public Booking findById(int id) {
-        String sql = BASE_SELECT + "WHERE b.id = ?";
+        String sql =
+            "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+            "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
+            "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+            "b.created_at, b.completed_at, " +
+            "u.username, u.fullname, u.phone, " +
+            "v.license_plate, v.brand, v.model, v.color, " +
+            "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+            "FROM bookings b " +
+            "JOIN users u ON b.user_id = u.id " +
+            "JOIN vehicles v ON b.vehicle_id = v.id " +
+            "JOIN wash_services ws ON b.service_id = ws.id " +
+            "WHERE b.id = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
