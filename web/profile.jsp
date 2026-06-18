@@ -8,19 +8,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Hồ sơ cá nhân - Smart Car Wash</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="<c:url value='/css/navbar.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/dashboard.css'/>">
     </head>
     <body>
 
-        <nav class="navbar">
-            <div class="nav-container">
-                <a href="#" class="nav-logo">Smart CarWash</a>
-                <div class="nav-user">
-                    <a href="<c:url value='/profile'/>" class="user-greeting" style="text-decoration: none; color: inherit;">Xin chào, <span id="nav-fullname"><c:out value="${not empty currentUser.fullname ? currentUser.fullname : currentUser.username}"/></span>!</a>
-                    <a href="<c:url value='/auth/logout'/>" class="btn-logout" style="text-decoration: none; display: inline-block;">Đăng xuất</a>
-                </div>
-            </div>
-        </nav>
+        <jsp:include page="/WEB-INF/view/common/navbar.jsp"/>
 
         <div class="main-container">
 

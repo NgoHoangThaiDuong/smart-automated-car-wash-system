@@ -36,29 +36,29 @@ GO
 -- 2. SEED USERS (Each tier has 1 user. Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
 IF NOT EXISTS (SELECT * FROM users WHERE username='member_user')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('member_user', 'e10adc3949ba59abbe56e057f20f883e', N'Nguyễn Văn Thành Viên', '0911111111', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0);
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('member_user', 'e10adc3949ba59abbe56e057f20f883e', N'Nguyễn Văn Thành Viên', '0911111111', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 1, 50000);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM users WHERE username='silver_user')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('silver_user', 'e10adc3949ba59abbe56e057f20f883e', N'Trần Bạc', '0922222222', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 500, 1200000);
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('silver_user', 'e10adc3949ba59abbe56e057f20f883e', N'Trần Bạc', '0922222222', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2450, 8, 2500000);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM users WHERE username='gold_user')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('gold_user', 'e10adc3949ba59abbe56e057f20f883e', N'Lê Hoàng Vàng', '0933333333', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 1500, 4500000);
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('gold_user', 'e10adc3949ba59abbe56e057f20f883e', N'Lê Hoàng Vàng', '0933333333', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 1500, 18, 7500000);
 END;
 GO
 
 IF NOT EXISTS (SELECT * FROM users WHERE username='platinum_user')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) 
-    VALUES ('platinum_user', 'e10adc3949ba59abbe56e057f20f883e', N'Phạm Bạch Kim', '0944444444', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 4500, 12000000);
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('platinum_user', 'e10adc3949ba59abbe56e057f20f883e', N'Phạm Bạch Kim', '0944444444', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 4500, 35, 18000000);
 END;
 GO
 
@@ -91,8 +91,8 @@ GO
 -- 4. SEED ADMIN USER
 IF NOT EXISTS (SELECT * FROM users WHERE username='admin')
 BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent)
-    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', N'Quản Trị Viên', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0);
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', N'Quản Trị Viên', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0);
 END;
 GO
 
