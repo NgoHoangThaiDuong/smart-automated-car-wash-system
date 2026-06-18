@@ -47,7 +47,8 @@ BEGIN
         license_plate VARCHAR(20) UNIQUE NOT NULL,
         brand NVARCHAR(50),
         model NVARCHAR(50),
-        color NVARCHAR(30)
+        color NVARCHAR(30),
+        image_path VARCHAR(255)
     );
 END;
 GO
