@@ -9,6 +9,9 @@ import mylib.DBUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,6 +160,107 @@ public class BookingDAO {
             throw new RuntimeException("Error counting today bookings: " + e.getMessage(), e);
         }
         return 0;
+    }
+
+    public int countBookingsBySlot(Date bookingDate, String timeSlot) {
+        String sql = "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND time_slot = ? " +
+                     "AND booking_status NOT IN ('CANCELLED', 'NO_SHOW')";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, bookingDate);
+            ps.setString(2, timeSlot);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting bookings by slot: " + e.getMessage(), e);
+        }
+    }
+
+    public int createBooking(int userId, int vehicleId, int serviceId, Date bookingDate,
+                             String timeSlot, BigDecimal totalAmount, String notes) {
+        String sql = "INSERT INTO bookings " +
+                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, " +
+                " payment_status, payment_method, total_amount, points_earned, notes) " +
+                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', 'UNPAID', NULL, ?, 0, ?)";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, vehicleId);
+            ps.setInt(3, serviceId);
+            ps.setDate(4, bookingDate);
+            ps.setString(5, timeSlot);
+            ps.setBigDecimal(6, totalAmount);
+            ps.setString(7, notes);
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+            throw new RuntimeException("Generated booking ID was not returned");
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating booking: " + e.getMessage(), e);
+        }
+    }
+
+    public Booking getUpcomingBookingByUserId(int userId) {
+        String sql = "SELECT TOP 1 " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? AND b.booking_date >= CAST(GETDATE() AS DATE) " +
+                "AND b.booking_status IN ('CONFIRMED', 'IN_PROGRESS') " +
+                "ORDER BY b.booking_date ASC, b.time_slot ASC";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapRow(rs) : null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading upcoming booking: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Booking> getRecentBookingsByUserId(int userId, int limit) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? ORDER BY b.created_at DESC";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading recent bookings: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? " +
+                "AND b.booking_status = 'COMPLETED' " +
+                "AND b.payment_status = 'PAID' " +
+                "ORDER BY b.completed_at DESC";
+
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading recent wash history: " + e.getMessage(), e);
+        }
+        return list;
     }
 
     private Booking mapRow(ResultSet rs) throws Exception {

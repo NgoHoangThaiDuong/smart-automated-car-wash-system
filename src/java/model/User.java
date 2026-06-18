@@ -11,6 +11,7 @@ public class User {
     private String role;
     private int tierId;
     private int pointsBalance;
+    private int totalWashes;
     private double lifetimeSpent;
     private Date createdAt;
 
@@ -102,6 +103,14 @@ public class User {
 
     public void setLifetimeSpent(double lifetimeSpent) {
         this.lifetimeSpent = lifetimeSpent;
+    }
+
+    public int getTotalWashes() {
+        return totalWashes;
+    }
+
+    public void setTotalWashes(int totalWashes) {
+        this.totalWashes = totalWashes;
     }
 
     public Date getCreatedAt() {

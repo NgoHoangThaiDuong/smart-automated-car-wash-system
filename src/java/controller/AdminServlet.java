@@ -16,6 +16,7 @@ public class AdminServlet extends HttpServlet {
 
         switch (pathInfo) {
             case "/dashboard":
+                req.setAttribute("activePage", "dashboard");
                 req.getRequestDispatcher("/WEB-INF/view/admin/dashboard.jsp").forward(req, res);
                 break;
             default:
