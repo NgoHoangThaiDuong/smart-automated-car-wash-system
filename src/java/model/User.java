@@ -14,6 +14,7 @@ public class User {
     private int totalWashes;
     private double lifetimeSpent;
     private Date createdAt;
+    private boolean deleted;
 
     private LoyaltyTier loyaltyTier;
 
@@ -127,5 +128,13 @@ public class User {
 
     public void setLoyaltyTier(LoyaltyTier loyaltyTier) {
         this.loyaltyTier = loyaltyTier;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

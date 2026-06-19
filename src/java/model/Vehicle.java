@@ -7,6 +7,7 @@ public class Vehicle {
     private String brand;
     private String model;
     private String color;
+    private boolean deleted;
 
     public Vehicle() {
     }
@@ -66,5 +67,13 @@ public class Vehicle {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
