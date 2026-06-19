@@ -59,7 +59,8 @@ public class UserDAO {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
             "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
-            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
+            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
+            "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
             "FROM users u " +
             "LEFT JOIN tiers t ON u.tier_id = t.id " +
             "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
@@ -231,6 +232,13 @@ public class UserDAO {
             lt.setMinSpend(rs.getDouble("min_spend"));
             u.setLoyaltyTier(lt);
         }
+        
+        try {
+            u.setVehicleCount(rs.getInt("vehicle_count"));
+        } catch (SQLException e) {
+            // column not in result set
+        }
+
         return u;
     }
 

@@ -17,6 +17,7 @@ public class User {
     private boolean deleted;
 
     private LoyaltyTier loyaltyTier;
+    private int vehicleCount;
 
     public User() {
     }
@@ -136,5 +137,13 @@ public class User {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public int getVehicleCount() {
+        return vehicleCount;
+    }
+
+    public void setVehicleCount(int vehicleCount) {
+        this.vehicleCount = vehicleCount;
     }
 }

@@ -2,8 +2,11 @@ package controller;
 
 import model.Booking;
 import model.WashService;
+import model.User;
+import model.LoyaltyTier;
 import service.BookingService;
 import service.WashServiceService;
+import service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +22,7 @@ public class AdminServlet extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
     private final WashServiceService washServiceService = new WashServiceService();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -37,6 +41,9 @@ public class AdminServlet extends HttpServlet {
                 break;
             case "/services":
                 handleServiceList(req, res);
+                break;
+            case "/customers":
+                handleCustomerList(req, res);
                 break;
             default:
                 res.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -223,5 +230,28 @@ public class AdminServlet extends HttpServlet {
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
+    }
+
+    private void handleCustomerList(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String search = req.getParameter("search");
+        String tierIdParam = req.getParameter("tierId");
+        Integer tierId = null;
+        if (tierIdParam != null && !tierIdParam.trim().isEmpty()) {
+            try {
+                tierId = Integer.parseInt(tierIdParam);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+
+        List<User> customers = userService.searchCustomers(search, tierId);
+        List<LoyaltyTier> tiers = userService.getAllLoyaltyTiers();
+
+        req.setAttribute("customers", customers);
+        req.setAttribute("tiers", tiers);
+        req.setAttribute("search", search);
+        req.setAttribute("selectedTierId", tierId);
+
+        req.getRequestDispatcher("/WEB-INF/view/admin/customers.jsp").forward(req, res);
     }
 }
