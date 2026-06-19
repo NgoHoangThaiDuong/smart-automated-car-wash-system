@@ -8,6 +8,7 @@ public class WashService {
     private int durationMinutes;
     private boolean isActive;
     private boolean deleted;
+    private int bookingCount; // Helper field for admin stats
 
     public WashService() {}
 
@@ -40,4 +41,7 @@ public class WashService {
 
     public boolean isDeleted() { return deleted; }
     public void setDeleted(boolean deleted) { this.deleted = deleted; }
+
+    public int getBookingCount() { return bookingCount; }
+    public void setBookingCount(int bookingCount) { this.bookingCount = bookingCount; }
 }
