@@ -17,4 +17,17 @@ public class UserService {
     public List<LoyaltyTier> getAllLoyaltyTiers() {
         return loyaltyTierDAO.findAll();
     }
+
+    public int getCustomerCount() {
+        return userDAO.countCustomers();
+    }
+
+    public int getRegisteredVehicleCount() {
+        return userDAO.countRegisteredVehicles();
+    }
+
+    public double getLifetimeSpentSum() {
+        return userDAO.sumLifetimeSpent();
+    }
 }
+

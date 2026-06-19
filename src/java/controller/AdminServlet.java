@@ -254,6 +254,9 @@ public class AdminServlet extends HttpServlet {
         req.setAttribute("tiers", tiers);
         req.setAttribute("search", search);
         req.setAttribute("selectedTierId", tierId);
+        req.setAttribute("totalCustomers", userService.getCustomerCount());
+        req.setAttribute("totalVehicles", userService.getRegisteredVehicleCount());
+        req.setAttribute("totalRevenue", userService.getLifetimeSpentSum());
 
         req.getRequestDispatcher("/WEB-INF/view/admin/customers.jsp").forward(req, res);
     }
