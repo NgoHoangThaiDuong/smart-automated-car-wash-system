@@ -119,7 +119,7 @@
 <body class="bg-background text-on-background min-h-screen font-body-md text-body-md overflow-x-hidden pt-24">
 
 <!-- TopNavBar -->
-<c:import url="/WEB-INF/view/admin/common/navbar.jsp">
+<c:import url="/WEB-INF/view/common/navbar.jsp">
     <c:param name="activePage" value="customers"/>
 </c:import>
 

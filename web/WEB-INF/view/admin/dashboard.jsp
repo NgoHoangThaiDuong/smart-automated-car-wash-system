@@ -134,7 +134,7 @@
 <body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col pt-20">
 
 <!-- Sticky Top Navbar -->
-<c:import url="/WEB-INF/view/admin/common/navbar.jsp">
+<c:import url="/WEB-INF/view/common/navbar.jsp">
     <c:param name="activePage" value="dashboard"/>
 </c:import>
 
