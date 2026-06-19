@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Reset & Global */
 * {
     margin: 0;
@@ -6,18 +8,22 @@
     font-family: 'Inter', sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6, .hero-title {
+    font-family: 'Hanken Grotesk', sans-serif;
+}
+
 :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --secondary: #64748b;
-    --success: #10b981;
-    --danger: #ef4444;
-    --bg: #f8fafc;
+    --primary: #1d4ed8;
+    --primary-hover: #0039b5;
+    --secondary: #505f76;
+    --success: #2e7d32;
+    --danger: #ba1a1a;
+    --bg: #f9f9ff;
     --surface: #ffffff;
-    --text: #0f172a;
-    --text-light: #64748b;
-    --border: #e2e8f0;
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --text: #111c2d;
+    --text-light: #54647a;
+    --border: #c4c5d7;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 body {
