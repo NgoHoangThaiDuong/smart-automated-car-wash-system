@@ -10,9 +10,6 @@ public class Booking {
     private String bookingDate;
     private String timeSlot;
     private String bookingStatus;
-    private String paymentStatus;
-    private String paymentMethod;
-    private double totalAmount;
     private int pointsEarned;
     private String notes;
     private Date createdAt;
@@ -21,6 +18,7 @@ public class Booking {
     private User user;
     private Vehicle vehicle;
     private WashService service;
+    private Payment payment;
 
     public Booking() {}
 
@@ -45,15 +43,6 @@ public class Booking {
     public String getBookingStatus() { return bookingStatus; }
     public void setBookingStatus(String bookingStatus) { this.bookingStatus = bookingStatus; }
 
-    public String getPaymentStatus() { return paymentStatus; }
-    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
-
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-
-    public double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
-
     public int getPointsEarned() { return pointsEarned; }
     public void setPointsEarned(int pointsEarned) { this.pointsEarned = pointsEarned; }
 
@@ -74,4 +63,7 @@ public class Booking {
 
     public WashService getService() { return service; }
     public void setService(WashService service) { this.service = service; }
+
+    public Payment getPayment() { return payment; }
+    public void setPayment(Payment payment) { this.payment = payment; }
 }
