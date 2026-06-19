@@ -103,6 +103,31 @@ public class BookingDAO {
         }
     }
 
+    public void updatePaymentStatus(int id, String paymentStatus, String paymentMethod) {
+        String sql = "UPDATE bookings SET payment_status = ?, payment_method = ? WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, paymentStatus);
+            ps.setString(2, paymentMethod);
+            ps.setInt(3, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating payment status: " + e.getMessage(), e);
+        }
+    }
+
+    public void updatePointsEarned(int bookingId, int pointsEarned) {
+        String sql = "UPDATE bookings SET points_earned = ? WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, pointsEarned);
+            ps.setInt(2, bookingId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating booking points earned: " + e.getMessage(), e);
+        }
+    }
+
     public int countByStatus(String status) {
         String sql = "SELECT COUNT(*) FROM bookings WHERE booking_status = ?";
         try (Connection cn = DBUtils.getConnection();
