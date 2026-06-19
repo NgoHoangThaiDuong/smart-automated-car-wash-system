@@ -30,7 +30,8 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "WHERE b.is_deleted = 0 " +
-                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) "
+                +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
                 "ORDER BY b.created_at DESC";
@@ -142,10 +143,6 @@ public class BookingDAO {
         }
         return 0;
     }
-
-    // -------------------------------------------------------
-    // Methods từ main (Customer Dashboard & Booking Creation)
-    // -------------------------------------------------------
 
     public int countBookingsBySlot(Date bookingDate, String timeSlot) {
         String sql = "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND time_slot = ? " +
