@@ -67,6 +67,7 @@ public class ProfileServlet extends HttpServlet {
         List<Vehicle> vehicles = vehicleRepo.findByUserId(freshUser.getId());
         req.setAttribute("vehicles", vehicles);
 
+        req.setAttribute("activePage", "profile");
         req.getRequestDispatcher("/profile.jsp").forward(req, res);
     }
 

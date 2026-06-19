@@ -1,0 +1,355 @@
+:root {
+    --dashboard-blue: #0b50c7;
+    --dashboard-text: #111827;
+    --dashboard-muted: #4b5563;
+    --dashboard-border: #cfd5df;
+    --dashboard-bg: #f7f8fc;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: var(--dashboard-text);
+    background: var(--dashboard-bg);
+}
+
+.dashboard-page {
+    width: min(1500px, calc(100% - 64px));
+    margin: 0 auto;
+    padding: 58px 0 80px;
+}
+
+.dashboard-heading {
+    margin-bottom: 48px;
+}
+
+.dashboard-heading h1 {
+    margin: 0 0 15px;
+    font-size: clamp(36px, 4vw, 56px);
+    letter-spacing: -0.04em;
+}
+
+.dashboard-heading p {
+    max-width: 780px;
+    margin: 0;
+    color: var(--dashboard-muted);
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.dashboard-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(330px, 1fr);
+    gap: 28px;
+}
+
+.loyalty-card,
+.small-card,
+.history-card {
+    border: 1px solid var(--dashboard-border);
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.loyalty-card {
+    min-height: 460px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(37, 99, 235, 0.10), transparent 36%),
+        #ffffff;
+}
+
+.loyalty-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.tier-label {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 6px 14px;
+    border: 1px solid #c6d6f7;
+    border-radius: 20px;
+    color: #12479e;
+    background: #f1f6ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.loyalty-card h2 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.points-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.points-box span {
+    font-size: 13px;
+}
+
+.points-box strong {
+    color: #0d429f;
+    font-size: 28px;
+}
+
+.progress-text {
+    margin-bottom: 11px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 14px;
+}
+
+.progress-bar {
+    height: 13px;
+    overflow: hidden;
+    border: 1px solid #ced9eb;
+    border-radius: 20px;
+    background: #dce8fb;
+}
+
+.progress-bar div {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #0754ce, #3671d4);
+}
+
+.loyalty-card-bottom {
+    padding-top: 25px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 25px;
+    align-items: end;
+    border-top: 1px solid #d8dce4;
+}
+
+.loyalty-card-bottom div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.loyalty-card-bottom span {
+    color: var(--dashboard-muted);
+    font-size: 13px;
+}
+
+.loyalty-card-bottom strong {
+    font-size: 23px;
+}
+
+.loyalty-card-bottom a,
+.small-card a,
+.history-header a {
+    color: #073fa6;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.dashboard-side {
+    display: grid;
+    grid-template-rows: 1fr 1.2fr;
+    gap: 28px;
+}
+
+.small-card {
+    padding: 29px;
+}
+
+.vehicle-summary {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 20px;
+    align-items: center;
+    border-top: 4px solid #171717;
+}
+
+.small-card-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #064cc5;
+    background: #e9f0ff;
+    font-size: 24px;
+}
+
+.vehicle-summary > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vehicle-summary span {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+}
+
+.vehicle-summary strong {
+    font-size: 31px;
+}
+
+.vehicle-summary a {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.upcoming-booking {
+    border-top: 5px solid var(--dashboard-blue);
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 13px;
+}
+
+.card-row b {
+    padding: 6px 10px;
+    border-radius: 20px;
+    color: #1f4c91;
+    background: #dfe9fb;
+    font-size: 11px;
+}
+
+.upcoming-booking h3 {
+    margin: 27px 0 10px;
+    font-size: 24px;
+}
+
+.upcoming-booking p {
+    color: var(--dashboard-muted);
+    line-height: 1.5;
+}
+
+.payment-status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 7px 11px;
+    border-radius: 8px;
+    color: #17449b;
+    background: #edf3ff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.history-card {
+    margin-top: 56px;
+    overflow: hidden;
+}
+
+.history-header {
+    min-height: 76px;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.history-header h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 17px 30px;
+    color: #303746;
+    background: #f0f4ff;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 21px 30px;
+    border-top: 1px solid #e1e4eb;
+    font-size: 14px;
+}
+
+.completed-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #176337;
+    background: #dcf8e6;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.empty-row {
+    color: var(--dashboard-muted);
+    text-align: center;
+}
+
+@media (max-width: 1000px) {
+    .dashboard-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-side {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-page {
+        width: calc(100% - 32px);
+        padding-top: 36px;
+    }
+
+    .dashboard-side {
+        grid-template-columns: 1fr;
+    }
+
+    .loyalty-card {
+        min-height: 520px;
+        padding: 24px;
+    }
+
+    .loyalty-card-top,
+    .progress-text {
+        flex-direction: column;
+    }
+
+    .points-box {
+        align-items: flex-start;
+    }
+
+    .loyalty-card-bottom {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .loyalty-card-bottom a {
+        grid-column: 1 / 3;
+    }
+}

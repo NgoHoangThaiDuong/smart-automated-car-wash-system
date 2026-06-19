@@ -31,6 +31,7 @@ public class AdminServlet extends HttpServlet {
                 break;
             case "/bookings/detail":
                 handleBookingDetail(req, res);
+
                 break;
             default:
                 res.sendError(HttpServletResponse.SC_NOT_FOUND);

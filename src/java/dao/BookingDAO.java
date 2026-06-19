@@ -9,25 +9,31 @@ import mylib.DBUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookingDAO {
 
+    // Dùng chung cho các method cần SELECT TOP hoặc filter user
+    private static final String BASE_SELECT =
+        "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+        "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
+        "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+        "b.created_at, b.completed_at, " +
+        "u.username, u.fullname, u.phone, " +
+        "v.license_plate, v.brand, v.model, v.color, " +
+        "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+        "FROM bookings b " +
+        "JOIN users u ON b.user_id = u.id " +
+        "JOIN vehicles v ON b.vehicle_id = v.id " +
+        "JOIN wash_services ws ON b.service_id = ws.id ";
+
     public List<Booking> searchBookings(String key, String status, String date) {
-        String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
-                "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
-                "v.license_plate, v.brand, v.model, v.color, " +
-                "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
-                "FROM bookings b " +
-                "JOIN users u ON b.user_id = u.id " +
-                "JOIN vehicles v ON b.vehicle_id = v.id " +
-                "JOIN wash_services ws ON b.service_id = ws.id " +
-                "WHERE (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) "
-                +
+        String sql = BASE_SELECT +
+                "WHERE (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
                 "ORDER BY b.created_at DESC";
@@ -59,18 +65,7 @@ public class BookingDAO {
     }
 
     public Booking findById(int id) {
-        String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
-                "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
-                "v.license_plate, v.brand, v.model, v.color, " +
-                "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
-                "FROM bookings b " +
-                "JOIN users u ON b.user_id = u.id " +
-                "JOIN vehicles v ON b.vehicle_id = v.id " +
-                "JOIN wash_services ws ON b.service_id = ws.id " +
-                "WHERE b.id = ?";
+        String sql = BASE_SELECT + "WHERE b.id = ?";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -138,6 +133,105 @@ public class BookingDAO {
             throw new RuntimeException("Error counting today bookings: " + e.getMessage(), e);
         }
         return 0;
+    }
+
+    // -------------------------------------------------------
+    // Methods từ main (Customer Dashboard & Booking Creation)
+    // -------------------------------------------------------
+
+    public int countBookingsBySlot(Date bookingDate, String timeSlot) {
+        String sql = "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND time_slot = ? " +
+                     "AND booking_status NOT IN ('CANCELLED', 'NO_SHOW')";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setDate(1, bookingDate);
+            ps.setString(2, timeSlot);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting bookings by slot: " + e.getMessage(), e);
+        }
+    }
+
+    public int createBooking(int userId, int vehicleId, int serviceId, Date bookingDate,
+                             String timeSlot, BigDecimal totalAmount, String notes) {
+        String sql = "INSERT INTO bookings " +
+                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, " +
+                " payment_status, payment_method, total_amount, points_earned, notes) " +
+                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', 'UNPAID', NULL, ?, 0, ?)";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, vehicleId);
+            ps.setInt(3, serviceId);
+            ps.setDate(4, bookingDate);
+            ps.setString(5, timeSlot);
+            ps.setBigDecimal(6, totalAmount);
+            ps.setString(7, notes);
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) return keys.getInt(1);
+            }
+            throw new RuntimeException("Generated booking ID was not returned");
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating booking: " + e.getMessage(), e);
+        }
+    }
+
+    public Booking getUpcomingBookingByUserId(int userId) {
+        String sql = "SELECT TOP 1 " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? AND b.booking_date >= CAST(GETDATE() AS DATE) " +
+                "AND b.booking_status IN ('CONFIRMED', 'IN_PROGRESS') " +
+                "ORDER BY b.booking_date ASC, b.time_slot ASC";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? getBooking(rs) : null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading upcoming booking: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Booking> getRecentBookingsByUserId(int userId, int limit) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? ORDER BY b.created_at DESC";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(getBooking(rs));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading recent bookings: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring("SELECT ".length()) +
+                "WHERE b.user_id = ? " +
+                "AND b.booking_status = 'COMPLETED' " +
+                "AND b.payment_status = 'PAID' " +
+                "ORDER BY b.completed_at DESC";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(getBooking(rs));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading recent wash history: " + e.getMessage(), e);
+        }
+        return list;
     }
 
     private Booking getBooking(ResultSet rs) throws Exception {
