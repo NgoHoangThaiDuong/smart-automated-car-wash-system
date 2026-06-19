@@ -61,6 +61,9 @@ public class AdminServlet extends HttpServlet {
             case "/bookings/update-status":
                 handleUpdateStatus(req, res);
                 break;
+            case "/bookings/collect-payment":
+                handleCollectPayment(req, res);
+                break;
             case "/services/create":
                 handleCreateService(req, res);
                 break;
@@ -253,5 +256,20 @@ public class AdminServlet extends HttpServlet {
         req.setAttribute("selectedTierId", tierId);
 
         req.getRequestDispatcher("/WEB-INF/view/admin/customers.jsp").forward(req, res);
+    }
+
+    private void handleCollectPayment(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        String idParam = req.getParameter("bookingId");
+        String paymentMethod = req.getParameter("paymentMethod");
+        try {
+            int id = Integer.parseInt(idParam);
+            bookingService.collectPayment(id, paymentMethod);
+            session.setAttribute("adminMsg", "Xác nhận thanh toán thành công.");
+            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + id);
+        } catch (Exception e) {
+            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + idParam);
+        }
     }
 }
