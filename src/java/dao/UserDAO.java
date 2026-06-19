@@ -33,7 +33,7 @@ public class UserDAO {
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.username = ?";
+                     "WHERE u.username = ? AND u.is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -53,7 +53,7 @@ public class UserDAO {
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.id = ?";
+                     "WHERE u.id = ? AND u.is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -106,5 +106,16 @@ public class UserDAO {
             u.setLoyaltyTier(lt);
         }
         return u;
+    }
+
+    public void delete(int id) {
+        String sql = "UPDATE users SET is_deleted = 1 WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
+        }
     }
 }

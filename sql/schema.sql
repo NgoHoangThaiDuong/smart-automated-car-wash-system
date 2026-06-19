@@ -34,6 +34,7 @@ BEGIN
         points_balance INT NOT NULL DEFAULT 0,
         total_washes INT NOT NULL DEFAULT 0,
         lifetime_spent DECIMAL(18,2) NOT NULL DEFAULT 0,
+        is_deleted BIT NOT NULL DEFAULT 0,
         created_at DATETIME DEFAULT GETDATE()
     );
 END;
@@ -48,7 +49,8 @@ BEGIN
         brand NVARCHAR(50),
         model NVARCHAR(50),
         color NVARCHAR(30),
-        image_path VARCHAR(255)
+        image_path VARCHAR(255),
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO
@@ -60,7 +62,8 @@ BEGIN
         description NVARCHAR(500),
         price DECIMAL(18,2) NOT NULL,
         duration_minutes INT NOT NULL DEFAULT 30,
-        is_active BIT DEFAULT 1
+        is_active BIT DEFAULT 1,
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO
@@ -81,7 +84,8 @@ BEGIN
 		points_earned INT DEFAULT 0,
         notes NVARCHAR(500),
         created_at DATETIME DEFAULT GETDATE(),
-        completed_at DATETIME NULL
+        completed_at DATETIME NULL,
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO

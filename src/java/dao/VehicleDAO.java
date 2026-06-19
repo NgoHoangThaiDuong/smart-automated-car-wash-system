@@ -32,7 +32,7 @@ public class VehicleDAO {
     public List<Vehicle> findByUserId(int userId) {
         List<Vehicle> list = new ArrayList<>();
 
-        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE user_id = ?";
+        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE user_id = ? AND is_deleted = 0";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -61,7 +61,7 @@ public class VehicleDAO {
     }
 
     public Vehicle findById(int id) {
-        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE id = ?";
+        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE id = ? AND is_deleted = 0";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -108,7 +108,7 @@ public class VehicleDAO {
     }
 
     public void delete(int id) {
-        String sql = "DELETE FROM vehicles WHERE id = ?";
+        String sql = "UPDATE vehicles SET is_deleted = 1 WHERE id = ?";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -121,7 +121,7 @@ public class VehicleDAO {
     }
 
     public boolean existsByPlateExceptId(String plate, int id) {
-        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id <> ?";
+        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id <> ? AND is_deleted = 0";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -138,7 +138,7 @@ public class VehicleDAO {
     }
 
     public boolean existsByPlate(String plate) {
-        String sql = "SELECT id FROM vehicles WHERE license_plate = ?";
+        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND is_deleted = 0";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 

@@ -33,7 +33,8 @@ public class BookingDAO {
 
     public List<Booking> searchBookings(String key, String status, String date) {
         String sql = BASE_SELECT +
-                "WHERE (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "WHERE b.is_deleted = 0 " +
+                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
                 "ORDER BY b.created_at DESC";
@@ -65,7 +66,7 @@ public class BookingDAO {
     }
 
     public Booking findById(int id) {
-        String sql = BASE_SELECT + "WHERE b.id = ?";
+        String sql = BASE_SELECT + "WHERE b.id = ? AND b.is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
