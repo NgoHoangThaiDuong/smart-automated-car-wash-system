@@ -60,6 +60,11 @@ public class AdminServlet extends HttpServlet {
         req.setAttribute("completedCount", bookingService.countByStatus("COMPLETED"));
         req.setAttribute("todayCount", bookingService.countTodayBookings());
         req.setAttribute("totalRevenue", bookingService.sumRevenue());
+
+        List<Booking> allBookings = bookingService.getAllBookings(null, null, null);
+        List<Booking> recentBookings = allBookings.size() > 5 ? allBookings.subList(0, 5) : allBookings;
+        req.setAttribute("recentBookings", recentBookings);
+
         req.getRequestDispatcher("/WEB-INF/view/admin/dashboard.jsp").forward(req, res);
     }
 
