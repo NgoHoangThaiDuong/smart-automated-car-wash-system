@@ -30,7 +30,8 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "WHERE b.is_deleted = 0 " +
-                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) "
+                +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
                 "ORDER BY b.created_at DESC";
@@ -62,6 +63,7 @@ public class BookingDAO {
     }
 
     public Booking findById(int id) {
+<<<<<<< HEAD
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
@@ -74,6 +76,9 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "WHERE b.id = ? AND b.is_deleted = 0";
+=======
+        String sql = BASE_SELECT + "WHERE b.id = ? AND b.is_deleted = 0";
+>>>>>>> 0481e75e45c5656b4c73031dade9121546772442
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
