@@ -1,6 +1,7 @@
 package dao;
 
 import model.Booking;
+import model.LoyaltyTier;
 import model.User;
 import model.Vehicle;
 import model.WashService;
@@ -22,13 +23,14 @@ public class BookingDAO {
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
                 "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
                 "FROM bookings b " +
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "WHERE b.is_deleted = 0 " +
                 "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) "
                 +
@@ -67,13 +69,14 @@ public class BookingDAO {
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
                 "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
                 "FROM bookings b " +
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "WHERE b.id = ? AND b.is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -215,13 +218,14 @@ public class BookingDAO {
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
                 "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
                 "FROM bookings b " +
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "WHERE b.user_id = ? AND b.booking_date >= CAST(GETDATE() AS DATE) " +
                 "AND b.booking_status IN ('CONFIRMED', 'IN_PROGRESS') " +
                 "ORDER BY b.booking_date ASC, b.time_slot ASC";
@@ -242,13 +246,14 @@ public class BookingDAO {
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
                 "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
                 "FROM bookings b " +
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "WHERE b.user_id = ? ORDER BY b.created_at DESC";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -270,13 +275,14 @@ public class BookingDAO {
                 "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
                 "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
-                "u.username, u.fullname, u.phone, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
                 "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
                 "FROM bookings b " +
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "WHERE b.user_id = ? " +
                 "AND b.booking_status = 'COMPLETED' " +
                 "AND b.payment_status = 'PAID' " +
@@ -316,6 +322,20 @@ public class BookingDAO {
         u.setUsername(rs.getString("username"));
         u.setFullname(rs.getString("fullname"));
         u.setPhone(rs.getString("phone"));
+        
+        try {
+            int tierId = rs.getInt("tier_id");
+            u.setTierId(tierId);
+            String tierName = rs.getString("tier_name");
+            if (tierName != null) {
+                LoyaltyTier lt = new LoyaltyTier();
+                lt.setId(tierId);
+                lt.setName(tierName);
+                u.setLoyaltyTier(lt);
+            }
+        } catch (java.sql.SQLException e) {
+            // safe fallback if columns are not selected
+        }
         b.setUser(u);
 
         Vehicle v = new Vehicle();

@@ -1,93 +1,114 @@
+/* SmartWash Pro - Navigation Bar Styles */
+
 .app-navbar {
     position: sticky;
     top: 0;
     z-index: 1000;
     background: #ffffff;
-    border-bottom: 1px solid #d8dee9;
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
 }
 
 .app-navbar-container {
-    width: min(1500px, calc(100% - 48px));
-    min-height: 82px;
+    width: min(1400px, calc(100% - 48px));
+    min-height: 70px;
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 30px;
+    justify-content: space-between;
 }
 
+/* Logo and Branding */
 .app-brand {
     display: flex;
     align-items: center;
-    gap: 13px;
-    color: #0647bb;
+    gap: 0.5rem;
     text-decoration: none;
-    white-space: nowrap;
 }
 
 .app-brand-icon {
-    width: 50px;
-    height: 50px;
-    padding: 12px;
-    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #0B45BD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #ffffff;
-    background: #1457d9;
-}
-
-.app-brand-icon svg,
-.app-profile-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
+    flex-shrink: 0;
 }
 
 .app-brand-text {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #0F172A;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    white-space: nowrap;
 }
 
-.app-brand-text strong {
-    font-family: 'Hanken Grotesk', sans-serif;
-    font-size: 22px;
-    line-height: 1.1;
+.app-brand-text span {
+    color: #0B45BD;
 }
 
-.app-brand-text small {
-    margin-top: 3px;
-    color: #566176;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-}
-
+/* Navigation Menu Links */
 .app-menu {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    height: 100%;
 }
 
 .app-menu a {
-    padding: 14px 17px;
-    border-bottom: 3px solid transparent;
-    color: #273349;
+    padding: 22px 14px;
+    color: #475569;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
 }
 
-.app-menu a:hover,
+.app-menu a span.material-symbols-outlined {
+    font-size: 1.2rem;
+    color: #64748B;
+    transition: color 0.2s;
+}
+
+.app-menu a:hover {
+    color: #0B45BD;
+    background: transparent;
+}
+
+.app-menu a:hover span.material-symbols-outlined {
+    color: #0B45BD;
+}
+
 .app-menu a.active {
-    color: #0647bb;
-    border-bottom-color: #1457d9;
-    background: #f4f7ff;
+    color: #0B45BD;
+    border-bottom-color: #0B45BD;
+    background: transparent;
 }
 
+.app-menu a.active span.material-symbols-outlined {
+    color: #0B45BD;
+}
+
+/* User Account Section */
 .app-user {
-    padding-left: 18px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-left: 1px solid #d8dee9;
+    gap: 0.75rem;
+    border-left: 1px solid #E2E8F0;
+    padding-left: 1.25rem;
+    margin-left: 0.5rem;
 }
 
 .app-user-info {
@@ -97,74 +118,85 @@
     line-height: 1.25;
 }
 
-.app-user-info strong {
-    color: #111827;
-    font-size: 13px;
+.app-user-info .role-label {
+    font-size: 0.65rem;
+    color: #64748B;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.app-user-info small {
-    color: #586276;
-    font-size: 10px;
-    letter-spacing: 0.06em;
+.app-user-info .username-label {
+    font-size: 0.82rem;
+    color: #0F172A;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .app-profile-icon {
-    width: 40px;
-    height: 40px;
-    padding: 10px;
-    border: 1px solid #c7d0e0;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    color: #24324a;
-    background: #edf3ff;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0B45BD;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.app-profile-icon:hover {
+    background: #DBEAFE;
+    border-color: #0B45BD;
+}
+
+.app-profile-icon span {
+    font-size: 1.15rem;
 }
 
 .app-logout {
-    padding: 10px 0 10px 13px;
-    color: #d82020;
+    color: #EF4444;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
+    padding-left: 0.5rem;
+    transition: color 0.2s;
 }
 
+.app-logout:hover {
+    color: #DC2626;
+}
+
+.app-logout span {
+    font-size: 1.15rem;
+}
+
+/* Menu Toggle Button (Mobile) */
 .app-menu-button {
     display: none;
     margin-left: auto;
     border: 0;
-    color: #1f2937;
+    color: #1F2937;
     background: transparent;
     font-size: 24px;
+    cursor: pointer;
 }
 
-@media (max-width: 1100px) {
-    .app-brand-text small,
-    .app-user-info,
-    .app-logout {
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .app-user-info {
         display: none;
     }
-
-    .app-navbar-container {
-        gap: 14px;
-    }
-
-    .app-menu a {
-        padding: 14px 10px;
-    }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 768px) {
     .app-navbar-container {
-        width: calc(100% - 28px);
-        min-height: 70px;
-    }
-
-    .app-brand-icon {
-        width: 42px;
-        height: 42px;
-        padding: 10px;
-    }
-
-    .app-brand-text strong {
-        font-size: 18px;
+        width: calc(100% - 32px);
     }
 
     .app-menu-button {
@@ -181,7 +213,9 @@
         flex-direction: column;
         align-items: stretch;
         background: #ffffff;
-        border-bottom: 1px solid #d8dee9;
+        border-bottom: 1px solid #E2E8F0;
+        gap: 0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
 
     .app-menu.show {
@@ -189,10 +223,13 @@
     }
 
     .app-menu a {
-        text-align: center;
+        padding: 12px 18px;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        text-align: left;
     }
 
-    .app-user {
-        padding-left: 8px;
+    .app-menu a.active {
+        border-left-color: #0B45BD;
     }
 }
