@@ -23,11 +23,10 @@ public class BookingService {
             throw new IllegalArgumentException("Booking không tồn tại: " + bookingId);
         }
         validateTransition(booking.getBookingStatus(), newStatus);
-        if ("COMPLETED".equals(newStatus)) {
-            completeBooking(booking);
-        } else {
-            bookingDAO.updateStatus(bookingId, newStatus);
+        if ("COMPLETED".equals(newStatus) && !"PAID".equals(booking.getPaymentStatus())) {
+            throw new IllegalArgumentException("Không thể hoàn thành booking chưa thanh toán");
         }
+        bookingDAO.updateStatus(bookingId, newStatus);
     }
 
     private void validateTransition(String current, String next) {
@@ -42,13 +41,6 @@ public class BookingService {
                 break;
         }
         throw new IllegalArgumentException("Không thể chuyển trạng thái từ " + current + " sang " + next);
-    }
-
-    private void completeBooking(Booking booking) {
-        if (!"PAID".equals(booking.getPaymentStatus())) {
-            throw new IllegalArgumentException("Không thể hoàn thành booking chưa thanh toán");
-        }
-        bookingDAO.updateStatusCompleted(booking.getId());
     }
 
     public int countByStatus(String status) {

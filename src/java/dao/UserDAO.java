@@ -14,8 +14,8 @@ public class UserDAO {
     public void create(String username, String hashedPassword, String fullname, String phone, String role) {
         String sql = "INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, lifetime_spent) " +
                      "VALUES (?, ?, ?, ?, ?, (SELECT id FROM tiers WHERE name='Member'), 0, 0.00)";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, fullname);
@@ -33,12 +33,12 @@ public class UserDAO {
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
                      "WHERE u.username = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return setUser(rs);
+                    return getUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -53,12 +53,12 @@ public class UserDAO {
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
                      "WHERE u.id = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return setUser(rs);
+                    return getUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -69,8 +69,8 @@ public class UserDAO {
 
     public void updateProfile(int id, String fullname, String phone) {
         String sql = "UPDATE users SET fullname = ?, phone = ? WHERE id = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, fullname);
             ps.setString(2, phone);
             ps.setInt(3, id);
@@ -80,7 +80,7 @@ public class UserDAO {
         }
     }
 
-    private User setUser(ResultSet rs) throws SQLException {
+    private User getUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
         u.setUsername(rs.getString("username"));
