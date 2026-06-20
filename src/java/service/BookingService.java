@@ -94,4 +94,12 @@ public class BookingService {
     public int countTodayBookings() {
         return bookingDAO.countTodayBookings();
     }
+
+    public Booking getUpcomingBookingByUserId(int userId) {
+        return bookingDAO.getUpcomingBookingByUserId(userId);
+    }
+
+    public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
+        return bookingDAO.getRecentWashHistoryByUserId(userId, limit);
+    }
 }
