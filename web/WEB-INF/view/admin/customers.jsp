@@ -7,9 +7,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customers - SmartWash Pro</title>
+    <title>Customers - Smart Car Wash</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<c:url value='/css/admin/common.css'/>">
+    <link rel="stylesheet" href="<c:url value='/css/admin/components/booking-table.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/admin/customers.css'/>">
 </head>
 <body>
@@ -20,16 +22,23 @@
 
 <div class="admin-container">
     
-    <!-- Header -->
-    <div class="overview-header">
-        <div>
-            <h1 class="overview-title">Customers</h1>
-            <div class="overview-subtitle">Monitor customer loyalty accounts, membership tiers, wash counts, and spending balances.</div>
+    <!-- Page Header & Breadcrumbs -->
+    <div class="page-header-container">
+        <div class="breadcrumb-trail">
+            <a href="<c:url value='/admin/dashboard'/>">Dashboard</a>
+            <span class="material-symbols-outlined">chevron_right</span>
+            <span style="font-weight: 700;">Customers</span>
         </div>
-        <div>
-            <a href="<c:url value='/admin/customers'/>" class="btn-refresh">
-                <span class="material-symbols-outlined">refresh</span> Refresh Data
-            </a>
+        <div class="header-action-row">
+            <div>
+                <h1 class="page-title">Customers</h1>
+            </div>
+            <div>
+                <a href="<c:url value='/admin/customers'/>" class="btn-admin-secondary" style="text-decoration: none;">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Refresh Data
+                </a>
+            </div>
         </div>
     </div>
 
@@ -71,40 +80,37 @@
         </div>
     </div>
 
+    <!-- Shared Search and Filter Card -->
+    <div class="filter-card">
+        <form action="<c:url value='/admin/customers'/>" method="GET" style="margin: 0;">
+            <div class="filter-form-grid">
+                
+                <!-- Search Field -->
+                <div class="search-input-wrapper">
+                    <span class="material-symbols-outlined">search</span>
+                    <input name="search" class="search-input-field" placeholder="Search by name, phone number, or username..." type="text" value="<c:out value='${search}'/>">
+                </div>
+
+                <!-- Tier Filter Select -->
+                <select name="tierId" class="filter-select-field">
+                    <option value="">All Tiers</option>
+                    <c:forEach var="t" items="${tiers}">
+                        <option value="${t.id}" ${selectedTierId == t.id ? 'selected' : ''}>
+                            <c:out value="${t.name}"/>
+                        </option>
+                    </c:forEach>
+                </select>
+
+                <!-- Filter Submit -->
+                <button type="submit" class="btn-submit-filter">
+                    <span class="material-symbols-outlined" style="font-size: 1.15rem;">tune</span> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Customer Table Section -->
     <div class="mgmt-card">
-        
-        <!-- Controls Filter Form -->
-        <div class="mgmt-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2E8F0;">
-            <form action="<c:url value='/admin/customers'/>" method="GET" style="width: 100%; margin: 0;">
-                <div class="filter-form-grid">
-                    
-                    <!-- Search Field -->
-                    <div class="search-input-wrapper">
-                        <span class="material-symbols-outlined">search</span>
-                        <input name="search" class="search-input-field" placeholder="Search by name, phone number, or username..." type="text" value="<c:out value='${search}'/>">
-                    </div>
-
-                    <!-- Tier Filter Select -->
-                    <select name="tierId" class="filter-select-field">
-                        <option value="">All Tiers</option>
-                        <c:forEach var="t" items="${tiers}">
-                            <option value="${t.id}" ${selectedTierId == t.id ? 'selected' : ''}>
-                                <c:out value="${t.name}"/>
-                            </option>
-                        </c:forEach>
-                    </select>
-
-                    <!-- Filter Submit & Reset -->
-                    <button type="submit" class="btn-submit-filter">
-                        <span class="material-symbols-outlined" style="font-size: 1.15rem;">filter_list</span> Filter
-                    </button>
-                    <a href="<c:url value='/admin/customers'/>" class="btn-clear-filter">
-                        <span class="material-symbols-outlined" style="font-size: 1.15rem;">restart_alt</span> Reset
-                    </a>
-                </div>
-            </form>
-        </div>
 
         <!-- Customers Table -->
         <div style="overflow-x: auto;">
@@ -242,59 +248,176 @@
             </table>
         </div>
 
-        <!-- Pagination Section -->
+        <!-- Pagination Section matching UI layout spec -->
         <c:if test="${totalPages > 0}">
-            <div class="pagination-container">
-                <span class="pagination-info">
-                    Hiển thị ${startEntry} - ${endEntry} trên tổng số ${totalEntries} khách hàng
-                </span>
-                <div class="pagination-controls">
-                    <!-- Nút Trước -->
-                    <c:choose>
-                        <c:when test="${currentPage > 1}">
-                            <c:url value="/admin/customers" var="prevUrl">
-                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
-                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
-                                <c:param name="page" value="${currentPage - 1}"/>
-                            </c:url>
-                            <a href="${prevUrl}" class="pagination-btn"><span>&laquo;</span></a>
-                        </c:when>
-                        <c:otherwise>
-                            <button class="pagination-btn disabled" disabled><span>&laquo;</span></button>
-                        </c:otherwise>
-                    </c:choose>
-
-                    <!-- Danh sách số trang -->
-                    <c:forEach var="i" begin="1" end="${totalPages}">
+            <div class="pagination-container" style="border-top: 1px solid var(--border-slate);">
+                <div class="pagination-wrapper">
+                    <ul class="pagination-list">
+                        <li>
+                            <c:choose>
+                                <c:when test="${currentPage > 1}">
+                                    <c:url value="/admin/customers" var="prevUrl">
+                                        <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                        <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                        <c:param name="page" value="${currentPage - 1}"/>
+                                    </c:url>
+                                    <a href="${prevUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_left</span>
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="page-item-btn disabled">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_left</span>
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </li>
                         <c:choose>
-                            <c:when test="${i == currentPage}">
-                                <button class="pagination-btn active">${i}</button>
+                            <%-- If totalPages <= 5, show all pages without any ellipsis --%>
+                            <c:when test="${totalPages <= 5}">
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <li>
+                                        <c:choose>
+                                            <c:when test="${i == currentPage}">
+                                                <button class="page-item-btn active">${i}</button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:url value="/admin/customers" var="pageUrl">
+                                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                    <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                    <c:param name="page" value="${i}"/>
+                                                </c:url>
+                                                <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </li>
+                                </c:forEach>
                             </c:when>
+                            
+                            <%-- If totalPages > 5, apply ellipsis logic --%>
                             <c:otherwise>
-                                <c:url value="/admin/customers" var="pageUrl">
-                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
-                                    <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
-                                    <c:param name="page" value="${i}"/>
-                                </c:url>
-                                <a href="${pageUrl}" class="pagination-btn">${i}</a>
+                                <c:choose>
+                                    <%-- Case 1: Near the beginning --%>
+                                    <c:when test="${currentPage <= 3}">
+                                        <c:forEach var="i" begin="1" end="4">
+                                            <li>
+                                                <c:choose>
+                                                    <c:when test="${i == currentPage}">
+                                                        <button class="page-item-btn active">${i}</button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:url value="/admin/customers" var="pageUrl">
+                                                            <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                            <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:param name="page" value="${i}"/>
+                                                        </c:url>
+                                                        <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </li>
+                                        </c:forEach>
+                                        <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                        <li>
+                                            <c:url value="/admin/customers" var="pageUrl">
+                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:param name="page" value="${totalPages}"/>
+                                            </c:url>
+                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
+                                        </li>
+                                    </c:when>
+                                    
+                                    <%-- Case 2: Near the end --%>
+                                    <c:when test="${currentPage >= totalPages - 2}">
+                                        <li>
+                                            <c:url value="/admin/customers" var="pageUrl">
+                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:param name="page" value="1"/>
+                                            </c:url>
+                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
+                                        </li>
+                                        <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                        <c:forEach var="i" begin="${totalPages - 3}" end="${totalPages}">
+                                            <li>
+                                                <c:choose>
+                                                    <c:when test="${i == currentPage}">
+                                                        <button class="page-item-btn active">${i}</button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:url value="/admin/customers" var="pageUrl">
+                                                            <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                            <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:param name="page" value="${i}"/>
+                                                        </c:url>
+                                                        <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </li>
+                                        </c:forEach>
+                                    </c:when>
+                                    
+                                    <%-- Case 3: In the middle --%>
+                                    <c:otherwise>
+                                        <li>
+                                            <c:url value="/admin/customers" var="pageUrl">
+                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:param name="page" value="1"/>
+                                            </c:url>
+                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
+                                        </li>
+                                        <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                        <c:forEach var="i" begin="${currentPage - 1}" end="${currentPage + 1}">
+                                            <li>
+                                                <c:choose>
+                                                    <c:when test="${i == currentPage}">
+                                                        <button class="page-item-btn active">${i}</button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:url value="/admin/customers" var="pageUrl">
+                                                            <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                            <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:param name="page" value="${i}"/>
+                                                        </c:url>
+                                                        <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </li>
+                                        </c:forEach>
+                                        <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                        <li>
+                                            <c:url value="/admin/customers" var="pageUrl">
+                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:param name="page" value="${totalPages}"/>
+                                            </c:url>
+                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
+                                        </li>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:otherwise>
                         </c:choose>
-                    </c:forEach>
-
-                    <!-- Nút Tiếp -->
-                    <c:choose>
-                        <c:when test="${currentPage < totalPages}">
-                            <c:url value="/admin/customers" var="nextUrl">
-                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
-                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
-                                <c:param name="page" value="${currentPage + 1}"/>
-                            </c:url>
-                            <a href="${nextUrl}" class="pagination-btn"><span>&raquo;</span></a>
-                        </c:when>
-                        <c:otherwise>
-                            <button class="pagination-btn disabled" disabled><span>&raquo;</span></button>
-                        </c:otherwise>
-                    </c:choose>
+                        <li>
+                            <c:choose>
+                                <c:when test="${currentPage < totalPages}">
+                                    <c:url value="/admin/customers" var="nextUrl">
+                                        <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                        <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                        <c:param name="page" value="${currentPage + 1}"/>
+                                    </c:url>
+                                    <a href="${nextUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_right</span>
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="page-item-btn disabled">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_right</span>
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </c:if>

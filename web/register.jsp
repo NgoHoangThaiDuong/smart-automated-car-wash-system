@@ -6,20 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng ký tài khoản - Smart Car Wash</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/typography.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/register.css'/>">
 </head>
 <body>
 
     <div class="register-container">
-        <div class="icon-wrapper">
-            <svg viewBox="0 0 24 24">
-                <path d="M18.92 11.01C18.72 10.42 18.16 10 17.5 10H6.5c-.66 0-1.21.42-1.42 1.01L3 17v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 12h10.3l1.04 3H5.81l1.04-3zM6 21c-.83 0-1.5-.67-1.5-1.5S5.17 18 6 18s1.5.67 1.5 1.5S6.83 21 6 21zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-            </svg>
+        <div class="login-logo-container">
+            <img src="<c:url value='/public/logo.svg'/>" alt="Smart Car Wash Logo" class="login-logo-img" height="80">
         </div>
 
-        <h1>Đăng ký tài khoản</h1>
-        <p class="subtitle">Trở thành thành viên Smart Car Wash</p>
+        <h1>Smart <span>Car Wash</span></h1>
+        <p class="subtitle">Đăng ký tài khoản thành viên</p>
 
         <form method="POST" action="<c:url value='/auth/register'/>">
             <div class="form-group">
