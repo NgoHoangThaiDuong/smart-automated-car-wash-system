@@ -2,7 +2,7 @@ package service;
 
 import model.User;
 import dao.UserDAO;
-import java.security.MessageDigest;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
     private final UserDAO userRepo = new UserDAO();
@@ -20,8 +20,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        String hashed = hashMD5(password);
-        if (!hashed.equals(user.getPassword())) {
+        if (!BCrypt.checkpw(password, user.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
@@ -40,21 +39,7 @@ public class AuthService {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        String hashedPassword = hashMD5(password);
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         userRepo.create(username.trim(), hashedPassword, fullname != null ? fullname.trim() : null, phone != null ? phone.trim() : null, "CUSTOMER");
-    }
-
-    public static String hashMD5(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(input.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("MD5 encryption error", e);
-        }
     }
 }
