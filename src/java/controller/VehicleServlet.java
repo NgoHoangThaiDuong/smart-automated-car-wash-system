@@ -1,6 +1,6 @@
 package controller;
 
-import dao.VehicleDAO;
+import service.VehicleService;
 import model.User;
 import model.Vehicle;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 @WebServlet("/vehicles/*")
 public class VehicleServlet extends HttpServlet {
 
-    private final VehicleDAO vehicleRepo = new VehicleDAO();
+    private final VehicleService vehicleService = new VehicleService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -76,34 +76,18 @@ public class VehicleServlet extends HttpServlet {
             res.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
-//        if (brand.isEmpty()) {
-//            session.setAttribute("vehicleError", "Hãng xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/profile");
-//            return;
-//        }
-//
-//        if (model.isEmpty()) {
-//            session.setAttribute("vehicleError", "Dòng xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/profile");
-//            return;
-//        }
-//
-//        if (color.isEmpty()) {
-//            session.setAttribute("vehicleError", "Màu xe không được để trống!");
-//            res.sendRedirect(req.getContextPath() + "/profile");
-//            return;
-//        }
 
-        if (vehicleRepo.existsByPlate(licensePlate)) {
+        if (vehicleService.existsByPlate(licensePlate)) {
             session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
             res.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
 
         try {
-            vehicleRepo.create(currentUser.getId(), licensePlate, brand, model, color);
+            vehicleService.createVehicle(currentUser.getId(), licensePlate, brand, model, color);
             res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_add_success");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("vehicleError", "Lỗi khi thêm xe!");
             res.sendRedirect(req.getContextPath() + "/profile");
         }
@@ -149,16 +133,16 @@ public class VehicleServlet extends HttpServlet {
                 return;
             }
 
-            if (vehicleRepo.existsByPlateExceptId(licensePlate, id)) {
+            if (vehicleService.existsByPlateExceptId(licensePlate, id)) {
                 session.setAttribute("vehicleError", "Biển số xe đã tồn tại!");
                 res.sendRedirect(req.getContextPath() + "/profile");
                 return;
             }
 
-            Vehicle v = vehicleRepo.findById(id);
+            Vehicle v = vehicleService.findById(id);
 
             if (v != null && v.getUserId() == currentUser.getId()) {
-                vehicleRepo.update(id, licensePlate, brand, model, color);
+                vehicleService.updateVehicle(id, licensePlate, brand, model, color);
                 res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_update_success");
             } else {
                 session.setAttribute("vehicleError", "Không có quyền sửa xe này!");
@@ -166,6 +150,7 @@ public class VehicleServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("vehicleError", "Lỗi khi cập nhật xe!");
             res.sendRedirect(req.getContextPath() + "/profile");
         }
@@ -176,15 +161,16 @@ public class VehicleServlet extends HttpServlet {
 
         try {
             int id = Integer.parseInt(req.getParameter("vehicleId"));
-            Vehicle v = vehicleRepo.findById(id);
+            Vehicle v = vehicleService.findById(id);
             if (v != null && v.getUserId() == currentUser.getId()) {
-                vehicleRepo.delete(id);
+                vehicleService.deleteVehicle(id);
                 res.sendRedirect(req.getContextPath() + "/profile?msg=vehicle_delete_success");
             } else {
                 session.setAttribute("vehicleError", "Không có quyền xóa phương tiện này hoặc không tìm thấy!");
                 res.sendRedirect(req.getContextPath() + "/profile");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("vehicleError", "Lỗi khi xóa phương tiện: " + e.getMessage());
             res.sendRedirect(req.getContextPath() + "/profile");
         }

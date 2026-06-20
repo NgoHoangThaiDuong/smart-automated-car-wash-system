@@ -1,8 +1,7 @@
 package controller;
 
-import dao.LoyaltyTierDAO;
-import dao.UserDAO;
-import dao.VehicleDAO;
+import service.UserService;
+import service.VehicleService;
 import model.LoyaltyTier;
 import model.User;
 import model.Vehicle;
@@ -19,23 +18,22 @@ import java.util.List;
 @WebServlet("/profile/*")
 public class ProfileServlet extends HttpServlet {
 
-    private final UserDAO userRepo = new UserDAO();
-    private final LoyaltyTierDAO tierRepo = new LoyaltyTierDAO();
-    private final VehicleDAO vehicleRepo = new VehicleDAO();
+    private final UserService userService = new UserService();
+    private final VehicleService vehicleService = new VehicleService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         User sessionUser = (User) session.getAttribute("currentUser");
 
-        User freshUser = userRepo.findById(sessionUser.getId());
+        User freshUser = userService.findById(sessionUser.getId());
         if (freshUser != null) {
             session.setAttribute("currentUser", freshUser);
         } else {
             freshUser = sessionUser;
         }
 
-        List<LoyaltyTier> allTiers = tierRepo.findAll();
+        List<LoyaltyTier> allTiers = userService.getAllLoyaltyTiers();
         LoyaltyTier nextTier = null;
         for (LoyaltyTier t : allTiers) {
             if (t.getMinSpend() > freshUser.getLifetimeSpent()) {
@@ -64,7 +62,7 @@ public class ProfileServlet extends HttpServlet {
             session.removeAttribute("vehicleError");
         }
 
-        List<Vehicle> vehicles = vehicleRepo.findByUserId(freshUser.getId());
+        List<Vehicle> vehicles = vehicleService.findByUserId(freshUser.getId());
         req.setAttribute("vehicles", vehicles);
 
         req.setAttribute("activePage", "profile");
@@ -97,13 +95,14 @@ public class ProfileServlet extends HttpServlet {
         }
 
         try {
-            userRepo.updateProfile(currentUser.getId(),
+            userService.updateProfile(currentUser.getId(),
                     fullname != null ? fullname.trim() : "",
                     phone != null ? phone.trim() : "");
-            User updatedUser = userRepo.findById(currentUser.getId());
+            User updatedUser = userService.findById(currentUser.getId());
             session.setAttribute("currentUser", updatedUser);
             res.sendRedirect(req.getContextPath() + "/profile?msg=profile_success");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("profileError", "Lỗi hệ thống khi cập nhật hồ sơ cá nhân.");
             res.sendRedirect(req.getContextPath() + "/profile");
         }
