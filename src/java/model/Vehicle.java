@@ -8,6 +8,7 @@ public class Vehicle {
     private String model;
     private String color;
     private String imagePath;
+    private boolean deleted;
 
     public Vehicle() {
     }
@@ -75,5 +76,13 @@ public class Vehicle {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

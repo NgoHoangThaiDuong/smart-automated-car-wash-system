@@ -1,10 +1,9 @@
 package controller;
 
-import dao.BookingDAO;
-import dao.CustomerDashboardDAO;
-import dao.UserDAO;
 import dto.CustomerDashboardDTO;
 import model.User;
+import service.BookingService;
+import service.UserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,9 +16,8 @@ import java.io.IOException;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-    private final UserDAO userDAO = new UserDAO();
-    private final CustomerDashboardDAO dashboardDAO = new CustomerDashboardDAO();
-    private final BookingDAO bookingDAO = new BookingDAO();
+    private final UserService userService = new UserService();
+    private final BookingService bookingService = new BookingService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -36,14 +34,14 @@ public class DashboardServlet extends HttpServlet {
             return;
         }
 
-        User freshUser = userDAO.findById(currentUser.getId());
+        User freshUser = userService.findById(currentUser.getId());
         if (freshUser == null) {
             session.invalidate();
             res.sendRedirect(req.getContextPath() + "/auth/login");
             return;
         }
 
-        CustomerDashboardDTO dashboard = dashboardDAO.getCustomerDashboard(freshUser.getId());
+        CustomerDashboardDTO dashboard = userService.getCustomerDashboard(freshUser.getId());
         if (dashboard == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -51,8 +49,8 @@ public class DashboardServlet extends HttpServlet {
 
         session.setAttribute("currentUser", freshUser);
         req.setAttribute("dashboard", dashboard);
-        req.setAttribute("upcomingBooking", bookingDAO.getUpcomingBookingByUserId(freshUser.getId()));
-        req.setAttribute("recentWashHistory", bookingDAO.getRecentWashHistoryByUserId(freshUser.getId(), 5));
+        req.setAttribute("upcomingBooking", bookingService.getUpcomingBookingByUserId(freshUser.getId()));
+        req.setAttribute("recentWashHistory", bookingService.getRecentWashHistoryByUserId(freshUser.getId(), 5));
         req.setAttribute("activePage", "dashboard");
 
         req.getRequestDispatcher("/WEB-INF/view/customer/dashboard.jsp").forward(req, res);

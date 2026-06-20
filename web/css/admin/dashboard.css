@@ -1,0 +1,191 @@
+/* Admin Dashboard — Stats Cards & Dashboard Controls */
+
+/* ─── Stats Row 1: Large Cards ─── */
+.stats-row-large {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-large {
+    background: #ffffff;
+    border: 1px solid var(--border-slate);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.01);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    min-height: 145px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-large.blue-card {
+    background: linear-gradient(135deg, #0B45BD 0%, #1E5BE4 100%);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 10px 20px rgba(11, 69, 189, 0.12);
+}
+
+.card-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-slate-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-slate-dark);
+    line-height: 1.1;
+    margin-top: 0.25rem;
+}
+
+.blue-card .card-label { color: rgba(255, 255, 255, 0.8); }
+.blue-card .card-value { color: #ffffff; }
+
+.card-decor-circle {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-decor-circle .material-symbols-outlined {
+    font-size: 1.6rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.card-icon-wrapper {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon-wrapper .material-symbols-outlined {
+    font-size: 1.3rem;
+    color: var(--primary);
+}
+
+/* ─── Stats Row 2: Small Cards ─── */
+.stats-row-small {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card-small {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border-slate);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+}
+
+.card-small .card-label {
+    margin-top: 0.25rem;
+}
+
+.card-small .card-value {
+    font-size: 1.5rem;
+}
+
+/* ─── Management Card Controls ─── */
+.mgmt-title-wrapper h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-slate-dark);
+    margin: 0;
+}
+
+.mgmt-title-wrapper p {
+    font-size: 0.825rem;
+    color: var(--text-slate-muted);
+    margin: 0.25rem 0 0 0;
+}
+
+.mgmt-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper .material-symbols-outlined {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--text-slate-light);
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+.search-input {
+    padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    min-width: 200px;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(11, 69, 189, 0.1);
+}
+
+.btn-filter,
+.btn-new-booking {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: 1px solid #CBD5E1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.btn-filter:hover { background: #F8FAFC; border-color: #94A3B8; }
+
+.btn-new-booking {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(11, 69, 189, 0.15);
+}
+
+.btn-new-booking:hover { background: var(--primary-hover); }

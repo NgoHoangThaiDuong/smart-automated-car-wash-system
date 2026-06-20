@@ -8,14 +8,237 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
+
+    public int countCustomers() {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'CUSTOMER' AND is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting customers: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public int countRegisteredVehicles() {
+        String sql = "SELECT COUNT(*) FROM vehicles WHERE is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting registered vehicles: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public double sumLifetimeSpent() {
+        String sql = "SELECT SUM(lifetime_spent) FROM users WHERE role = 'CUSTOMER' AND is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error summing lifetime spent: " + e.getMessage(), e);
+        }
+        return 0.0;
+    }
+
+    public List<User> searchCustomers(String key, Integer tierId) {
+        List<User> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
+            "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
+            "FROM users u " +
+            "LEFT JOIN tiers t ON u.tier_id = t.id " +
+            "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (key != null && !key.trim().isEmpty()) {
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            String keyParam = "%" + key.trim() + "%";
+            params.add(keyParam);
+            params.add(keyParam);
+            params.add(keyParam);
+        }
+        
+        if (tierId != null && tierId > 0) {
+            sql.append("AND u.tier_id = ? ");
+            params.add(tierId);
+        }
+        
+        sql.append("ORDER BY u.fullname ASC");
+        
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) {
+                    ps.setString(i + 1, (String) p);
+                } else if (p instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) p);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getUser(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching customers: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public int countCustomers(String key, Integer tierId) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users u WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 ");
+        List<Object> params = new ArrayList<>();
+        
+        if (key != null && !key.trim().isEmpty()) {
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            String keyParam = "%" + key.trim() + "%";
+            params.add(keyParam);
+            params.add(keyParam);
+            params.add(keyParam);
+        }
+        
+        if (tierId != null && tierId > 0) {
+            sql.append("AND u.tier_id = ? ");
+            params.add(tierId);
+        }
+        
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) {
+                    ps.setString(i + 1, (String) p);
+                } else if (p instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) p);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting customers: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public List<User> searchCustomersPaginated(String key, Integer tierId, int offset, int limit) {
+        List<User> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
+            "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
+            "FROM users u " +
+            "LEFT JOIN tiers t ON u.tier_id = t.id " +
+            "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (key != null && !key.trim().isEmpty()) {
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            String keyParam = "%" + key.trim() + "%";
+            params.add(keyParam);
+            params.add(keyParam);
+            params.add(keyParam);
+        }
+        
+        if (tierId != null && tierId > 0) {
+            sql.append("AND u.tier_id = ? ");
+            params.add(tierId);
+        }
+        
+        sql.append("ORDER BY u.fullname ASC ");
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add(offset);
+        params.add(limit);
+        
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) {
+                    ps.setString(i + 1, (String) p);
+                } else if (p instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) p);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getUser(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching customers paginated: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+
+    public void updateUserStatsAndTier(int userId, double spendAmount, int pointsEarned) {
+        User user = findById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        int newWashes = user.getTotalWashes() + 1;
+        double newSpent = user.getLifetimeSpent() + spendAmount;
+        int newPoints = user.getPointsBalance() + pointsEarned;
+
+        int targetTierId = user.getTierId();
+        List<LoyaltyTier> tiers = new LoyaltyTierDAO().findAll();
+        for (LoyaltyTier tier : tiers) {
+            if (newWashes >= tier.getMinWashes() || newSpent >= tier.getMinSpend()) {
+                targetTierId = tier.getId();
+            }
+        }
+
+        String sql = "UPDATE users SET total_washes = ?, lifetime_spent = ?, points_balance = ?, tier_id = ? WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, newWashes);
+            ps.setDouble(2, newSpent);
+            ps.setInt(3, newPoints);
+            ps.setInt(4, targetTierId);
+            ps.setInt(5, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating user stats and loyalty tier: " + e.getMessage(), e);
+        }
+    }
 
     public void create(String username, String hashedPassword, String fullname, String phone, String role) {
         String sql = "INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) " +
                      "VALUES (?, ?, ?, ?, ?, (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.00)";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, fullname);
@@ -32,13 +255,13 @@ public class UserDAO {
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.username = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                     "WHERE u.username = ? AND u.is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return setUser(rs);
+                    return getUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -52,13 +275,13 @@ public class UserDAO {
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.id = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                     "WHERE u.id = ? AND u.is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return setUser(rs);
+                    return getUser(rs);
                 }
             }
         } catch (Exception e) {
@@ -69,8 +292,8 @@ public class UserDAO {
 
     public void updateProfile(int id, String fullname, String phone) {
         String sql = "UPDATE users SET fullname = ?, phone = ? WHERE id = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, fullname);
             ps.setString(2, phone);
             ps.setInt(3, id);
@@ -80,7 +303,7 @@ public class UserDAO {
         }
     }
 
-    private User setUser(ResultSet rs) throws SQLException {
+    private User getUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
         u.setUsername(rs.getString("username"));
@@ -104,6 +327,23 @@ public class UserDAO {
             lt.setMinSpend(rs.getDouble("min_spend"));
             u.setLoyaltyTier(lt);
         }
+        
+        try {
+            u.setVehicleCount(rs.getInt("vehicle_count"));
+        } catch (SQLException e) {
+        }
+
         return u;
+    }
+
+    public void delete(int id) {
+        String sql = "UPDATE users SET is_deleted = 1 WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
+        }
     }
 }

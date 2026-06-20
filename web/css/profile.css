@@ -1,13 +1,13 @@
 :root {
-    --bg-color: #F3F4F6;
+    --bg-color: #F8FAFC;
     --primary: #2563EB;
     --primary-hover: #1D4ED8;
-    --text-dark: #1F2937;
-    --text-gray: #4B5563;
-    --text-light: #9CA3AF;
-    --border: #E5E7EB;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.02), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --text-dark: #0f172a;
+    --text-gray: #475569;
+    --text-light: #94a3b8;
+    --border: #f1f5f9;
+    --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 2px 4px -1px rgba(15, 23, 42, 0.02);
+    --card-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.02), 0 4px 6px -2px rgba(15, 23, 42, 0.01);
     --gold: #FBBF24;
     --platinum: #3B82F6;
     --silver: #9CA3AF;
@@ -21,69 +21,11 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: #F0F4F8;
     color: var(--text-dark);
     min-height: 100vh;
     padding-bottom: 4rem;
-}
-
-.navbar {
-    background: #ffffff;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.nav-container {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-}
-
-.nav-logo {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--primary);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-user {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.user-greeting {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-gray);
-}
-
-.btn-logout {
-    background: #FEE2E2;
-    color: #EF4444;
-    border: 1px solid #FCA5A5;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-logout:hover {
-    background: #EF4444;
-    color: #ffffff;
-    border-color: #EF4444;
 }
 
 .main-container {

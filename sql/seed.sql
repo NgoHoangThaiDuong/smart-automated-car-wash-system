@@ -4,398 +4,275 @@
 USE AutoCarWash;
 GO
 
--- 1. SEED TIERS (Member, Silver, Gold, Platinum)
-IF NOT EXISTS (SELECT * FROM tiers WHERE name='Member')
-BEGIN
-    INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Member', 1.00, 7, 0, 0);
-END;
+-- Clear existing data in correct FK dependency order
+DELETE FROM payments;
+DELETE FROM bookings;
+DELETE FROM vehicles;
+DELETE FROM users;
+DELETE FROM wash_services;
+DELETE FROM tiers;
 GO
 
-IF NOT EXISTS (SELECT * FROM tiers WHERE name='Silver')
-BEGIN
-    INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Silver', 1.10, 10, 5, 2000000);
-END;
+DBCC CHECKIDENT ('tiers', RESEED, 0);
+DBCC CHECKIDENT ('users', RESEED, 0);
+DBCC CHECKIDENT ('vehicles', RESEED, 0);
+DBCC CHECKIDENT ('wash_services', RESEED, 0);
+DBCC CHECKIDENT ('bookings', RESEED, 0);
+DBCC CHECKIDENT ('payments', RESEED, 0);
 GO
 
-IF NOT EXISTS (SELECT * FROM tiers WHERE name='Gold')
-BEGIN
-    INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Gold', 1.20, 12, 15, 6000000);
-END;
+-- 1. SEED TIERS
+INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend) VALUES ('Member', 1.00, 7, 0, 0), ('Silver', 1.10, 10, 5, 2000000), ('Gold', 1.20, 12, 15, 6000000), ('Platinum', 1.30, 14, 30, 15000000);
 GO
 
-IF NOT EXISTS (SELECT * FROM tiers WHERE name='Platinum')
-BEGIN
-    INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend)
-    VALUES ('Platinum', 1.30, 14, 30, 15000000);
-END;
+-- 2. SEED USERS
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('admin@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Admin', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('ducphucdn2006@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phạm Đức Phúc', '0912000001', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 100, 1, 100000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tanbaobadao123@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Dương Duy Lợi', '0912000002', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('jahanne1911@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phạm Gia Hân', '0912000003', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('luongkhuongduyitt@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lương Khương Duy', '0912000004', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('Hikarilong@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lê Hoàng Long', '0912000005', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tahuunguyen60@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Tạ Hữu Nguyên', '0912000006', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('hxt14102004@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Hồ Xuân Thanh', '0912000007', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('trumclone7778@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Tô Gia Bảo', '0912000008', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('nguyenthaotien0809@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Thảo Tiên', '0912000009', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('luohuang300506@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Hoàng Duy Lưu', '0912000010', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('duonghuuviet218@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Dương Hữu Việt', '0912000011', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('nguyenhuukiet7a2@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Hữu Kiệt', '0912000012', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('vantho2607@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phu Vạn Thọ', '0912000013', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 200, 2, 200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('thanhsu.tb.cl.tg.vn@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Đặng Trang Thanh Sử', '0912000014', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('duytanpham2311@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phạm Duy Tân', '0912000015', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('phuocnguyentuan399@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Tuấn Phước', '0912000016', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('quangthainguyenhoang@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Hoàng Quang Thái', '0912000017', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 200, 2, 200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('leesinnnmain1234@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Hoàng Phương', '0912000018', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('mphng2004@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Minh Phương', '0912000019', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('vuminhthien3012@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Vũ Minh Thiện', '0912000020', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tannnse162108@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Nhựt Tân', '0912000021', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('ddqcuong.12a4.c3tqcap@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Đặng Đình Quốc Cường', '0912000022', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 100, 1, 100000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('binhndtse182321@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Dương Thanh Bình', '0912000023', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('nguyennamthang56@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Nam Thắng', '0912000024', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 200, 2, 200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('hhieuu0205@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phạm Huy Hoàng Hiếu', '0912000025', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 100, 1, 100000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('hienthai26052005@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Thái Thảo Hiền', '0912000026', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 200, 2, 200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('thiennhan7972@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Thiện Nhân', '0912000027', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('quynhbong345@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Quỳnh Anh', '0912000028', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 300, 3, 300000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('minhhuynhc1502@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Trần Minh Huy', '0912000029', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 400, 4, 400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('danghaibui6@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Bùi Hải Đăng', '0912000030', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 200, 2, 200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('billphan50@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phan Trọng Nguyên', '0912000031', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2650, 11, 2650000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('takedo03377@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Trần Thành Đạt', '0912000032', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2050, 7, 2050000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('le5169851@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lê Minh Đăng', '0912000033', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2500, 10, 2500000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tainguyentan0908@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Tấn Tài', '0912000034', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2200, 8, 2200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tankhai15406@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lưu Nguyễn Tấn Khải', '0912000035', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2650, 11, 2650000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('muichirou31@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn An Duy', '0912000036', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2650, 11, 2650000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('huynhqiabao2718@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Huỳnh Gia Bảo', '0912000037', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 3100, 14, 3100000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('duykhanh20220601@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Duy Khanh', '0912000038', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2500, 10, 2500000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('denprovc321@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Minh Tường', '0912000039', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2500, 10, 2500000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('daothingoctram0604@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Đào Thị Ngọc Trâm', '0912000040', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2650, 11, 2650000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('vohoanganhkiet2006@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Võ Hoàng Anh Kiệt', '0912000041', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 8400, 27, 8400000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('triluong0166@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lương Quang Trí', '0912000042', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 6000, 15, 6000000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('lethanhdinh37@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lê Thanh Định', '0912000043', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 6000, 15, 6000000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('ducthachhong@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Thạch Hồng Tấn Đức', '0912000044', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 8600, 28, 8600000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('phamnhatduyanh01345@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phạm Nhật Duy Anh', '0912000045', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 6200, 16, 6200000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('minhduc040302@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Nguyễn Đặng Minh Đức', '0912000046', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 16800, 36, 16800000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('tcp352006@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Phan Chí Thuận', '0912000047', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 16500, 35, 16500000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('lnam.phong57@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Lê Nam Phong', '0912000048', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 18900, 43, 18900000.0);
+INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('taiphuc08102005@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Trịnh Nguyễn Phúc Tài', '0912000049', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 17100, 37, 17100000.0);
 GO
 
--- 2. SEED USERS (Each tier has 1 user. Default password: '123456' -> 'e10adc3949ba59abbe56e057f20f883e')
-IF NOT EXISTS (SELECT * FROM users WHERE username='member_user')
-BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
-    VALUES ('member_user', 'e10adc3949ba59abbe56e057f20f883e', N'Nguyễn Văn Thành Viên', '0911111111', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Member'), 0, 1, 50000);
-END;
+-- 3. SEED VEHICLES
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'ducphucdn2006@gmail.com'), '51G-367.24', N'Honda', N'City', N'Xanh dương');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tanbaobadao123@gmail.com'), '30A-949.88', N'Ford', N'Ranger', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tanbaobadao123@gmail.com'), '30A-504.16', N'Toyota', N'Camry', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'jahanne1911@gmail.com'), '30A-663.62', N'Kia', N'Cerato', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'jahanne1911@gmail.com'), '51G-436.99', N'BMW', N'520i', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'luongkhuongduyitt@gmail.com'), '51H-909.59', N'BMW', N'520i', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'Hikarilong@gmail.com'), '75A-158.95', N'Mercedes-Benz', N'C200', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tahuunguyen60@gmail.com'), '51H-404.24', N'Honda', N'CR-V', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'hxt14102004@gmail.com'), '30A-304.89', N'Mazda', N'CX-5', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), '51H-838.38', N'Hyundai', N'Accent', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), '51H-406.74', N'Kia', N'Morning', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'nguyenthaotien0809@gmail.com'), '30A-518.46', N'Hyundai', N'Accent', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'nguyenthaotien0809@gmail.com'), '43A-594.16', N'Mazda', N'Mazda 6', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'luohuang300506@gmail.com'), '75A-744.62', N'VinFast', N'Fadil', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'duonghuuviet218@gmail.com'), '51H-178.47', N'Ford', N'Everest', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'nguyenhuukiet7a2@gmail.com'), '51G-376.76', N'Mercedes-Benz', N'E300', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'vantho2607@gmail.com'), '51H-159.63', N'VinFast', N'VF 9', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'thanhsu.tb.cl.tg.vn@gmail.com'), '43A-413.99', N'Hyundai', N'Tucson', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'duytanpham2311@gmail.com'), '43A-587.94', N'Kia', N'Morning', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'phuocnguyentuan399@gmail.com'), '51G-502.99', N'Mercedes-Benz', N'C200', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), '51G-168.18', N'Honda', N'City', N'Xanh dương');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), '51G-629.74', N'BMW', N'320i', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'leesinnnmain1234@gmail.com'), '29B-463.28', N'Toyota', N'Vios', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), '75A-824.28', N'Mazda', N'CX-5', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'vuminhthien3012@gmail.com'), '75A-705.55', N'VinFast', N'VF e34', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tannnse162108@gmail.com'), '30A-124.69', N'Mazda', N'Mazda 6', N'Xanh dương');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'ddqcuong.12a4.c3tqcap@gmail.com'), '43A-798.79', N'BMW', N'X5', N'Xanh dương');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'binhndtse182321@gmail.com'), '43A-898.59', N'Honda', N'City', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'nguyennamthang56@gmail.com'), '29B-179.89', N'BMW', N'520i', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'nguyennamthang56@gmail.com'), '51H-264.75', N'VinFast', N'Lux A2.0', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'hhieuu0205@gmail.com'), '29B-272.38', N'Honda', N'CR-V', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'hienthai26052005@gmail.com'), '43A-450.95', N'BMW', N'X5', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'thiennhan7972@gmail.com'), '75A-767.31', N'Toyota', N'Vios', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), '43A-840.63', N'Hyundai', N'Santa Fe', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'minhhuynhc1502@gmail.com'), '51G-727.90', N'Hyundai', N'Elantra', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'minhhuynhc1502@gmail.com'), '51H-489.19', N'Toyota', N'Camry', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'danghaibui6@gmail.com'), '43A-970.60', N'Mazda', N'Mazda 3', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'billphan50@gmail.com'), '30A-856.79', N'Mazda', N'CX-5', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'billphan50@gmail.com'), '75A-768.78', N'Hyundai', N'Accent', N'Bạc');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'takedo03377@gmail.com'), '51G-504.58', N'Kia', N'Seltos', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'le5169851@gmail.com'), '29B-314.70', N'Ford', N'Explorer', N'Xanh dương');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tainguyentan0908@gmail.com'), '43A-853.91', N'VinFast', N'VF 9', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), '51H-898.13', N'BMW', N'320i', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), '75A-236.29', N'Ford', N'Everest', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'muichirou31@gmail.com'), '51G-388.67', N'Hyundai', N'Elantra', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'muichirou31@gmail.com'), '51H-189.71', N'BMW', N'X5', N'Đỏ');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'huynhqiabao2718@gmail.com'), '29B-700.55', N'Kia', N'Morning', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'duykhanh20220601@gmail.com'), '29B-171.62', N'Mazda', N'Mazda 3', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), '75A-779.41', N'Ford', N'Ranger', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'daothingoctram0604@gmail.com'), '30A-393.36', N'Mercedes-Benz', N'C200', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'vohoanganhkiet2006@gmail.com'), '51G-253.84', N'Mazda', N'CX-8', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'triluong0166@gmail.com'), '43A-507.43', N'Mazda', N'Mazda 6', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), '75A-500.44', N'Kia', N'Seltos', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'ducthachhong@gmail.com'), '29B-579.43', N'Hyundai', N'Accent', N'Đen');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'phamnhatduyanh01345@gmail.com'), '30A-980.17', N'VinFast', N'Fadil', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'minhduc040302@gmail.com'), '43A-930.51', N'Honda', N'Civic', N'Xám');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'tcp352006@gmail.com'), '51H-256.78', N'Hyundai', N'Accent', N'Vàng cát');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'lnam.phong57@gmail.com'), '29B-928.40', N'Kia', N'Morning', N'Trắng');
+INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES ((SELECT id FROM users WHERE username = 'taiphuc08102005@gmail.com'), '75A-831.46', N'BMW', N'X5', N'Đỏ');
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='silver_user')
-BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
-    VALUES ('silver_user', 'e10adc3949ba59abbe56e057f20f883e', N'Trần Bạc', '0922222222', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Silver'), 2450, 8, 2500000);
-END;
+-- 4. SEED WASH SERVICES
+INSERT INTO wash_services (name, description, price, duration_minutes, is_active) VALUES (N'Rửa xe cơ bản', N'Rửa thân xe bên ngoài bằng nước và xà phòng', 50000, 20, 1);
+INSERT INTO wash_services (name, description, price, duration_minutes, is_active) VALUES (N'Rửa xe + Hút bụi nội thất', N'Rửa thân xe và hút bụi toàn bộ khoang nội thất', 100000, 35, 1);
+INSERT INTO wash_services (name, description, price, duration_minutes, is_active) VALUES (N'Rửa xe cao cấp (Wax + Đánh bóng)', N'Rửa xe, đánh bóng và phủ wax bảo vệ sơn xe', 250000, 60, 1);
+INSERT INTO wash_services (name, description, price, duration_minutes, is_active) VALUES (N'Vệ sinh khoang máy', N'Vệ sinh và làm sạch khoang động cơ', 150000, 30, 1);
+INSERT INTO wash_services (name, description, price, duration_minutes, is_active) VALUES (N'Gói chăm sóc toàn diện', N'Rửa xe, hút bụi nội thất, vệ sinh khoang máy, đánh bóng và phủ wax', 400000, 90, 1);
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='gold_user')
-BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
-    VALUES ('gold_user', 'e10adc3949ba59abbe56e057f20f883e', N'Lê Hoàng Vàng', '0933333333', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Gold'), 1500, 18, 7500000);
-END;
+-- 5. SEED BOOKINGS & WASH HISTORY
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-406.74'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -10, CAST(GETDATE() AS DATE)), '16:00-16:30', 'COMPLETED', 100000, 100, DATEADD(minute, 77, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), 100000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 77, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'hxt14102004@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-304.89'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -4, CAST(GETDATE() AS DATE)), '09:00-09:35', 'COMPLETED', 50000, 50, DATEADD(minute, 39, DATEADD(day, -4, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'hxt14102004@gmail.com'), 50000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 39, DATEADD(day, -4, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'phamnhatduyanh01345@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-980.17'), (SELECT id FROM wash_services WHERE name = N'Vệ sinh khoang máy'), DATEADD(day, -12, CAST(GETDATE() AS DATE)), '16:00-16:30', 'COMPLETED', 150000, 150, DATEADD(minute, 44, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'phamnhatduyanh01345@gmail.com'), 150000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 44, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'binhndtse182321@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-898.59'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -12, CAST(GETDATE() AS DATE)), '10:00-10:30', 'COMPLETED', 100000, 100, DATEADD(minute, 57, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'binhndtse182321@gmail.com'), 100000, 'CASH', 'PAID', DATEADD(minute, 57, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-840.63'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -8, CAST(GETDATE() AS DATE)), '16:00-16:30', 'COMPLETED', 100000, 100, DATEADD(minute, 33, DATEADD(day, -8, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), 100000, 'CASH', 'PAID', DATEADD(minute, 33, DATEADD(day, -8, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'triluong0166@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-507.43'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -3, CAST(GETDATE() AS DATE)), '11:00-11:30', 'COMPLETED', 100000, 100, DATEADD(minute, 47, DATEADD(day, -3, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'triluong0166@gmail.com'), 100000, 'CASH', 'PAID', DATEADD(minute, 47, DATEADD(day, -3, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-629.74'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -8, CAST(GETDATE() AS DATE)), '08:00-08:30', 'COMPLETED', 400000, 400, DATEADD(minute, 21, DATEADD(day, -8, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 21, DATEADD(day, -8, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'hienthai26052005@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-450.95'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -12, CAST(GETDATE() AS DATE)), '08:00-08:30', 'COMPLETED', 400000, 400, DATEADD(minute, 76, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'hienthai26052005@gmail.com'), 400000, 'CASH', 'PAID', DATEADD(minute, 76, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tahuunguyen60@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-404.24'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -10, CAST(GETDATE() AS DATE)), '14:00-14:35', 'COMPLETED', 50000, 50, DATEADD(minute, 72, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tahuunguyen60@gmail.com'), 50000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 72, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'thiennhan7972@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-767.31'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, -12, CAST(GETDATE() AS DATE)), '09:00-09:35', 'COMPLETED', 250000, 250, DATEADD(minute, 78, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'thiennhan7972@gmail.com'), 250000, 'CASH', 'PAID', DATEADD(minute, 78, DATEADD(day, -12, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'huynhqiabao2718@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-700.55'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, -7, CAST(GETDATE() AS DATE)), '16:00-16:30', 'NO_SHOW', 250000, 250, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'huynhqiabao2718@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'hxt14102004@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-304.89'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -10, CAST(GETDATE() AS DATE)), '11:00-11:30', 'COMPLETED', 100000, 100, DATEADD(minute, 48, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'hxt14102004@gmail.com'), 100000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 48, DATEADD(day, -10, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-824.28'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -7, CAST(GETDATE() AS DATE)), '15:00-15:30', 'COMPLETED', 400000, 400, DATEADD(minute, 47, DATEADD(day, -7, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), 400000, 'CASH', 'PAID', DATEADD(minute, 47, DATEADD(day, -7, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-500.44'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -14, CAST(GETDATE() AS DATE)), '14:00-14:35', 'COMPLETED', 400000, 400, DATEADD(minute, 28, DATEADD(day, -14, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), 400000, 'CASH', 'PAID', DATEADD(minute, 28, DATEADD(day, -14, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-840.63'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -11, CAST(GETDATE() AS DATE)), '14:00-14:35', 'COMPLETED', 400000, 400, DATEADD(minute, 42, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 42, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'ducthachhong@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-579.43'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -11, CAST(GETDATE() AS DATE)), '16:00-16:30', 'COMPLETED', 400000, 400, DATEADD(minute, 52, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'ducthachhong@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 52, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tahuunguyen60@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-404.24'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, -6, CAST(GETDATE() AS DATE)), '09:00-09:35', 'CANCELLED', 250000, 250, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tahuunguyen60@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'daothingoctram0604@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-393.36'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -11, CAST(GETDATE() AS DATE)), '08:00-08:30', 'CANCELLED', 100000, 100, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'daothingoctram0604@gmail.com'), 100000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-898.13'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -15, CAST(GETDATE() AS DATE)), '16:00-16:30', 'COMPLETED', 50000, 50, DATEADD(minute, 89, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), 50000, 'CASH', 'PAID', DATEADD(minute, 89, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'vohoanganhkiet2006@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-253.84'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -6, CAST(GETDATE() AS DATE)), '10:00-10:30', 'CANCELLED', 50000, 50, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'vohoanganhkiet2006@gmail.com'), 50000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'muichirou31@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-388.67'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -7, CAST(GETDATE() AS DATE)), '11:00-11:30', 'COMPLETED', 400000, 400, DATEADD(minute, 53, DATEADD(day, -7, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'muichirou31@gmail.com'), 400000, 'CASH', 'PAID', DATEADD(minute, 53, DATEADD(day, -7, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'billphan50@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-856.79'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -11, CAST(GETDATE() AS DATE)), '11:00-11:30', 'COMPLETED', 50000, 50, DATEADD(minute, 83, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'billphan50@gmail.com'), 50000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 83, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'leesinnnmain1234@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-463.28'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -11, CAST(GETDATE() AS DATE)), '10:00-10:30', 'COMPLETED', 400000, 400, DATEADD(minute, 86, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'leesinnnmain1234@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 86, DATEADD(day, -11, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'duykhanh20220601@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-171.62'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -7, CAST(GETDATE() AS DATE)), '11:00-11:30', 'NO_SHOW', 100000, 100, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'duykhanh20220601@gmail.com'), 100000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tanbaobadao123@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-504.16'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, -15, CAST(GETDATE() AS DATE)), '09:00-09:35', 'COMPLETED', 250000, 250, DATEADD(minute, 39, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tanbaobadao123@gmail.com'), 250000, 'CASH', 'PAID', DATEADD(minute, 39, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'duonghuuviet218@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-178.47'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -8, CAST(GETDATE() AS DATE)), '15:00-15:30', 'CANCELLED', 400000, 400, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'duonghuuviet218@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-236.29'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, -15, CAST(GETDATE() AS DATE)), '08:00-08:30', 'COMPLETED', 400000, 400, DATEADD(minute, 37, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 37, DATEADD(day, -15, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'triluong0166@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-507.43'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, -4, CAST(GETDATE() AS DATE)), '15:00-15:30', 'CANCELLED', 50000, 50, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'triluong0166@gmail.com'), 50000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'nguyennamthang56@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-179.89'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), DATEADD(day, -3, CAST(GETDATE() AS DATE)), '09:00-09:35', 'COMPLETED', 100000, 100, DATEADD(minute, 86, DATEADD(day, -3, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'nguyennamthang56@gmail.com'), 100000, 'CASH', 'PAID', DATEADD(minute, 86, DATEADD(day, -3, CAST(GETDATE() AS DATETIME))));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-406.74'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, -5, CAST(GETDATE() AS DATE)), '10:00-10:30', 'COMPLETED', 250000, 250, DATEADD(minute, 28, DATEADD(day, -5, CAST(GETDATE() AS DATETIME))));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'trumclone7778@gmail.com'), 250000, 'CASH', 'PAID', DATEADD(minute, 28, DATEADD(day, -5, CAST(GETDATE() AS DATETIME))));
 GO
 
-IF NOT EXISTS (SELECT * FROM users WHERE username='platinum_user')
-BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
-    VALUES ('platinum_user', 'e10adc3949ba59abbe56e057f20f883e', N'Phạm Bạch Kim', '0944444444', 'CUSTOMER', (SELECT id FROM tiers WHERE name='Platinum'), 4500, 35, 18000000);
-END;
+-- 6. SEED TODAY'S BOOKINGS
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'huynhqiabao2718@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-700.55'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), CAST(GETDATE() AS DATE), '08:00-08:20', 'COMPLETED', 400000, 400, DATEADD(minute, 57, CAST(GETDATE() AS DATETIME)));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'huynhqiabao2718@gmail.com'), 400000, 'BANK_TRANSFER', 'PAID', DATEADD(minute, 57, CAST(GETDATE() AS DATETIME)));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'hhieuu0205@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-272.38'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), CAST(GETDATE() AS DATE), '08:30-08:50', 'COMPLETED', 250000, 250, DATEADD(minute, 24, CAST(GETDATE() AS DATETIME)));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'hhieuu0205@gmail.com'), 250000, 'CASH', 'PAID', DATEADD(minute, 24, CAST(GETDATE() AS DATETIME)));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'luohuang300506@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-744.62'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), CAST(GETDATE() AS DATE), '09:00-09:20', 'COMPLETED', 250000, 250, DATEADD(minute, 37, CAST(GETDATE() AS DATETIME)));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'luohuang300506@gmail.com'), 250000, 'CASH', 'PAID', DATEADD(minute, 37, CAST(GETDATE() AS DATETIME)));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tainguyentan0908@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-853.91'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), CAST(GETDATE() AS DATE), '09:30-09:50', 'COMPLETED', 50000, 50, DATEADD(minute, 48, CAST(GETDATE() AS DATETIME)));
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tainguyentan0908@gmail.com'), 50000, 'CASH', 'PAID', DATEADD(minute, 48, CAST(GETDATE() AS DATETIME)));
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'minhduc040302@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-930.51'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), CAST(GETDATE() AS DATE), '10:00-10:20', 'IN_PROGRESS', 50000, 50, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'minhduc040302@gmail.com'), 50000, 'BANK_TRANSFER', 'PAID', GETDATE());
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'thiennhan7972@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-767.31'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), CAST(GETDATE() AS DATE), '10:30-10:50', 'IN_PROGRESS', 400000, 400, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'thiennhan7972@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-629.74'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), CAST(GETDATE() AS DATE), '11:00-11:20', 'IN_PROGRESS', 250000, 250, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'quangthainguyenhoang@gmail.com'), 250000, 'CASH', 'PAID', GETDATE());
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-779.41'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), CAST(GETDATE() AS DATE), '11:30-11:50', 'IN_PROGRESS', 250000, 250, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-824.28'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), CAST(GETDATE() AS DATE), '13:00-13:20', 'CONFIRMED', 50000, 50, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), 50000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-236.29'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), CAST(GETDATE() AS DATE), '13:30-13:50', 'CONFIRMED', 400000, 400, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tankhai15406@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'le5169851@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-314.70'), (SELECT id FROM wash_services WHERE name = N'Vệ sinh khoang máy'), CAST(GETDATE() AS DATE), '14:00-14:20', 'CONFIRMED', 150000, 150, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'le5169851@gmail.com'), 150000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tannnse162108@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-124.69'), (SELECT id FROM wash_services WHERE name = N'Vệ sinh khoang máy'), CAST(GETDATE() AS DATE), '14:30-14:50', 'CONFIRMED', 150000, 150, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tannnse162108@gmail.com'), 150000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-779.41'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), CAST(GETDATE() AS DATE), '15:00-15:20', 'CONFIRMED', 250000, 250, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-779.41'), (SELECT id FROM wash_services WHERE name = N'Vệ sinh khoang máy'), CAST(GETDATE() AS DATE), '15:30-15:50', 'CONFIRMED', 150000, 150, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'denprovc321@gmail.com'), 150000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'duonghuuviet218@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51H-178.47'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), CAST(GETDATE() AS DATE), '16:00-16:20', 'NO_SHOW', 100000, 100, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'duonghuuviet218@gmail.com'), 100000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-824.28'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), CAST(GETDATE() AS DATE), '16:30-16:50', 'NO_SHOW', 100000, 100, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'mphng2004@gmail.com'), 100000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-500.44'), (SELECT id FROM wash_services WHERE name = N'Vệ sinh khoang máy'), CAST(GETDATE() AS DATE), '17:00-17:20', 'NO_SHOW', 150000, 150, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), 150000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'daothingoctram0604@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-393.36'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), CAST(GETDATE() AS DATE), '17:30-17:50', 'CANCELLED', 400000, 400, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'daothingoctram0604@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'tannnse162108@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '30A-124.69'), (SELECT id FROM wash_services WHERE name = N'Rửa xe + Hút bụi nội thất'), CAST(GETDATE() AS DATE), '18:00-18:20', 'CANCELLED', 100000, 100, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tannnse162108@gmail.com'), 100000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, completed_at) VALUES ((SELECT id FROM users WHERE username = 'binhndtse182321@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-898.59'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), CAST(GETDATE() AS DATE), '18:30-18:50', 'CANCELLED', 50000, 50, NULL);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'binhndtse182321@gmail.com'), 50000, NULL, 'UNPAID', NULL);
 GO
 
--- 3. SEED VEHICLES: 3 VEHICLES FOR EACH CUSTOMER
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-11111')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11111', N'Toyota', N'Vios', N'Đỏ', '/images/vehicles/vehicle-white.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-11222')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11222', N'Honda', N'City', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30A-11333')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), '30A-11333', N'Mazda', N'CX-3', N'Đen', '/images/vehicles/vehicle-black.jpg');
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-22222')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22222', N'Honda', N'CR-V', N'Trắng', '/images/vehicles/vehicle-white.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-22333')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22333', N'Toyota', N'Camry', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='29B-22444')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), '29B-22444', N'BMW', N'X5 xDrive40i', N'Đen', '/images/vehicles/vehicle-black.jpg');
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33333')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33333', N'Mazda', N'CX-5', N'Đen', '/images/vehicles/vehicle-black.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33444')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33444', N'Mercedes', N'C200', N'Trắng', '/images/vehicles/vehicle-white.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33555')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33555', N'VinFast', N'VF 8', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44444')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44444', N'Ford', N'Ranger', N'Xám', '/images/vehicles/vehicle-black.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44555')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44555', N'Porsche', N'Taycan 4S', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
-END;
-GO
-IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44666')
-BEGIN
-    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44666', N'Tesla', N'Model 3', N'Trắng', '/images/vehicles/vehicle-white.jpg');
-END;
-GO
-
--- 4. SEED ADMIN USER
-IF NOT EXISTS (SELECT * FROM users WHERE username='admin')
-BEGIN
-    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
-    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', N'Quản Trị Viên', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0);
-END;
-GO
-
--- 5. SEED WASH SERVICES
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cơ bản')
-BEGIN
-    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
-    VALUES (N'Rửa xe cơ bản', N'Rửa thân xe bên ngoài bằng nước và xà phòng', 50000, 20, 1);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất')
-BEGIN
-    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
-    VALUES (N'Rửa xe + Hút bụi nội thất', N'Rửa thân xe và hút bụi toàn bộ khoang nội thất', 100000, 35, 1);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)')
-BEGIN
-    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
-    VALUES (N'Rửa xe cao cấp (Wax + Đánh bóng)', N'Rửa xe, đánh bóng và phủ wax bảo vệ sơn xe', 250000, 60, 1);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Vệ sinh khoang máy')
-BEGIN
-    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
-    VALUES (N'Vệ sinh khoang máy', N'Vệ sinh và làm sạch khoang động cơ', 150000, 30, 1);
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Gói chăm sóc toàn diện')
-BEGIN
-    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
-    VALUES (N'Gói chăm sóc toàn diện', N'Rửa xe, hút bụi nội thất, vệ sinh khoang máy, đánh bóng và phủ wax', 400000, 90, 1);
-END;
-GO
-
--- 6. SEED BOOKINGS
--- Booking identity in seed: user_id + booking_date + time_slot.
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11111'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cơ bản'), '2026-06-15', '09:00-09:30',
-        'CONFIRMED', 0, N'Khách yêu cầu rửa kỹ phần gầm xe', '2026-06-14 20:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22222'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-12', '14:00-14:35',
-        'COMPLETED', 110, NULL, '2026-06-11 09:00:00', '2026-06-12 14:35:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33333'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-10', '10:00-11:00',
-        'COMPLETED', 300, N'Khách hàng VIP, ưu tiên xử lý', '2026-06-08 08:30:00', '2026-06-10 11:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44444'),
-        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-06-18', '08:00-09:30',
-        'CONFIRMED', 0, N'Đặt lịch định kỳ hàng tháng', '2026-06-16 10:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11222'),
-        (SELECT id FROM wash_services WHERE name=N'Vệ sinh khoang máy'), '2026-05-20', '16:00-16:30',
-        'CANCELLED', 0, N'Khách hủy do bận đột xuất', '2026-05-18 12:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11333'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-21', '10:00-10:35',
-        'CONFIRMED', 0, N'Thanh toán MOMO thất bại, chờ thanh toán lại', '2026-06-19 18:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22333'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-22', '09:00-10:00',
-        'CONFIRMED', 0, N'Khách đã thanh toán trước qua VNPAY', '2026-06-19 19:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33444'),
-        (SELECT id FROM wash_services WHERE name=N'Vệ sinh khoang máy'), '2026-06-23', '15:00-15:30',
-        'IN_PROGRESS', 0, N'Đã thanh toán bằng thẻ', '2026-06-20 08:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44555'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cơ bản'), '2026-06-24', '13:00-13:20',
-        'CONFIRMED', 0, N'Khách sẽ thanh toán tại quầy', '2026-06-20 09:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
-    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22444'),
-        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-05-28', '08:00-09:30',
-        'COMPLETED', 440, NULL, '2026-05-25 08:00:00', '2026-05-28 09:30:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
-    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33555'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-05-25', '11:00-11:35',
-        'CANCELLED', 0, N'Khách đổi lịch', '2026-05-23 14:00:00');
-END;
-GO
-
-IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00')
-BEGIN
-    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
-    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44666'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-05-30', '14:00-15:00',
-        'COMPLETED', 325, NULL, '2026-05-27 10:00:00', '2026-05-30 15:00:00');
-END;
-GO
-
--- 7. SEED PAYMENTS
--- A payment is found through the booking's user + date + time slot.
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30'),
-        (SELECT id FROM users WHERE username='member_user'), 50000, 'UNPAID', '2026-06-14 20:00:00', '2026-06-14 20:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'),
-        (SELECT id FROM users WHERE username='silver_user'), 100000, 'CASH', 'PAID', '2026-06-12 14:35:00', '2026-06-11 09:00:00', '2026-06-12 14:35:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'),
-        (SELECT id FROM users WHERE username='gold_user'), 250000, 'BANK_TRANSFER', 'PAID', '2026-06-10 10:05:00', '2026-06-08 08:30:00', '2026-06-10 10:05:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30'),
-        (SELECT id FROM users WHERE username='platinum_user'), 400000, 'UNPAID', '2026-06-16 10:00:00', '2026-06-16 10:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30'),
-        (SELECT id FROM users WHERE username='member_user'), 150000, 'CANCELLED', '2026-05-18 12:00:00', '2026-05-19 16:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35'),
-        (SELECT id FROM users WHERE username='member_user'), 100000, 'MOMO', 'FAILED', '2026-06-19 18:00:00', '2026-06-19 18:05:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00'),
-        (SELECT id FROM users WHERE username='silver_user'), 250000, 'VNPAY', 'PAID', '2026-06-19 19:05:00', '2026-06-19 19:00:00', '2026-06-19 19:05:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30'),
-        (SELECT id FROM users WHERE username='gold_user'), 150000, 'CARD', 'PAID', '2026-06-20 08:10:00', '2026-06-20 08:00:00', '2026-06-20 08:10:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20'),
-        (SELECT id FROM users WHERE username='platinum_user'), 50000, 'UNPAID', '2026-06-20 09:00:00', '2026-06-20 09:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'),
-        (SELECT id FROM users WHERE username='silver_user'), 400000, 'MOMO', 'PAID', '2026-05-27 20:00:00', '2026-05-25 08:00:00', '2026-05-27 20:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35'),
-        (SELECT id FROM users WHERE username='gold_user'), 100000, 'CANCELLED', '2026-05-23 14:00:00', '2026-05-24 09:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'))
-    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'),
-        (SELECT id FROM users WHERE username='platinum_user'), 250000, 'CASH', 'PAID', '2026-05-30 15:00:00', '2026-05-27 10:00:00', '2026-05-30 15:00:00');
-GO
-
--- 8. SEED WASH HISTORY (completed and paid bookings only)
-IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'))
-    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'),
-        (SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22222'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-12 14:35:00', 110,
-        N'Rửa sạch, nhân viên thân thiện', '2026-06-12 14:35:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'))
-    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'),
-        (SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33333'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-10 11:00:00', 300,
-        N'Xe bóng loáng, rất hài lòng', '2026-06-10 11:00:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'))
-    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'),
-        (SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22444'),
-        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-05-28 09:30:00', 440,
-        N'Dịch vụ đầy đủ, xe sạch và bóng', '2026-05-28 09:30:00');
-GO
-
-IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'))
-    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
-    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'),
-        (SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44666'),
-        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-05-30 15:00:00', 325,
-        N'Hài lòng với chất lượng đánh bóng', '2026-05-30 15:00:00');
+-- 7. SEED FUTURE BOOKINGS
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'vohoanganhkiet2006@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-253.84'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, 2, CAST(GETDATE() AS DATE)), '11:00-11:30', 'CONFIRMED', 250000, 250);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'vohoanganhkiet2006@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'taiphuc08102005@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-831.46'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, 5, CAST(GETDATE() AS DATE)), '15:00-15:30', 'CONFIRMED', 250000, 250);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'taiphuc08102005@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'le5169851@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-314.70'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, 5, CAST(GETDATE() AS DATE)), '09:00-09:30', 'CONFIRMED', 400000, 400);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'le5169851@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'ducphucdn2006@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-367.24'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cao cấp (Wax + Đánh bóng)'), DATEADD(day, 2, CAST(GETDATE() AS DATE)), '15:00-15:30', 'CONFIRMED', 250000, 250);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'ducphucdn2006@gmail.com'), 250000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'tainguyentan0908@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-853.91'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, 1, CAST(GETDATE() AS DATE)), '11:00-11:30', 'CONFIRMED', 50000, 50);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'tainguyentan0908@gmail.com'), 50000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '43A-840.63'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, 1, CAST(GETDATE() AS DATE)), '09:00-09:30', 'CONFIRMED', 400000, 400);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'quynhbong345@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '75A-500.44'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, 4, CAST(GETDATE() AS DATE)), '09:00-09:30', 'CONFIRMED', 400000, 400);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'lethanhdinh37@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'leesinnnmain1234@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-463.28'), (SELECT id FROM wash_services WHERE name = N'Gói chăm sóc toàn diện'), DATEADD(day, 2, CAST(GETDATE() AS DATE)), '11:00-11:30', 'CONFIRMED', 400000, 400);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'leesinnnmain1234@gmail.com'), 400000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'lnam.phong57@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '29B-928.40'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, 3, CAST(GETDATE() AS DATE)), '11:00-11:30', 'CONFIRMED', 50000, 50);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'lnam.phong57@gmail.com'), 50000, NULL, 'UNPAID', NULL);
+INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) VALUES ((SELECT id FROM users WHERE username = 'phuocnguyentuan399@gmail.com'), (SELECT id FROM vehicles WHERE license_plate = '51G-502.99'), (SELECT id FROM wash_services WHERE name = N'Rửa xe cơ bản'), DATEADD(day, 5, CAST(GETDATE() AS DATE)), '15:00-15:30', 'CONFIRMED', 50000, 50);
+INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at) VALUES ((SELECT MAX(id) FROM bookings), (SELECT id FROM users WHERE username = 'phuocnguyentuan399@gmail.com'), 50000, NULL, 'UNPAID', NULL);
 GO

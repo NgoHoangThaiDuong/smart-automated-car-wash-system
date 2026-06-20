@@ -14,8 +14,8 @@ public class LoyaltyTierDAO {
     public List<LoyaltyTier> findAll() {
         List<LoyaltyTier> list = new ArrayList<>();
         String sql = "SELECT id, name, point_multiplier, booking_window_days, min_washes, min_spend FROM tiers ORDER BY min_spend ASC";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 LoyaltyTier lt = new LoyaltyTier();

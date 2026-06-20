@@ -10,10 +10,13 @@ public class Booking {
     private String bookingDate;
     private String timeSlot;
     private String bookingStatus;
+    private String paymentStatus;
+    private String paymentMethod;
+    private double totalAmount;
     private int pointsEarned;
-    private String notes;
     private Date createdAt;
     private Date completedAt;
+    private boolean deleted;
 
     private User user;
     private Vehicle vehicle;
@@ -43,11 +46,17 @@ public class Booking {
     public String getBookingStatus() { return bookingStatus; }
     public void setBookingStatus(String bookingStatus) { this.bookingStatus = bookingStatus; }
 
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+
     public int getPointsEarned() { return pointsEarned; }
     public void setPointsEarned(int pointsEarned) { this.pointsEarned = pointsEarned; }
-
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
@@ -66,4 +75,7 @@ public class Booking {
 
     public Payment getPayment() { return payment; }
     public void setPayment(Payment payment) { this.payment = payment; }
+
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }
