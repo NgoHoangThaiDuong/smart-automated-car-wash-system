@@ -3,6 +3,7 @@
 
 <!-- Load Material Icons inside navbar for global usage -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<c:url value='/css/common/navbar.css'/>">
 
 <header class="app-navbar">
     <div class="app-navbar-container">

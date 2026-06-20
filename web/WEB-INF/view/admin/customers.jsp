@@ -9,9 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customers - SmartWash Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<c:url value='/css/navbar.css'/>">
-    <link rel="stylesheet" href="<c:url value='/css/dashboard.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/admin/common.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/admin/customers.css'/>">
 </head>
@@ -244,6 +241,63 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination Section -->
+        <c:if test="${totalPages > 0}">
+            <div class="pagination-container">
+                <span class="pagination-info">
+                    Hiển thị ${startEntry} - ${endEntry} trên tổng số ${totalEntries} khách hàng
+                </span>
+                <div class="pagination-controls">
+                    <!-- Nút Trước -->
+                    <c:choose>
+                        <c:when test="${currentPage > 1}">
+                            <c:url value="/admin/customers" var="prevUrl">
+                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                <c:param name="page" value="${currentPage - 1}"/>
+                            </c:url>
+                            <a href="${prevUrl}" class="pagination-btn"><span>&laquo;</span></a>
+                        </c:when>
+                        <c:otherwise>
+                            <button class="pagination-btn disabled" disabled><span>&laquo;</span></button>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <!-- Danh sách số trang -->
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <button class="pagination-btn active">${i}</button>
+                            </c:when>
+                            <c:otherwise>
+                                <c:url value="/admin/customers" var="pageUrl">
+                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                    <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                    <c:param name="page" value="${i}"/>
+                                </c:url>
+                                <a href="${pageUrl}" class="pagination-btn">${i}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+
+                    <!-- Nút Tiếp -->
+                    <c:choose>
+                        <c:when test="${currentPage < totalPages}">
+                            <c:url value="/admin/customers" var="nextUrl">
+                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                <c:param name="page" value="${currentPage + 1}"/>
+                            </c:url>
+                            <a href="${nextUrl}" class="pagination-btn"><span>&raquo;</span></a>
+                        </c:when>
+                        <c:otherwise>
+                            <button class="pagination-btn disabled" disabled><span>&raquo;</span></button>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+        </c:if>
     </div>
 
     <!-- Tier Rule Guidelines Card -->

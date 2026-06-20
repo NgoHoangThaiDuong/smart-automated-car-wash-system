@@ -17,6 +17,14 @@ public class UserService {
         return userDAO.searchCustomers(key, tierId);
     }
 
+    public dto.PageResult<User> getCustomersPage(String search, Integer tierId, int page, int pageSize) {
+        int totalEntries = userDAO.countCustomers(search, tierId);
+        int offset = (page - 1) * pageSize;
+        List<User> list = userDAO.searchCustomersPaginated(search, tierId, offset, pageSize);
+        return new dto.PageResult<>(list, page, pageSize, totalEntries);
+    }
+
+
     public int getCustomerCount() {
         return userDAO.countCustomers();
     }

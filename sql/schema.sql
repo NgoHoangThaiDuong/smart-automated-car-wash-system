@@ -78,8 +78,6 @@ BEGIN
         booking_date DATE NOT NULL,
         time_slot VARCHAR(20) NOT NULL,
         booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
-        payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
-        payment_method VARCHAR(30),
         total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
         points_earned INT DEFAULT 0,
         notes NVARCHAR(500),
@@ -126,93 +124,3 @@ BEGIN
     );
 END;
 GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
-BEGIN
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'is_deleted')
-    BEGIN
-        ALTER TABLE users ADD is_deleted BIT NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'points_balance')
-    BEGIN
-        ALTER TABLE users ADD points_balance INT NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'total_washes')
-    BEGIN
-        ALTER TABLE users ADD total_washes INT NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'lifetime_spent')
-    BEGIN
-        ALTER TABLE users ADD lifetime_spent DECIMAL(18,2) NOT NULL DEFAULT 0;
-    END;
-END;
-GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE name='vehicles' AND xtype='U')
-BEGIN
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('vehicles') AND name = 'is_deleted')
-    BEGIN
-        ALTER TABLE vehicles ADD is_deleted BIT NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('vehicles') AND name = 'image_path')
-    BEGIN
-        ALTER TABLE vehicles ADD image_path VARCHAR(255);
-    END;
-END;
-GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE name='wash_services' AND xtype='U')
-BEGIN
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('wash_services') AND name = 'is_deleted')
-    BEGIN
-        ALTER TABLE wash_services ADD is_deleted BIT NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('wash_services') AND name = 'is_active')
-    BEGIN
-        ALTER TABLE wash_services ADD is_active BIT DEFAULT 1;
-    END;
-END;
-GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE name='bookings' AND xtype='U')
-BEGIN
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('bookings') AND name = 'payment_status')
-    BEGIN
-        ALTER TABLE bookings ADD payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID';
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('bookings') AND name = 'payment_method')
-    BEGIN
-        ALTER TABLE bookings ADD payment_method VARCHAR(30);
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('bookings') AND name = 'total_amount')
-    BEGIN
-        ALTER TABLE bookings ADD total_amount DECIMAL(18,2) NOT NULL DEFAULT 0;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('bookings') AND name = 'completed_at')
-    BEGIN
-        ALTER TABLE bookings ADD completed_at DATETIME NULL;
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('bookings') AND name = 'is_deleted')
-    BEGIN
-        ALTER TABLE bookings ADD is_deleted BIT NOT NULL DEFAULT 0;
-    END;
-END;
-GO
-
-IF EXISTS (SELECT * FROM sysobjects WHERE name='wash_history' AND xtype='U')
-BEGIN
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('wash_history') AND name = 'payment_method')
-    BEGIN
-        ALTER TABLE wash_history ADD payment_method VARCHAR(30);
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('wash_history') AND name = 'payment_status')
-    BEGIN
-        ALTER TABLE wash_history ADD payment_status VARCHAR(20);
-    END;
-    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('wash_history') AND name = 'amount_paid')
-    BEGIN
-        ALTER TABLE wash_history ADD amount_paid DECIMAL(18,2);
-    END;
-END;
-GO
-

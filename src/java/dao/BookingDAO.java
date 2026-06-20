@@ -5,6 +5,7 @@ import model.LoyaltyTier;
 import model.User;
 import model.Vehicle;
 import model.WashService;
+import model.Payment;
 import mylib.DBUtils;
 
 import java.sql.Connection;
@@ -20,8 +21,9 @@ public class BookingDAO {
 
     public List<Booking> searchBookings(String key, String status, String date) {
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -31,6 +33,7 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.is_deleted = 0 " +
                 "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) "
                 +
@@ -64,10 +67,46 @@ public class BookingDAO {
         return list;
     }
 
-    public Booking findById(int id) {
+    public int countBookings(String key, String status, String date) {
+        String sql = "SELECT COUNT(*) FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN vehicles v ON b.vehicle_id = v.id " +
+                "WHERE b.is_deleted = 0 " +
+                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR b.booking_status = ?) " +
+                "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) ";
+
+        String search = (key == null || key.trim().isEmpty()) ? null : "%" + key.trim() + "%";
+        String bookingStatus = (status == null || status.trim().isEmpty()) ? null : status.trim();
+        String bookingDate = (date == null || date.trim().isEmpty()) ? null : date.trim();
+
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, search);
+            ps.setString(2, search);
+            ps.setString(3, search);
+            ps.setString(4, search);
+            ps.setString(5, search);
+            ps.setString(6, bookingStatus);
+            ps.setString(7, bookingStatus);
+            ps.setString(8, bookingDate);
+            ps.setString(9, bookingDate);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting bookings: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public List<Booking> searchBookingsPaginated(String key, String status, String date, int offset, int limit) {
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -77,6 +116,57 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
+                "WHERE b.is_deleted = 0 " +
+                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR b.booking_status = ?) " +
+                "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
+                "ORDER BY b.created_at DESC " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        String search = (key == null || key.trim().isEmpty()) ? null : "%" + key.trim() + "%";
+        String bookingStatus = (status == null || status.trim().isEmpty()) ? null : status.trim();
+        String bookingDate = (date == null || date.trim().isEmpty()) ? null : date.trim();
+
+        List<Booking> list = new ArrayList<>();
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, search);
+            ps.setString(2, search);
+            ps.setString(3, search);
+            ps.setString(4, search);
+            ps.setString(5, search);
+            ps.setString(6, bookingStatus);
+            ps.setString(7, bookingStatus);
+            ps.setString(8, bookingDate);
+            ps.setString(9, bookingDate);
+            ps.setInt(10, offset);
+            ps.setInt(11, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(getBooking(rs));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching bookings paginated: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public Booking findById(int id) {
+        String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
+                "b.created_at, b.completed_at, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
+                "v.license_plate, v.brand, v.model, v.color, " +
+                "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+                "FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN vehicles v ON b.vehicle_id = v.id " +
+                "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.id = ? AND b.is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -107,12 +197,34 @@ public class BookingDAO {
     }
 
     public void updatePaymentStatus(int id, String paymentStatus, String paymentMethod) {
-        String sql = "UPDATE bookings SET payment_status = ?, payment_method = ? WHERE id = ?";
+        String sql = "IF EXISTS (SELECT 1 FROM payments WHERE booking_id = ?)\n" +
+                "BEGIN\n" +
+                "    UPDATE payments \n" +
+                "    SET payment_status = ?, \n" +
+                "        payment_method = ?, \n" +
+                "        paid_at = CASE WHEN ? = 'PAID' THEN GETDATE() ELSE paid_at END,\n" +
+                "        updated_at = GETDATE()\n" +
+                "    WHERE booking_id = ?\n" +
+                "END\n" +
+                "ELSE\n" +
+                "BEGIN\n" +
+                "    INSERT INTO payments (booking_id, user_id, amount, payment_status, payment_method, paid_at)\n" +
+                "    SELECT id, user_id, total_amount, ?, ?, \n" +
+                "           CASE WHEN ? = 'PAID' THEN GETDATE() ELSE NULL END\n" +
+                "    FROM bookings\n" +
+                "    WHERE id = ?\n" +
+                "END";
         try (Connection cn = DBUtils.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, paymentStatus);
-            ps.setString(2, paymentMethod);
-            ps.setInt(3, id);
+            ps.setInt(1, id);
+            ps.setString(2, paymentStatus);
+            ps.setString(3, paymentMethod);
+            ps.setString(4, paymentStatus);
+            ps.setInt(5, id);
+            ps.setString(6, paymentStatus);
+            ps.setString(7, paymentMethod);
+            ps.setString(8, paymentStatus);
+            ps.setInt(9, id);
             ps.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException("Error updating payment status: " + e.getMessage(), e);
@@ -147,7 +259,7 @@ public class BookingDAO {
     }
 
     public double sumRevenue() {
-        String sql = "SELECT ISNULL(SUM(total_amount), 0) FROM bookings WHERE payment_status = 'PAID'";
+        String sql = "SELECT ISNULL(SUM(b.total_amount), 0) FROM bookings b JOIN payments p ON b.id = p.booking_id WHERE p.payment_status = 'PAID'";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -189,34 +301,72 @@ public class BookingDAO {
 
     public int createBooking(int userId, int vehicleId, int serviceId, Date bookingDate,
             String timeSlot, BigDecimal totalAmount, String notes) {
-        String sql = "INSERT INTO bookings " +
-                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, " +
-                " payment_status, payment_method, total_amount, points_earned, notes) " +
-                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', 'UNPAID', NULL, ?, 0, ?)";
-        try (Connection cn = DBUtils.getConnection();
-                PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, vehicleId);
-            ps.setInt(3, serviceId);
-            ps.setDate(4, bookingDate);
-            ps.setString(5, timeSlot);
-            ps.setBigDecimal(6, totalAmount);
-            ps.setString(7, notes);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next())
-                    return keys.getInt(1);
+        String insertBookingSql = "INSERT INTO bookings " +
+                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, notes) " +
+                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', ?, 0, ?)";
+        String insertPaymentSql = "INSERT INTO payments (booking_id, user_id, amount, payment_status, payment_method) " +
+                "VALUES (?, ?, ?, 'UNPAID', NULL)";
+        
+        Connection cn = null;
+        try {
+            cn = DBUtils.getConnection();
+            cn.setAutoCommit(false);
+            
+            int bookingId = -1;
+            try (PreparedStatement ps = cn.prepareStatement(insertBookingSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, userId);
+                ps.setInt(2, vehicleId);
+                ps.setInt(3, serviceId);
+                ps.setDate(4, bookingDate);
+                ps.setString(5, timeSlot);
+                ps.setBigDecimal(6, totalAmount);
+                ps.setString(7, notes);
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        bookingId = keys.getInt(1);
+                    }
+                }
             }
-            throw new RuntimeException("Generated booking ID was not returned");
+            
+            if (bookingId == -1) {
+                throw new RuntimeException("Generated booking ID was not returned");
+            }
+            
+            try (PreparedStatement ps = cn.prepareStatement(insertPaymentSql)) {
+                ps.setInt(1, bookingId);
+                ps.setInt(2, userId);
+                ps.setBigDecimal(3, totalAmount);
+                ps.executeUpdate();
+            }
+            
+            cn.commit();
+            return bookingId;
         } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (Exception re) {
+                    // ignore
+                }
+            }
             throw new RuntimeException("Error creating booking: " + e.getMessage(), e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.close();
+                } catch (Exception ce) {
+                    // ignore
+                }
+            }
         }
     }
 
     public Booking getUpcomingBookingByUserId(int userId) {
         String sql = "SELECT TOP 1 b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -226,6 +376,7 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.user_id = ? AND b.booking_date >= CAST(GETDATE() AS DATE) " +
                 "AND b.booking_status IN ('CONFIRMED', 'IN_PROGRESS') " +
                 "ORDER BY b.booking_date ASC, b.time_slot ASC";
@@ -243,8 +394,9 @@ public class BookingDAO {
     public List<Booking> getRecentBookingsByUserId(int userId, int limit) {
         List<Booking> list = new ArrayList<>();
         String sql = "SELECT TOP (?) b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -254,6 +406,7 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.user_id = ? ORDER BY b.created_at DESC";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -272,8 +425,9 @@ public class BookingDAO {
     public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
         List<Booking> list = new ArrayList<>();
         String sql = "SELECT TOP (?) b.id, b.user_id, b.vehicle_id, b.service_id, " +
-                "b.booking_date, b.time_slot, b.booking_status, b.payment_status, " +
-                "b.payment_method, b.total_amount, b.points_earned, b.notes, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.notes, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -283,9 +437,10 @@ public class BookingDAO {
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "JOIN wash_services ws ON b.service_id = ws.id " +
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.user_id = ? " +
                 "AND b.booking_status = 'COMPLETED' " +
-                "AND b.payment_status = 'PAID' " +
+                "AND ISNULL(p.payment_status, 'UNPAID') = 'PAID' " +
                 "ORDER BY b.completed_at DESC";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -312,6 +467,15 @@ public class BookingDAO {
         b.setBookingStatus(rs.getString("booking_status"));
         b.setPaymentStatus(rs.getString("payment_status"));
         b.setPaymentMethod(rs.getString("payment_method"));
+        
+        Payment p = new Payment();
+        p.setBookingId(b.getId());
+        p.setUserId(b.getUserId());
+        p.setAmount(BigDecimal.valueOf(b.getTotalAmount()));
+        p.setPaymentStatus(b.getPaymentStatus());
+        p.setPaymentMethod(b.getPaymentMethod());
+        b.setPayment(p);
+
         b.setTotalAmount(rs.getDouble("total_amount"));
         b.setPointsEarned(rs.getInt("points_earned"));
         b.setNotes(rs.getString("notes"));

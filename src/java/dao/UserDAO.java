@@ -106,6 +106,101 @@ public class UserDAO {
         return list;
     }
 
+    public int countCustomers(String key, Integer tierId) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users u WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 ");
+        List<Object> params = new ArrayList<>();
+        
+        if (key != null && !key.trim().isEmpty()) {
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            String keyParam = "%" + key.trim() + "%";
+            params.add(keyParam);
+            params.add(keyParam);
+            params.add(keyParam);
+        }
+        
+        if (tierId != null && tierId > 0) {
+            sql.append("AND u.tier_id = ? ");
+            params.add(tierId);
+        }
+        
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) {
+                    ps.setString(i + 1, (String) p);
+                } else if (p instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) p);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting customers: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public List<User> searchCustomersPaginated(String key, Integer tierId, int offset, int limit) {
+        List<User> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
+            "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
+            "FROM users u " +
+            "LEFT JOIN tiers t ON u.tier_id = t.id " +
+            "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (key != null && !key.trim().isEmpty()) {
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            String keyParam = "%" + key.trim() + "%";
+            params.add(keyParam);
+            params.add(keyParam);
+            params.add(keyParam);
+        }
+        
+        if (tierId != null && tierId > 0) {
+            sql.append("AND u.tier_id = ? ");
+            params.add(tierId);
+        }
+        
+        sql.append("ORDER BY u.fullname ASC ");
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add(offset);
+        params.add(limit);
+        
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object p = params.get(i);
+                if (p instanceof String) {
+                    ps.setString(i + 1, (String) p);
+                } else if (p instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) p);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getUser(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching customers paginated: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+
     public void updateUserStatsAndTier(int userId, double spendAmount, int pointsEarned) {
         User user = findById(userId);
         if (user == null) {

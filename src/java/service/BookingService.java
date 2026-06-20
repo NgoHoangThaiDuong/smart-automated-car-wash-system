@@ -3,6 +3,7 @@ package service;
 import dao.BookingDAO;
 import dao.UserDAO;
 import model.Booking;
+import dto.PageResult;
 
 import java.util.List;
 
@@ -101,5 +102,21 @@ public class BookingService {
 
     public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
         return bookingDAO.getRecentWashHistoryByUserId(userId, limit);
+    }
+
+    public PageResult<Booking> getBookingsPage(String search, String status, String date, int page, int pageSize) {
+        if (page < 1) page = 1;
+        int totalEntries = bookingDAO.countBookings(search, status, date);
+        
+        int totalPages = (int) Math.ceil((double) totalEntries / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        
+        if (page > totalPages) page = totalPages;
+        
+        int offset = (page - 1) * pageSize;
+        if (offset < 0) offset = 0;
+        
+        List<Booking> data = bookingDAO.searchBookingsPaginated(search, status, date, offset, pageSize);
+        return new PageResult<>(data, page, pageSize, totalEntries);
     }
 }

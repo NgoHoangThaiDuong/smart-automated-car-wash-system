@@ -295,7 +295,7 @@ body {
 .pagination-container {
     padding: 1.25rem 1.75rem;
     border-top: 1px solid var(--border-slate);
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: flex-end; align-items: center;
 }
 
 .pagination-info { font-size: 0.825rem; color: var(--text-slate-muted); font-weight: 500; }
