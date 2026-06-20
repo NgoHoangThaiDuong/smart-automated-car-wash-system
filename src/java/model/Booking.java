@@ -17,10 +17,12 @@ public class Booking {
     private String notes;
     private Date createdAt;
     private Date completedAt;
+    private boolean deleted;
 
     private User user;
     private Vehicle vehicle;
     private WashService service;
+    private Payment payment;
 
     public Booking() {}
 
@@ -74,4 +76,10 @@ public class Booking {
 
     public WashService getService() { return service; }
     public void setService(WashService service) { this.service = service; }
+
+    public Payment getPayment() { return payment; }
+    public void setPayment(Payment payment) { this.payment = payment; }
+
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }

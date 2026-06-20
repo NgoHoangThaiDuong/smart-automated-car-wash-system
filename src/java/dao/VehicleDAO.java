@@ -14,7 +14,7 @@ public class VehicleDAO {
     public void create(int userId, String licensePlate, String brand, String model, String color) {
         String sql = "INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES (?, ?, ?, ?, ?)";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ps.setString(2, licensePlate);
@@ -32,9 +32,9 @@ public class VehicleDAO {
     public List<Vehicle> findByUserId(int userId) {
         List<Vehicle> list = new ArrayList<>();
 
-        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE user_id = ?";
+        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE user_id = ? AND is_deleted = 0";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
@@ -61,9 +61,9 @@ public class VehicleDAO {
     }
 
     public Vehicle findById(int id) {
-        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE id = ?";
+        String sql = "SELECT id, user_id, license_plate, brand, model, color FROM vehicles WHERE id = ? AND is_deleted = 0";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
 
@@ -92,7 +92,7 @@ public class VehicleDAO {
     public void update(int id, String licensePlate, String brand, String model, String color) {
         String sql = "UPDATE vehicles SET license_plate = ?, brand = ?, model = ?, color = ? WHERE id = ?";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, licensePlate);
             ps.setString(2, brand);
@@ -108,9 +108,9 @@ public class VehicleDAO {
     }
 
     public void delete(int id) {
-        String sql = "DELETE FROM vehicles WHERE id = ?";
+        String sql = "UPDATE vehicles SET is_deleted = 1 WHERE id = ?";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -121,9 +121,9 @@ public class VehicleDAO {
     }
 
     public boolean existsByPlateExceptId(String plate, int id) {
-        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id <> ?";
+        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id <> ? AND is_deleted = 0";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, plate);
             ps.setInt(2, id);
@@ -138,9 +138,9 @@ public class VehicleDAO {
     }
 
     public boolean existsByPlate(String plate) {
-        String sql = "SELECT id FROM vehicles WHERE license_plate = ?";
+        String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND is_deleted = 0";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, plate);
 

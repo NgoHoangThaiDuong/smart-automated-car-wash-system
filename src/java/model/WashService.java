@@ -7,7 +7,8 @@ public class WashService {
     private double price;
     private int durationMinutes;
     private boolean isActive;
-
+    private boolean deleted;
+    private int bookingCount;
     public WashService() {}
 
     public WashService(int id, String name, String description, double price, int durationMinutes, boolean isActive) {
@@ -36,4 +37,10 @@ public class WashService {
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+
+    public int getBookingCount() { return bookingCount; }
+    public void setBookingCount(int bookingCount) { this.bookingCount = bookingCount; }
 }

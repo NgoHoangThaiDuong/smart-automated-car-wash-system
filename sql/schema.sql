@@ -29,10 +29,12 @@ BEGIN
         password VARCHAR(255) NOT NULL,
         fullname NVARCHAR(100),
         phone VARCHAR(20),
-        role VARCHAR(20) DEFAULT 'CUSTOMER',
+        role VARCHAR(20) NOT NULL DEFAULT 'CUSTOMER',
         tier_id INT FOREIGN KEY REFERENCES tiers(id),
-        points_balance INT DEFAULT 0,
-        lifetime_spent DECIMAL(18,2) DEFAULT 0,
+        points_balance INT NOT NULL DEFAULT 0,
+        total_washes INT NOT NULL DEFAULT 0,
+        lifetime_spent DECIMAL(18,2) NOT NULL DEFAULT 0,
+        is_deleted BIT NOT NULL DEFAULT 0,
         created_at DATETIME DEFAULT GETDATE()
     );
 END;
@@ -46,7 +48,9 @@ BEGIN
         license_plate VARCHAR(20) UNIQUE NOT NULL,
         brand NVARCHAR(50),
         model NVARCHAR(50),
-        color NVARCHAR(30)
+        color NVARCHAR(30),
+        image_path VARCHAR(255),
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO
@@ -58,7 +62,8 @@ BEGIN
         description NVARCHAR(500),
         price DECIMAL(18,2) NOT NULL,
         duration_minutes INT NOT NULL DEFAULT 30,
-        is_active BIT DEFAULT 1
+        is_active BIT DEFAULT 1,
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO
@@ -74,15 +79,35 @@ BEGIN
         time_slot VARCHAR(20) NOT NULL,
         booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
         payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
-        payment_method VARCHAR(20),
+        payment_method VARCHAR(30),
         total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
-		points_earned INT DEFAULT 0,
+        points_earned INT DEFAULT 0,
         notes NVARCHAR(500),
         created_at DATETIME DEFAULT GETDATE(),
-        completed_at DATETIME NULL
+        completed_at DATETIME NULL,
+        is_deleted BIT NOT NULL DEFAULT 0
     );
 END;
 GO
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='payments' AND xtype='U')
+BEGIN
+    CREATE TABLE payments (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        booking_id INT NOT NULL UNIQUE
+            FOREIGN KEY REFERENCES bookings(id) ON DELETE CASCADE,
+        user_id INT NOT NULL
+            FOREIGN KEY REFERENCES users(id),
+        amount DECIMAL(18,2) NOT NULL,
+        payment_method VARCHAR(30),
+        payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
+        paid_at DATETIME NULL,
+        created_at DATETIME NOT NULL DEFAULT GETDATE(),
+        updated_at DATETIME NOT NULL DEFAULT GETDATE()
+    );
+END;
+GO
+
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='wash_history' AND xtype='U')
 BEGIN
     CREATE TABLE wash_history (
@@ -90,9 +115,8 @@ BEGIN
        booking_id INT FOREIGN KEY REFERENCES bookings(id),
        user_id INT FOREIGN KEY REFERENCES users(id),
        vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
-	   service_id INT FOREIGN KEY REFERENCES wash_services(id),
-	   wash_date DATETIME NOT NULL,
-       amount_paid DECIMAL(18,2) NOT NULL,
+       service_id INT FOREIGN KEY REFERENCES wash_services(id),
+       wash_date DATETIME NOT NULL,
        points_earned INT DEFAULT 0,
        feedback NVARCHAR(500),
        created_at DATETIME DEFAULT GETDATE()

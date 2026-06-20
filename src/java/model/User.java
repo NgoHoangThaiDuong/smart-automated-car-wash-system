@@ -11,10 +11,13 @@ public class User {
     private String role;
     private int tierId;
     private int pointsBalance;
+    private int totalWashes;
     private double lifetimeSpent;
     private Date createdAt;
+    private boolean deleted;
 
     private LoyaltyTier loyaltyTier;
+    private int vehicleCount;
 
     public User() {
     }
@@ -104,6 +107,14 @@ public class User {
         this.lifetimeSpent = lifetimeSpent;
     }
 
+    public int getTotalWashes() {
+        return totalWashes;
+    }
+
+    public void setTotalWashes(int totalWashes) {
+        this.totalWashes = totalWashes;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -118,5 +129,21 @@ public class User {
 
     public void setLoyaltyTier(LoyaltyTier loyaltyTier) {
         this.loyaltyTier = loyaltyTier;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public int getVehicleCount() {
+        return vehicleCount;
+    }
+
+    public void setVehicleCount(int vehicleCount) {
+        this.vehicleCount = vehicleCount;
     }
 }
