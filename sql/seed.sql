@@ -451,3 +451,303 @@ VALUES ((SELECT id FROM users WHERE username = 'phuocnguyentuan399'), (SELECT id
 GO
 
 
+
+
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33333')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33333', N'Mazda', N'CX-5', N'Đen', '/images/vehicles/vehicle-black.jpg');
+END;
+GO
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33444')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33444', N'Mercedes', N'C200', N'Trắng', '/images/vehicles/vehicle-white.jpg');
+END;
+GO
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30C-33555')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), '30C-33555', N'VinFast', N'VF 8', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44444')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44444', N'Ford', N'Ranger', N'Xám', '/images/vehicles/vehicle-black.jpg');
+END;
+GO
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44555')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44555', N'Porsche', N'Taycan 4S', N'Xanh dương', '/images/vehicles/vehicle-blue.jpg');
+END;
+GO
+IF NOT EXISTS (SELECT * FROM vehicles WHERE license_plate='30E-44666')
+BEGIN
+    INSERT INTO vehicles (user_id, license_plate, brand, model, color, image_path)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), '30E-44666', N'Tesla', N'Model 3', N'Trắng', '/images/vehicles/vehicle-white.jpg');
+END;
+GO
+
+-- 4. SEED ADMIN USER
+IF NOT EXISTS (SELECT * FROM users WHERE username='admin')
+BEGIN
+    INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent)
+    VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', N'Quản Trị Viên', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0);
+END;
+GO
+
+-- 5. SEED WASH SERVICES
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cơ bản')
+BEGIN
+    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
+    VALUES (N'Rửa xe cơ bản', N'Rửa thân xe bên ngoài bằng nước và xà phòng', 50000, 20, 1);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất')
+BEGIN
+    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
+    VALUES (N'Rửa xe + Hút bụi nội thất', N'Rửa thân xe và hút bụi toàn bộ khoang nội thất', 100000, 35, 1);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)')
+BEGIN
+    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
+    VALUES (N'Rửa xe cao cấp (Wax + Đánh bóng)', N'Rửa xe, đánh bóng và phủ wax bảo vệ sơn xe', 250000, 60, 1);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Vệ sinh khoang máy')
+BEGIN
+    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
+    VALUES (N'Vệ sinh khoang máy', N'Vệ sinh và làm sạch khoang động cơ', 150000, 30, 1);
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM wash_services WHERE name=N'Gói chăm sóc toàn diện')
+BEGIN
+    INSERT INTO wash_services (name, description, price, duration_minutes, is_active)
+    VALUES (N'Gói chăm sóc toàn diện', N'Rửa xe, hút bụi nội thất, vệ sinh khoang máy, đánh bóng và phủ wax', 400000, 90, 1);
+END;
+GO
+
+-- 6. SEED BOOKINGS
+-- Booking identity in seed: user_id + booking_date + time_slot.
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11111'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cơ bản'), '2026-06-15', '09:00-09:30',
+        'CONFIRMED', 0, N'Khách yêu cầu rửa kỹ phần gầm xe', '2026-06-14 20:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
+    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22222'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-12', '14:00-14:35',
+        'COMPLETED', 110, NULL, '2026-06-11 09:00:00', '2026-06-12 14:35:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33333'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-10', '10:00-11:00',
+        'COMPLETED', 300, N'Khách hàng VIP, ưu tiên xử lý', '2026-06-08 08:30:00', '2026-06-10 11:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44444'),
+        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-06-18', '08:00-09:30',
+        'CONFIRMED', 0, N'Đặt lịch định kỳ hàng tháng', '2026-06-16 10:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11222'),
+        (SELECT id FROM wash_services WHERE name=N'Vệ sinh khoang máy'), '2026-05-20', '16:00-16:30',
+        'CANCELLED', 0, N'Khách hủy do bận đột xuất', '2026-05-18 12:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='member_user'), (SELECT id FROM vehicles WHERE license_plate='30A-11333'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-21', '10:00-10:35',
+        'CONFIRMED', 0, N'Thanh toán MOMO thất bại, chờ thanh toán lại', '2026-06-19 18:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22333'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-22', '09:00-10:00',
+        'CONFIRMED', 0, N'Khách đã thanh toán trước qua VNPAY', '2026-06-19 19:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33444'),
+        (SELECT id FROM wash_services WHERE name=N'Vệ sinh khoang máy'), '2026-06-23', '15:00-15:30',
+        'IN_PROGRESS', 0, N'Đã thanh toán bằng thẻ', '2026-06-20 08:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44555'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cơ bản'), '2026-06-24', '13:00-13:20',
+        'CONFIRMED', 0, N'Khách sẽ thanh toán tại quầy', '2026-06-20 09:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
+    VALUES ((SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22444'),
+        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-05-28', '08:00-09:30',
+        'COMPLETED', 440, NULL, '2026-05-25 08:00:00', '2026-05-28 09:30:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at)
+    VALUES ((SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33555'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-05-25', '11:00-11:35',
+        'CANCELLED', 0, N'Khách đổi lịch', '2026-05-23 14:00:00');
+END;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00')
+BEGIN
+    INSERT INTO bookings (user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, points_earned, notes, created_at, completed_at)
+    VALUES ((SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44666'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-05-30', '14:00-15:00',
+        'COMPLETED', 325, NULL, '2026-05-27 10:00:00', '2026-05-30 15:00:00');
+END;
+GO
+
+-- 7. SEED PAYMENTS
+-- A payment is found through the booking's user + date + time slot.
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-15' AND time_slot='09:00-09:30'),
+        (SELECT id FROM users WHERE username='member_user'), 50000, 'UNPAID', '2026-06-14 20:00:00', '2026-06-14 20:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'),
+        (SELECT id FROM users WHERE username='silver_user'), 100000, 'CASH', 'PAID', '2026-06-12 14:35:00', '2026-06-11 09:00:00', '2026-06-12 14:35:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'),
+        (SELECT id FROM users WHERE username='gold_user'), 250000, 'BANK_TRANSFER', 'PAID', '2026-06-10 10:05:00', '2026-06-08 08:30:00', '2026-06-10 10:05:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-18' AND time_slot='08:00-09:30'),
+        (SELECT id FROM users WHERE username='platinum_user'), 400000, 'UNPAID', '2026-06-16 10:00:00', '2026-06-16 10:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-05-20' AND time_slot='16:00-16:30'),
+        (SELECT id FROM users WHERE username='member_user'), 150000, 'CANCELLED', '2026-05-18 12:00:00', '2026-05-19 16:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='member_user') AND booking_date='2026-06-21' AND time_slot='10:00-10:35'),
+        (SELECT id FROM users WHERE username='member_user'), 100000, 'MOMO', 'FAILED', '2026-06-19 18:00:00', '2026-06-19 18:05:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-22' AND time_slot='09:00-10:00'),
+        (SELECT id FROM users WHERE username='silver_user'), 250000, 'VNPAY', 'PAID', '2026-06-19 19:05:00', '2026-06-19 19:00:00', '2026-06-19 19:05:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-23' AND time_slot='15:00-15:30'),
+        (SELECT id FROM users WHERE username='gold_user'), 150000, 'CARD', 'PAID', '2026-06-20 08:10:00', '2026-06-20 08:00:00', '2026-06-20 08:10:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-06-24' AND time_slot='13:00-13:20'),
+        (SELECT id FROM users WHERE username='platinum_user'), 50000, 'UNPAID', '2026-06-20 09:00:00', '2026-06-20 09:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'),
+        (SELECT id FROM users WHERE username='silver_user'), 400000, 'MOMO', 'PAID', '2026-05-27 20:00:00', '2026-05-25 08:00:00', '2026-05-27 20:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_status, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-05-25' AND time_slot='11:00-11:35'),
+        (SELECT id FROM users WHERE username='gold_user'), 100000, 'CANCELLED', '2026-05-23 14:00:00', '2026-05-24 09:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM payments WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'))
+    INSERT INTO payments (booking_id, user_id, amount, payment_method, payment_status, paid_at, created_at, updated_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'),
+        (SELECT id FROM users WHERE username='platinum_user'), 250000, 'CASH', 'PAID', '2026-05-30 15:00:00', '2026-05-27 10:00:00', '2026-05-30 15:00:00');
+GO
+
+-- 8. SEED WASH HISTORY (completed and paid bookings only)
+IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'))
+    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-06-12' AND time_slot='14:00-14:35'),
+        (SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22222'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe + Hút bụi nội thất'), '2026-06-12 14:35:00', 110,
+        N'Rửa sạch, nhân viên thân thiện', '2026-06-12 14:35:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'))
+    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='gold_user') AND booking_date='2026-06-10' AND time_slot='10:00-11:00'),
+        (SELECT id FROM users WHERE username='gold_user'), (SELECT id FROM vehicles WHERE license_plate='30C-33333'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-06-10 11:00:00', 300,
+        N'Xe bóng loáng, rất hài lòng', '2026-06-10 11:00:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'))
+    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='silver_user') AND booking_date='2026-05-28' AND time_slot='08:00-09:30'),
+        (SELECT id FROM users WHERE username='silver_user'), (SELECT id FROM vehicles WHERE license_plate='29B-22444'),
+        (SELECT id FROM wash_services WHERE name=N'Gói chăm sóc toàn diện'), '2026-05-28 09:30:00', 440,
+        N'Dịch vụ đầy đủ, xe sạch và bóng', '2026-05-28 09:30:00');
+GO
+
+IF NOT EXISTS (SELECT 1 FROM wash_history WHERE booking_id=(SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'))
+    INSERT INTO wash_history (booking_id, user_id, vehicle_id, service_id, wash_date, points_earned, feedback, created_at)
+    VALUES ((SELECT id FROM bookings WHERE user_id=(SELECT id FROM users WHERE username='platinum_user') AND booking_date='2026-05-30' AND time_slot='14:00-15:00'),
+        (SELECT id FROM users WHERE username='platinum_user'), (SELECT id FROM vehicles WHERE license_plate='30E-44666'),
+        (SELECT id FROM wash_services WHERE name=N'Rửa xe cao cấp (Wax + Đánh bóng)'), '2026-05-30 15:00:00', 325,
+        N'Hài lòng với chất lượng đánh bóng', '2026-05-30 15:00:00');
+GO

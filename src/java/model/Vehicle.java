@@ -7,6 +7,7 @@ public class Vehicle {
     private String brand;
     private String model;
     private String color;
+    private String imagePath;
     private boolean deleted;
 
     public Vehicle() {
@@ -67,6 +68,14 @@ public class Vehicle {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public boolean isDeleted() {
