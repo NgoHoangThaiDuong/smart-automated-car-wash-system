@@ -71,7 +71,7 @@
         <div class="mgmt-header">
             <h2 class="mgmt-title">Booking List</h2>
             <div style="font-size: 0.85rem; color: #64748B; font-weight: 500;">
-                Found <strong style="color: #0F172A;"><c:out value="${bookings != null ? bookings.size() : 0}"/></strong> bookings matching filters.
+                Found <strong style="color: #0F172A;"><c:out value="${totalEntries != null ? totalEntries : 0}"/></strong> bookings matching filters.
             </div>
         </div>
 
@@ -203,19 +203,189 @@
             </table>
         </div>
 
-            <!-- Pagination section (visually identical to spec) -->
+            <!-- Pagination section (dynamically reflects the list) -->
             <div class="pagination-container">
                 <div class="pagination-info">
-                    Showing 1 to <c:out value="${not empty bookings ? bookings.size() : 0}"/> of <c:out value="${not empty bookings ? bookings.size() : 0}"/> entries
+                    Showing <c:out value="${startEntry}"/> to <c:out value="${endEntry}"/> of <c:out value="${totalEntries}"/> entries
                 </div>
                 <div>
                     <ul class="pagination-list">
-                        <li><button class="page-item-btn disabled"><span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_left</span></button></li>
-                        <li><button class="page-item-btn active">1</button></li>
-                        <li><button class="page-item-btn">2</button></li>
-                        <li><button class="page-item-btn">3</button></li>
-                        <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
-                        <li><button class="page-item-btn"><span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_right</span></button></li>
+                        <li>
+                            <c:choose>
+                                <c:when test="${currentPage > 1}">
+                                    <c:url value="/admin/bookings" var="prevUrl">
+                                        <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                        <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                        <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                        <c:param name="page" value="${currentPage - 1}"/>
+                                    </c:url>
+                                    <a href="${prevUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_left</span>
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="page-item-btn disabled">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_left</span>
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </li>
+                        <c:if test="${totalPages > 0}">
+                            <c:choose>
+                                <%-- If totalPages <= 5, show all pages without any ellipsis --%>
+                                <c:when test="${totalPages <= 5}">
+                                    <c:forEach var="i" begin="1" end="${totalPages}">
+                                        <li>
+                                            <c:choose>
+                                                <c:when test="${i == currentPage}">
+                                                    <button class="page-item-btn active">${i}</button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:url value="/admin/bookings" var="pageUrl">
+                                                        <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                        <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                        <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:param name="page" value="${i}"/>
+                                                    </c:url>
+                                                    <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </li>
+                                    </c:forEach>
+                                </c:when>
+                                
+                                <%-- If totalPages > 5, apply ellipsis logic --%>
+                                <c:otherwise>
+                                    <c:choose>
+                                        <%-- Case 1: Near the beginning --%>
+                                        <c:when test="${currentPage <= 3}">
+                                            <c:forEach var="i" begin="1" end="4">
+                                                <li>
+                                                    <c:choose>
+                                                        <c:when test="${i == currentPage}">
+                                                            <button class="page-item-btn active">${i}</button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:url value="/admin/bookings" var="pageUrl">
+                                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                                <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                                <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                                <c:param name="page" value="${i}"/>
+                                                            </c:url>
+                                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </li>
+                                            </c:forEach>
+                                            <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                            <li>
+                                                <c:url value="/admin/bookings" var="pageUrl">
+                                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                    <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                    <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                    <c:param name="page" value="${totalPages}"/>
+                                                </c:url>
+                                                <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
+                                            </li>
+                                        </c:when>
+                                        
+                                        <%-- Case 2: Near the end --%>
+                                        <c:when test="${currentPage >= totalPages - 2}">
+                                            <li>
+                                                <c:url value="/admin/bookings" var="pageUrl">
+                                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                    <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                    <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                    <c:param name="page" value="1"/>
+                                                </c:url>
+                                                <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
+                                            </li>
+                                            <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                            <c:forEach var="i" begin="${totalPages - 3}" end="${totalPages}">
+                                                <li>
+                                                    <c:choose>
+                                                        <c:when test="${i == currentPage}">
+                                                            <button class="page-item-btn active">${i}</button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:url value="/admin/bookings" var="pageUrl">
+                                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                                <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                                <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                                <c:param name="page" value="${i}"/>
+                                                            </c:url>
+                                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </li>
+                                            </c:forEach>
+                                        </c:when>
+                                        
+                                        <%-- Case 3: In the middle --%>
+                                        <c:otherwise>
+                                            <li>
+                                                <c:url value="/admin/bookings" var="pageUrl">
+                                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                    <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                    <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                    <c:param name="page" value="1"/>
+                                                </c:url>
+                                                <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
+                                            </li>
+                                            <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                            <c:forEach var="i" begin="${currentPage - 1}" end="${currentPage + 1}">
+                                                <li>
+                                                    <c:choose>
+                                                        <c:when test="${i == currentPage}">
+                                                            <button class="page-item-btn active">${i}</button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:url value="/admin/bookings" var="pageUrl">
+                                                                <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                                <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                                <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                                <c:param name="page" value="${i}"/>
+                                                            </c:url>
+                                                            <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </li>
+                                            </c:forEach>
+                                            <li><span style="padding: 0.5rem; color: #64748B;">...</span></li>
+                                            <li>
+                                                <c:url value="/admin/bookings" var="pageUrl">
+                                                    <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                                    <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                                    <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                    <c:param name="page" value="${totalPages}"/>
+                                                </c:url>
+                                                <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
+                                            </li>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
+                        <li>
+                            <c:choose>
+                                <c:when test="${currentPage < totalPages}">
+                                    <c:url value="/admin/bookings" var="nextUrl">
+                                        <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
+                                        <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
+                                        <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                        <c:param name="page" value="${currentPage + 1}"/>
+                                    </c:url>
+                                    <a href="${nextUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_right</span>
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="page-item-btn disabled">
+                                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">chevron_right</span>
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </li>
                     </ul>
                 </div>
             </div>

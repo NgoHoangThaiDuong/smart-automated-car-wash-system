@@ -88,9 +88,40 @@ public class AdminServlet extends HttpServlet {
         req.setAttribute("todayCount", bookingService.countTodayBookings());
         req.setAttribute("totalRevenue", bookingService.sumRevenue());
 
+        int page = 1;
+        int pageSize = 5;
+        String pageParam = req.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                // Keep default page = 1
+            }
+        }
+
         List<Booking> allBookings = bookingService.getAllBookings(null, null, null);
-        List<Booking> recentBookings = allBookings.size() > 5 ? allBookings.subList(0, 5) : allBookings;
+        int totalBookings = allBookings.size();
+        int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalBookings);
+        List<Booking> recentBookings = totalBookings > 0 ? allBookings.subList(start, end) : allBookings;
+
         req.setAttribute("recentBookings", recentBookings);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
+        req.setAttribute("totalEntries", totalBookings);
+        req.setAttribute("startEntry", totalBookings == 0 ? 0 : start + 1);
+        req.setAttribute("endEntry", end);
 
         req.getRequestDispatcher("/WEB-INF/view/admin/dashboard.jsp").forward(req, res);
     }
@@ -100,10 +131,43 @@ public class AdminServlet extends HttpServlet {
         String status = req.getParameter("status");
         String date = req.getParameter("date");
         List<Booking> bookings = bookingService.getAllBookings(search, status, date);
-        req.setAttribute("bookings", bookings);
+
+        int page = 1;
+        int pageSize = 10;
+        String pageParam = req.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                // Keep default page = 1
+            }
+        }
+
+        int totalBookings = bookings.size();
+        int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalBookings);
+        List<Booking> paginatedBookings = totalBookings > 0 ? bookings.subList(start, end) : bookings;
+
+        req.setAttribute("bookings", paginatedBookings);
         req.setAttribute("search", search);
         req.setAttribute("selectedStatus", status);
         req.setAttribute("date", date);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
+        req.setAttribute("totalEntries", totalBookings);
+        req.setAttribute("startEntry", totalBookings == 0 ? 0 : start + 1);
+        req.setAttribute("endEntry", end);
         req.getRequestDispatcher("/WEB-INF/view/admin/booking-list.jsp").forward(req, res);
     }
 
