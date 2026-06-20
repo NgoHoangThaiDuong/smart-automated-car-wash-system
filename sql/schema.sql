@@ -115,8 +115,6 @@ BEGIN
        vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
        service_id INT FOREIGN KEY REFERENCES wash_services(id),
        wash_date DATETIME NOT NULL,
-       payment_method VARCHAR(30),
-       payment_status VARCHAR(20),
        amount_paid DECIMAL(18,2),
        points_earned INT DEFAULT 0,
        feedback NVARCHAR(500),
