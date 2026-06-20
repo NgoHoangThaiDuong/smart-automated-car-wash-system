@@ -78,8 +78,6 @@ BEGIN
         booking_date DATE NOT NULL,
         time_slot VARCHAR(20) NOT NULL,
         booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
-        payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
-        payment_method VARCHAR(30),
         total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
         points_earned INT DEFAULT 0,
         notes NVARCHAR(500),
