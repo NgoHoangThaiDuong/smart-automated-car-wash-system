@@ -334,7 +334,6 @@ public class BookingDAO {
                 u.setLoyaltyTier(lt);
             }
         } catch (java.sql.SQLException e) {
-            // safe fallback if columns are not selected
         }
         b.setUser(u);
 

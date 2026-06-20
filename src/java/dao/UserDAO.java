@@ -236,7 +236,6 @@ public class UserDAO {
         try {
             u.setVehicleCount(rs.getInt("vehicle_count"));
         } catch (SQLException e) {
-            // column not in result set
         }
 
         return u;

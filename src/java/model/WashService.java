@@ -8,8 +8,7 @@ public class WashService {
     private int durationMinutes;
     private boolean isActive;
     private boolean deleted;
-    private int bookingCount; // Helper field for admin stats
-
+    private int bookingCount;
     public WashService() {}
 
     public WashService(int id, String name, String description, double price, int durationMinutes, boolean isActive) {

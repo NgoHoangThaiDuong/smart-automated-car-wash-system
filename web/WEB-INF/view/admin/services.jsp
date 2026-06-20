@@ -244,7 +244,6 @@
         modal.classList.remove('active');
     }
 
-    // Close when clicking outside of modal card
     window.onclick = function(event) {
         if (event.target === modal) {
             closeModal();
