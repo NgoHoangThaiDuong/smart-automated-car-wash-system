@@ -23,7 +23,7 @@ public class BookingDAO {
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -106,7 +106,7 @@ public class BookingDAO {
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -156,7 +156,7 @@ public class BookingDAO {
         String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -300,10 +300,10 @@ public class BookingDAO {
     }
 
     public int createBooking(int userId, int vehicleId, int serviceId, Date bookingDate,
-            String timeSlot, BigDecimal totalAmount, String notes) {
+            String timeSlot, BigDecimal totalAmount) {
         String insertBookingSql = "INSERT INTO bookings " +
-                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned, notes) " +
-                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', ?, 0, ?)";
+                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) " +
+                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', ?, 0)";
         String insertPaymentSql = "INSERT INTO payments (booking_id, user_id, amount, payment_status, payment_method) " +
                 "VALUES (?, ?, ?, 'UNPAID', NULL)";
         
@@ -320,7 +320,6 @@ public class BookingDAO {
                 ps.setDate(4, bookingDate);
                 ps.setString(5, timeSlot);
                 ps.setBigDecimal(6, totalAmount);
-                ps.setString(7, notes);
                 ps.executeUpdate();
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
@@ -366,7 +365,7 @@ public class BookingDAO {
         String sql = "SELECT TOP 1 b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -396,7 +395,7 @@ public class BookingDAO {
         String sql = "SELECT TOP (?) b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -427,7 +426,7 @@ public class BookingDAO {
         String sql = "SELECT TOP (?) b.id, b.user_id, b.vehicle_id, b.service_id, " +
                 "b.booking_date, b.time_slot, b.booking_status, " +
                 "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
-                "b.total_amount, b.points_earned, b.notes, " +
+                "b.total_amount, b.points_earned, " +
                 "b.created_at, b.completed_at, " +
                 "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
                 "v.license_plate, v.brand, v.model, v.color, " +
@@ -478,7 +477,6 @@ public class BookingDAO {
 
         b.setTotalAmount(rs.getDouble("total_amount"));
         b.setPointsEarned(rs.getInt("points_earned"));
-        b.setNotes(rs.getString("notes"));
         b.setCreatedAt(rs.getTimestamp("created_at"));
         b.setCompletedAt(rs.getTimestamp("completed_at"));
 

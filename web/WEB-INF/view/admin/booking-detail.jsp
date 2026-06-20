@@ -174,13 +174,6 @@
         </div>
     </div>
 
-    <!-- Notes Card (if present) -->
-    <c:if test="${not empty booking.notes}">
-        <div class="notes-card">
-            <div class="notes-title">Customer Notes / Requests</div>
-            <div class="notes-content"><c:out value="${booking.notes}"/></div>
-        </div>
-    </c:if>
 
     <!-- Actions Control Panel Grid -->
     <div class="actions-panel-grid">

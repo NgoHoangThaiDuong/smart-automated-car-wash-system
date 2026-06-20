@@ -14,7 +14,6 @@ public class Booking {
     private String paymentMethod;
     private double totalAmount;
     private int pointsEarned;
-    private String notes;
     private Date createdAt;
     private Date completedAt;
     private boolean deleted;
@@ -58,9 +57,6 @@ public class Booking {
 
     public int getPointsEarned() { return pointsEarned; }
     public void setPointsEarned(int pointsEarned) { this.pointsEarned = pointsEarned; }
-
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }

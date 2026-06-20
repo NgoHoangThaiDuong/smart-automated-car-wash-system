@@ -80,7 +80,6 @@ BEGIN
         booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
         total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
         points_earned INT DEFAULT 0,
-        notes NVARCHAR(500),
         created_at DATETIME DEFAULT GETDATE(),
         completed_at DATETIME NULL,
         is_deleted BIT NOT NULL DEFAULT 0
@@ -102,23 +101,6 @@ BEGIN
         paid_at DATETIME NULL,
         created_at DATETIME NOT NULL DEFAULT GETDATE(),
         updated_at DATETIME NOT NULL DEFAULT GETDATE()
-    );
-END;
-GO
-
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='wash_history' AND xtype='U')
-BEGIN
-    CREATE TABLE wash_history (
-       id INT IDENTITY(1,1) PRIMARY KEY,
-       booking_id INT FOREIGN KEY REFERENCES bookings(id),
-       user_id INT FOREIGN KEY REFERENCES users(id),
-       vehicle_id INT FOREIGN KEY REFERENCES vehicles(id),
-       service_id INT FOREIGN KEY REFERENCES wash_services(id),
-       wash_date DATETIME NOT NULL,
-       amount_paid DECIMAL(18,2),
-       points_earned INT DEFAULT 0,
-       feedback NVARCHAR(500),
-       created_at DATETIME DEFAULT GETDATE()
     );
 END;
 GO
