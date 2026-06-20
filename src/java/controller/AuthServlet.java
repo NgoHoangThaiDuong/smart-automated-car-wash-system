@@ -74,6 +74,7 @@ public class AuthServlet extends HttpServlet {
             req.setAttribute("username", usernameVal);
             req.getRequestDispatcher("/login.jsp").forward(req, res);
         } catch (Exception e) {
+            e.printStackTrace();
             req.setAttribute("error", "Hệ thống đang bận, vui lòng thử lại sau.");
             req.setAttribute("username", usernameVal);
             req.getRequestDispatcher("/login.jsp").forward(req, res);
@@ -109,6 +110,7 @@ public class AuthServlet extends HttpServlet {
             req.setAttribute("phone", phoneVal);
             req.getRequestDispatcher("/register.jsp").forward(req, res);
         } catch (Exception e) {
+            e.printStackTrace();
             req.setAttribute("error", "Hệ thống đang bận, vui lòng thử lại sau.");
             req.setAttribute("username", usernameVal);
             req.setAttribute("fullname", fullnameVal);

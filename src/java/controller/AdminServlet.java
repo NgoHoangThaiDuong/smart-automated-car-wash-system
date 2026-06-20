@@ -95,7 +95,6 @@ public class AdminServlet extends HttpServlet {
             try {
                 page = Integer.parseInt(pageParam);
             } catch (NumberFormatException e) {
-                // Keep default page = 1
             }
         }
 
@@ -139,7 +138,6 @@ public class AdminServlet extends HttpServlet {
             try {
                 page = Integer.parseInt(pageParam);
             } catch (NumberFormatException e) {
-                // Keep default page = 1
             }
         }
 
@@ -244,6 +242,7 @@ public class AdminServlet extends HttpServlet {
             washServiceService.createService(ws);
             session.setAttribute("adminMsg", "Thêm dịch vụ mới thành công.");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
@@ -270,6 +269,7 @@ public class AdminServlet extends HttpServlet {
             washServiceService.updateService(ws);
             session.setAttribute("adminMsg", "Cập nhật dịch vụ thành công.");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
@@ -282,6 +282,7 @@ public class AdminServlet extends HttpServlet {
             washServiceService.toggleServiceStatus(id);
             session.setAttribute("adminMsg", "Đã thay đổi trạng thái hoạt động của dịch vụ.");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
@@ -294,6 +295,7 @@ public class AdminServlet extends HttpServlet {
             washServiceService.deleteService(id);
             session.setAttribute("adminMsg", "Xóa dịch vụ thành công.");
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
@@ -307,7 +309,6 @@ public class AdminServlet extends HttpServlet {
             try {
                 tierId = Integer.parseInt(tierIdParam);
             } catch (NumberFormatException e) {
-                // ignore
             }
         }
 
@@ -335,6 +336,7 @@ public class AdminServlet extends HttpServlet {
             session.setAttribute("adminMsg", "Xác nhận thanh toán thành công.");
             res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + id);
         } catch (Exception e) {
+            e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
             res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + idParam);
         }
