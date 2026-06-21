@@ -42,6 +42,22 @@
         </div>
     </div>
 
+    <!-- Alert Notifications Session Feedbacks -->
+    <c:if test="${not empty sessionScope.adminMsg}">
+        <div class="alert-box alert-success" style="margin-bottom: 1.5rem;">
+            <span><c:out value="${sessionScope.adminMsg}"/></span>
+            <button class="alert-close-btn" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        <c:remove var="adminMsg" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.adminError}">
+        <div class="alert-box alert-error" style="margin-bottom: 1.5rem;">
+            <span><c:out value="${sessionScope.adminError}"/></span>
+            <button class="alert-close-btn" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        <c:remove var="adminError" scope="session"/>
+    </c:if>
+
     <!-- Analytics Cards (Bento style) -->
     <div class="analytics-grid">
         <!-- Total Customers -->
@@ -135,7 +151,7 @@
                         <th style="width: 15%; text-align: right;">Lifetime Spent</th>
                         <th style="width: 10%; text-align: center;">Wash Count</th>
                         <th style="width: 8%; text-align: center;">Vehicles</th>
-                        <th style="width: 18%;">Tier Upgrade Progress</th>
+                        <th style="width: 18%; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -184,63 +200,13 @@
                                         <span class="vehicle-count-tag">${u.vehicleCount}</span>
                                     </td>
 
-                                    <!-- Upgrade Progress Bar -->
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${tierName eq 'Platinum'}">
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span style="color: #2563EB; font-weight: 700;">MAX TIER REACHED</span>
-                                                        <span class="material-symbols-outlined" style="font-size: 14px; color: #3B82F6;">stars</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: 100%; background: #3B82F6;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:when test="${tierName eq 'Gold'}">
-                                                <c:set var="targetWashes" value="30"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #F59E0B;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:when test="${tierName eq 'Silver'}">
-                                                <c:set var="targetWashes" value="15"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #475569;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:set var="targetWashes" value="5"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #10B981;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <!-- Actions -->
+                                    <td style="text-align: center;">
+                                        <div class="actions-cell-group" style="justify-content: center;">
+                                            <a href="<c:url value='/admin/customers/detail?id=${u.id}'/>" class="btn-detail-icon" title="View Detail">
+                                                <span class="material-symbols-outlined" style="font-size: 1.25rem;">arrow_forward</span>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>
