@@ -42,7 +42,7 @@
     </div>
     
     <!-- Reusable Unified Booking Panel Component -->
-    <c:set var="paginationBaseUrl" value="${pageContext.request.contextPath}/admin/bookings" scope="request"/>
+    <c:set var="paginationBaseUrl" value="/admin/bookings" scope="request"/>
     <jsp:include page="/WEB-INF/view/admin/components/booking-table.jsp"/>
 </div>
 

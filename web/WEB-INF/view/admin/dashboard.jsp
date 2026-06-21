@@ -76,7 +76,7 @@
     </div>
 
     <!-- Reusable Unified Booking Panel Component -->
-    <c:set var="paginationBaseUrl" value="${pageContext.request.contextPath}/admin/dashboard" scope="request"/>
+    <c:set var="paginationBaseUrl" value="/admin/dashboard" scope="request"/>
     <jsp:include page="/WEB-INF/view/admin/components/booking-table.jsp"/>
 </div>
 </body>

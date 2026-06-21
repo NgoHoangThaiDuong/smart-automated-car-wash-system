@@ -7,7 +7,7 @@
 
 <!-- Shared Search and Filter Card -->
 <div class="filter-card">
-    <form method="GET" action="${paginationBaseUrl}" style="margin: 0;">
+    <form method="GET" action="<c:url value='${paginationBaseUrl}'/>" style="margin: 0;">
         <div class="filter-form-grid">
             <!-- Search -->
             <div class="search-input-wrapper">
