@@ -60,10 +60,20 @@
     width: 32px; height: 32px; border-radius: 50%; transition: all 0.2s;
 }
 
-.btn-detail-icon:hover { background: #F1F5F9; color: #0B45BD; }
+.btn-detail-icon:hover { background: #F1F5F9; color: var(--primary); }
 
 .pagination-list {
     display: flex; gap: 0.35rem; list-style: none; margin: 0; padding: 0;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-wrapper {
+    margin-left: auto;
 }
 
 .page-item-btn {
@@ -75,7 +85,7 @@
 }
 
 .page-item-btn:hover { background: #F8FAFC; border-color: #CBD5E1; }
-.page-item-btn.active { background: #0B45BD; color: #ffffff; border-color: #0B45BD; }
+.page-item-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
 .page-item-btn.disabled { color: #94A3B8; background: #F8FAFC; border-color: #E2E8F0; cursor: not-allowed; }
 
 .filter-date-field {
@@ -85,4 +95,4 @@
     color: #334155; min-width: 160px; transition: all 0.2s;
 }
 
-.filter-date-field:focus { outline: none; border-color: #0B45BD; }
+.filter-date-field:focus { outline: none; border-color: var(--primary); }

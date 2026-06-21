@@ -18,12 +18,12 @@
 }
 
 .analytics-card-val {
-    font-size: 2.25rem; font-weight: 800; color: var(--text-slate-dark);
+    font-size: var(--text-4xl); font-weight: var(--weight-extrabold); color: var(--text-slate-dark);
     line-height: 1.1; margin-top: 0.25rem;
 }
 
 .analytics-card-label {
-    font-size: 0.72rem; font-weight: 700; color: var(--text-slate-muted);
+    font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--text-slate-muted);
     text-transform: uppercase; letter-spacing: 0.05em;
 }
 
@@ -38,7 +38,7 @@
 
 /* Tier Badges */
 .tier-badge {
-    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    display: inline-block; font-size: var(--text-xs); font-weight: var(--weight-bold);
     padding: 0.25rem 0.6rem; border-radius: 8px;
     text-transform: uppercase; letter-spacing: 0.02em; text-align: center;
 }
@@ -56,8 +56,8 @@
 
 .vehicle-count-tag {
     display: inline-block; padding: 0.2rem 0.5rem;
-    background: #F1F5F9; border-radius: 6px; font-weight: 700;
-    font-size: 0.78rem; color: #475569; border: 1px solid var(--border-slate);
+    background: #F1F5F9; border-radius: 6px; font-weight: var(--weight-bold);
+    font-size: var(--text-xs); color: #475569; border: 1px solid var(--border-slate);
 }
 
 /* Progress Bars */
@@ -65,7 +65,7 @@
 
 .progress-info {
     display: flex; justify-content: space-between;
-    font-size: 0.72rem; font-weight: 700; color: var(--text-slate-muted);
+    font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--text-slate-muted);
 }
 
 .progress-bar-bg { height: 6px; background: #E2E8F0; border-radius: 9999px; overflow: hidden; }
@@ -77,13 +77,13 @@
     padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; margin-top: 2rem;
 }
 
-.rules-card-icon { color: #2563EB; font-size: 1.5rem; }
-.rules-title { margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 800; color: #1E3A8A; }
-.rules-desc { margin: 0 0 1rem 0; font-size: 0.85rem; color: #1E3A8A; line-height: 1.5; font-weight: 500; }
+.rules-card-icon { color: #2563EB; font-size: var(--text-2xl); }
+.rules-title { margin: 0 0 0.5rem 0; font-size: var(--text-md); font-weight: var(--weight-extrabold); color: #1E3A8A; }
+.rules-desc { margin: 0 0 1rem 0; font-size: var(--text-base); color: #1E3A8A; line-height: 1.5; font-weight: var(--weight-medium); }
 .rules-badge-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
 .rule-pill-badge {
     background: #ffffff; padding: 0.45rem 0.85rem; border-radius: 10px;
-    border: 1px solid #BFDBFE; font-size: 0.8rem; font-weight: 700; color: #1E3A8A;
+    border: 1px solid #BFDBFE; font-size: var(--text-xs); font-weight: var(--weight-bold); color: #1E3A8A;
     box-shadow: 0 1px 2px rgba(30, 58, 138, 0.03);
 }

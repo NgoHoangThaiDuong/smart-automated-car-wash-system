@@ -38,16 +38,6 @@
 
 <!-- Booking Table Card -->
 <div class="mgmt-card">
-    <div class="mgmt-header">
-        <div class="mgmt-controls">
-            <c:if test="${empty showNewBookingBtn || showNewBookingBtn}">
-                <a href="<c:url value='/admin/bookings'/>" class="btn-new-booking" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.25rem; background: var(--primary); color: white; font-weight: 700; border-radius: 10px; font-size: 0.875rem;">
-                    <span class="material-symbols-outlined" style="font-size: 1.15rem;">add</span>
-                    New Booking
-                </a>
-            </c:if>
-        </div>
-    </div>
 
     <div style="overflow-x: auto;">
         <table class="booking-table" id="bookingTable">
@@ -165,7 +155,7 @@
 
     <!-- Pagination Section matching UI layout spec -->
     <div class="pagination-container">
-        <div>
+        <div class="pagination-wrapper">
             <ul class="pagination-list">
                 <li>
                     <c:choose>

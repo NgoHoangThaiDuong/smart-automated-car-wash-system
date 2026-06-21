@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services - SmartWash Pro</title>
+    <title>Services - Smart Car Wash</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<c:url value='/css/admin/common.css'/>">
@@ -31,7 +31,6 @@
         <div class="header-action-row">
             <div>
                 <h1 class="page-title">Services</h1>
-                <p class="page-subtitle">Configure car wash packages, service pricing, and washing durations.</p>
             </div>
             <div>
                 <button onclick="openCreateModal()" class="btn-create-service">
@@ -56,88 +55,76 @@
         </div>
     </c:if>
 
-    <!-- Services Bento Grid -->
-    <div class="services-grid">
-        <c:choose>
-            <c:when test="${not empty services}">
-                <c:forEach var="ws" items="${services}">
-                    <div class="service-card ${ws.active ? '' : 'inactive'}">
-                        
-                        <!-- Status Badge -->
-                        <div class="service-card-status-badge">
-                            <c:choose>
-                                <c:when test="${ws.active}">
-                                    <span class="status-pill status-active">Active</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="status-pill status-inactive">Paused</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
-                        <!-- Card Body Details -->
-                        <div class="service-card-body">
-                            <h3 class="service-card-title"><c:out value="${ws.name}"/></h3>
-                            <p class="service-card-desc" title="<c:out value='${ws.description}'/>"><c:out value="${ws.description}"/></p>
-                        </div>
-
-                        <!-- Price, Duration and Order count stats -->
-                        <div class="service-card-footer">
-                            <div class="service-price-row">
-                                <span class="service-price-tag">
-                                    <fmt:formatNumber value="${ws.price}" type="number" groupingUsed="true"/> ₫
-                                </span>
-                                <span class="service-duration-badge">
-                                    <span class="material-symbols-outlined">schedule</span>
-                                    <c:out value="${ws.durationMinutes}"/> mins
-                                </span>
-                            </div>
-
-                            <div class="service-total-orders-card">
-                                <span class="label">
-                                    <span class="material-symbols-outlined" style="font-size: 0.95rem;">book_online</span>
-                                    Total Bookings
-                                </span>
-                                <span class="val"><c:out value="${ws.bookingCount}"/></span>
-                            </div>
-
-                            <!-- Operations Actions -->
-                            <div class="actions-row-grid">
-                                <!-- Edit Button -->
-                                <button onclick="openEditModal(${ws.id}, '${ws.name}', '${ws.description}', ${ws.price}, ${ws.durationMinutes}, ${ws.active})" class="btn-card-action btn-card-edit" title="Edit Service">
-                                    <span class="material-symbols-outlined">edit</span> Edit
-                                </button>
-
-                                <!-- Toggle Pause/Resume -->
-                                <form action="<c:url value='/admin/services/toggle-status'/>" method="POST" onsubmit="return confirm('Do you want to toggle operational status for this service?')" style="margin: 0;">
-                                    <input type="hidden" name="id" value="${ws.id}">
-                                    <button type="submit" class="btn-card-action btn-card-toggle" style="width: 100%;" title="${ws.active ? 'Pause Service' : 'Resume Service'}">
-                                        <span class="material-symbols-outlined">${ws.active ? 'pause' : 'play_arrow'}</span>
-                                        <c:out value="${ws.active ? 'Pause' : 'Resume'}"/>
-                                    </button>
-                                </form>
-
-                                <!-- Delete Service -->
-                                <form action="<c:url value='/admin/services/delete'/>" method="POST" onsubmit="return confirm('Are you sure you want to delete this service? All linked records might be affected!')" style="margin: 0;">
-                                    <input type="hidden" name="id" value="${ws.id}">
-                                    <button type="submit" class="btn-card-action btn-card-delete" style="width: 100%;" title="Delete Service">
-                                        <span class="material-symbols-outlined">delete</span> Delete
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                    </div>
-                </c:forEach>
-            </c:when>
-            <c:otherwise>
-                <div style="grid-column: 1 / -1; background: #ffffff; border: 2px dashed #E2E8F0; border-radius: 20px; padding: 4rem 2rem; text-align: center; color: #94A3B8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;">
-                    <span class="material-symbols-outlined" style="font-size: 3.5rem; color: #94A3B8;">assignment_late</span>
-                    <span style="font-weight: 700; font-size: 1.1rem; color: #475569;">No services found in system.</span>
-                    <span style="font-size: 0.85rem;">Click 'New Service' to start adding custom washing slots.</span>
-                </div>
-            </c:otherwise>
-        </c:choose>
+    <!-- Services Management Table -->
+    <div class="mgmt-card">
+        <div style="overflow-x: auto;">
+            <table class="booking-table" id="servicesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Service Name</th>
+                        <th style="width: 20%;">Price (VND)</th>
+                        <th style="width: 15%; text-align: center;">Duration (Minutes)</th>
+                        <th style="width: 15%; text-align: center;">Booking Count</th>
+                        <th style="width: 10%; text-align: center;">Status</th>
+                        <th style="width: 5%; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${not empty services}">
+                            <c:forEach var="ws" items="${services}">
+                                <tr>
+                                    <td>
+                                        <div class="service-name-cell">
+                                            <div class="service-name"><c:out value="${ws.name}"/></div>
+                                            <div class="service-desc"><c:out value="${ws.description}"/></div>
+                                        </div>
+                                    </td>
+                                    <td class="amount-cell">
+                                        <fmt:formatNumber value="${ws.price}" type="number" groupingUsed="true"/> ₫
+                                    </td>
+                                    <td style="text-align: center; font-weight: 600;">
+                                        <c:out value="${ws.durationMinutes}"/> mins
+                                    </td>
+                                    <td style="text-align: center; font-weight: 600; color: var(--text-slate-muted);">
+                                        <c:out value="${ws.bookingCount}"/>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <form action="<c:url value='/admin/services/toggle-status'/>" method="POST" style="margin: 0; display: inline-block;">
+                                            <input type="hidden" name="id" value="${ws.id}">
+                                            <label class="switch-toggle">
+                                                <input type="checkbox" ${ws.active ? 'checked' : ''} onchange="if(!confirm('Do you want to toggle operational status for this service?')) { this.checked = !this.checked; } else { this.form.submit(); }">
+                                                <span class="switch-slider"></span>
+                                            </label>
+                                        </form>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div class="actions-cell">
+                                            <button type="button" onclick="openEditModal(${ws.id}, '${ws.name}', '${ws.description}', ${ws.price}, ${ws.durationMinutes}, ${ws.active})" class="btn-action-icon edit-btn" title="Edit Service">
+                                                <span class="material-symbols-outlined">edit</span>
+                                            </button>
+                                            <form action="<c:url value='/admin/services/delete'/>" method="POST" onsubmit="return confirm('Are you sure you want to delete this service? All linked records might be affected!')" style="margin: 0; display: inline-block;">
+                                                <input type="hidden" name="id" value="${ws.id}">
+                                                <button type="submit" class="btn-action-icon delete-btn" title="Delete Service">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #94A3B8; padding: 3rem; font-style: italic;">
+                                    No services found in system. Click 'New Service' above to add one.
+                                </td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>

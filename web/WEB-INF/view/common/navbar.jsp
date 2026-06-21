@@ -7,12 +7,9 @@
 
 <header class="app-navbar">
     <div class="app-navbar-container">
-        <!-- Brand Logo and Name -->
+        <!-- Brand Logo -->
         <a class="app-brand" href="<c:url value='${sessionScope.currentUser.role eq "ADMIN" ? "/admin/dashboard" : "/dashboard"}'/>">
-            <span class="app-brand-icon">
-                <span class="material-symbols-outlined">directions_car</span>
-            </span>
-            <span class="app-brand-text">SmartWash<span>Pro</span></span>
+            <img src="<c:url value='/public/logo.svg'/>" alt="Smart Car Wash Logo" class="app-logo-img">
         </a>
 
         <!-- Mobile Navigation Menu Toggle Button -->

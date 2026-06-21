@@ -25,23 +25,23 @@
 }
 
 .card-large.blue-card {
-    background: linear-gradient(135deg, #0B45BD 0%, #1E5BE4 100%);
+    background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
     color: #ffffff;
     border: none;
-    box-shadow: 0 10px 20px rgba(11, 69, 189, 0.12);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
 }
 
 .card-label {
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
     color: var(--text-slate-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .card-value {
-    font-size: 2.25rem;
-    font-weight: 800;
+    font-size: var(--text-4xl);
+    font-weight: var(--weight-extrabold);
     color: var(--text-slate-dark);
     line-height: 1.1;
     margin-top: 0.25rem;
@@ -107,19 +107,19 @@
 }
 
 .card-small .card-value {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
 }
 
 /* ─── Management Card Controls ─── */
 .mgmt-title-wrapper h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
     color: var(--text-slate-dark);
     margin: 0;
 }
 
 .mgmt-title-wrapper p {
-    font-size: 0.825rem;
+    font-size: var(--text-sm);
     color: var(--text-slate-muted);
     margin: 0.25rem 0 0 0;
 }
@@ -148,7 +148,7 @@
     padding: 0.6rem 0.75rem 0.6rem 2.25rem;
     border: 1px solid #CBD5E1;
     border-radius: 10px;
-    font-size: 0.875rem;
+    font-size: var(--text-base);
     font-family: inherit;
     min-width: 200px;
     transition: all 0.2s;
@@ -167,8 +167,8 @@
     gap: 0.35rem;
     padding: 0.6rem 1rem;
     border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
@@ -184,7 +184,7 @@
     background: var(--primary);
     color: #ffffff;
     border-color: var(--primary);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     box-shadow: 0 4px 6px -1px rgba(11, 69, 189, 0.15);
 }
 

@@ -1,3 +1,5 @@
+@import url("../typography.css");
+
 :root {
     --dashboard-blue: #0b50c7;
     --dashboard-text: #111827;
@@ -13,7 +15,7 @@
 body {
     margin: 0;
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     color: var(--dashboard-text);
     background: var(--dashboard-bg);
 }

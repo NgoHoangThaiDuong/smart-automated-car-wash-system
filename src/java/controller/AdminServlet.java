@@ -311,7 +311,6 @@ public class AdminServlet extends HttpServlet {
         req.setAttribute("totalVehicles", userService.getRegisteredVehicleCount());
         req.setAttribute("totalRevenue", userService.getLifetimeSpentSum());
 
-        // Pagination attributes
         req.setAttribute("currentPage", pageResult.getCurrentPage());
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("totalEntries", pageResult.getTotalEntries());

@@ -7,14 +7,28 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Hồ sơ cá nhân - Smart Car Wash</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<c:url value='/css/profile.css'/>">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="<c:url value='/css/profile.css'/>?v=4">
     </head>
     <body>
 
         <jsp:include page="/WEB-INF/view/common/navbar.jsp"/>
 
         <div class="main-container">
+            <!-- Page Header & Breadcrumbs -->
+            <div class="page-header-container">
+                <div class="breadcrumb-trail">
+                    <a href="<c:url value='${sessionScope.currentUser.role eq "ADMIN" ? "/admin/dashboard" : "/dashboard"}'/>">Dashboard</a>
+                    <span class="material-symbols-outlined">chevron_right</span>
+                    <span style="font-weight: 700;">Profile</span>
+                </div>
+                <div class="header-action-row">
+                    <div>
+                        <h1 class="page-title">Xin chào, <c:out value="${currentUser.fullname}"/></h1>
+                    </div>
+                </div>
+            </div>
 
             <div id="tier-card" class="tier-card tier-${not empty currentUser.loyaltyTier ? currentUser.loyaltyTier.name : 'Member'}">
                 <div class="tier-info">
