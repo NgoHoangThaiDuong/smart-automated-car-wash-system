@@ -120,10 +120,20 @@
                                             <span class="payment-voided">Voided</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="payment-collect-btn">
+                                            <button type="button" 
+                                                    class="payment-collect-btn js-collect-payment-btn" 
+                                                    onclick="openCheckoutModal(this)"
+                                                    data-id="${b.id}"
+                                                    data-customer-name="<c:out value='${not empty b.user.fullname ? b.user.fullname : b.user.username}'/>"
+                                                    data-customer-tier="${tierName}"
+                                                    data-vehicle-model="<c:out value='${b.vehicle.brand} ${b.vehicle.model}'/>"
+                                                    data-vehicle-plate="<c:out value='${b.vehicle.licensePlate}'/>"
+                                                    data-service-name="<c:out value='${b.service.name}'/>"
+                                                    data-service-duration="${b.service.durationMinutes}"
+                                                    data-total-amount="<fmt:formatNumber value='${b.totalAmount}' type='number' groupingUsed='true'/>">
                                                 <span class="material-symbols-outlined">credit_card</span>
                                                 Collect <fmt:formatNumber value="${b.totalAmount}" type="number" groupingUsed="true"/> ₫
-                                            </a>
+                                            </button>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -358,3 +368,150 @@
             </div>
         </div>
 </div>
+
+<!-- Payment Checkout Modal (Khớp 100% hình 2) -->
+<div id="paymentCheckoutModal" class="checkout-modal">
+    <div class="checkout-modal-content">
+        <div class="checkout-modal-header">
+            <h2>Payment Checkout</h2>
+            <p>Review booking information and select a payment method.</p>
+            <button type="button" class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
+        </div>
+        
+        <form id="checkoutPaymentForm" method="POST" action="<c:url value='/admin/bookings/collect-payment'/>">
+            <input type="hidden" name="bookingId" id="checkoutBookingId">
+            <input type="hidden" name="redirect" value="list">
+            
+            <div class="checkout-card">
+                <div class="checkout-booking-title">
+                    Booking <span id="checkoutBookingRef">#SW-8942</span>
+                </div>
+                
+                <div class="checkout-info-grid">
+                    <div class="checkout-info-col">
+                        <div class="checkout-info-label">CUSTOMER</div>
+                        <div class="checkout-info-value" id="checkoutCustomerName">Michael Chen</div>
+                        <div>
+                            <span class="tier-badge-small" id="checkoutCustomerTier">GOLD TIER</span>
+                        </div>
+                    </div>
+                    <div class="checkout-info-col">
+                        <div class="checkout-info-label">VEHICLE</div>
+                        <div class="checkout-info-value" id="checkoutVehicleModel">Tesla Model 3</div>
+                        <div class="checkout-info-sub" id="checkoutVehiclePlate">CA-XYZ789</div>
+                    </div>
+                </div>
+                
+                <div class="checkout-divider"></div>
+                
+                <div class="checkout-service-row">
+                    <div class="checkout-service-left">
+                        <div class="checkout-service-name" id="checkoutServiceName">Premium Detail Wash</div>
+                        <div class="checkout-service-duration">
+                            <span class="material-symbols-outlined" style="font-size: 0.9rem; margin-right: 2px;">schedule</span>
+                            <span id="checkoutServiceDuration">90 mins</span>
+                        </div>
+                    </div>
+                    <div class="checkout-service-price">
+                        <span id="checkoutTotalAmount">1,200,000</span> ₫
+                    </div>
+                </div>
+                
+                <div class="checkout-payment-section">
+                    <div class="checkout-payment-title">Payment Method</div>
+                    
+                    <div class="payment-options">
+                        <label class="payment-option-card active" id="paymentCardCASH">
+                            <input type="radio" name="paymentMethod" value="CASH" checked onclick="selectPaymentMethod(this)">
+                            <div class="payment-option-content">
+                                <span class="custom-radio"></span>
+                                <span class="material-symbols-outlined payment-icon">payments</span>
+                                <span class="payment-text">Cash</span>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-option-card" id="paymentCardBANK">
+                            <input type="radio" name="paymentMethod" value="BANK_TRANSFER" onclick="selectPaymentMethod(this)">
+                            <div class="payment-option-content">
+                                <span class="custom-radio"></span>
+                                <span class="material-symbols-outlined payment-icon">account_balance</span>
+                                <span class="payment-text">Banking</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-confirm-payment">Confirm Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCheckoutModal(btn) {
+    var id = btn.getAttribute('data-id');
+    var customerName = btn.getAttribute('data-customer-name');
+    var customerTier = btn.getAttribute('data-customer-tier');
+    var vehicleModel = btn.getAttribute('data-vehicle-model');
+    var vehiclePlate = btn.getAttribute('data-vehicle-plate');
+    var serviceName = btn.getAttribute('data-service-name');
+    var serviceDuration = btn.getAttribute('data-service-duration');
+    var totalAmount = btn.getAttribute('data-total-amount');
+
+    document.getElementById('checkoutBookingId').value = id;
+    document.getElementById('checkoutBookingRef').innerText = '#BK-' + id;
+    document.getElementById('checkoutCustomerName').innerText = customerName;
+    
+    var tierBadge = document.getElementById('checkoutCustomerTier');
+    tierBadge.innerText = customerTier.toUpperCase() + ' TIER';
+    tierBadge.className = 'tier-badge-small tier-badge-' + customerTier.toUpperCase();
+
+    document.getElementById('checkoutVehicleModel').innerText = vehicleModel;
+    document.getElementById('checkoutVehiclePlate').innerText = vehiclePlate;
+    document.getElementById('checkoutServiceName').innerText = serviceName;
+    document.getElementById('checkoutServiceDuration').innerText = serviceDuration + ' mins';
+    document.getElementById('checkoutTotalAmount').innerText = totalAmount;
+
+    // Reset payment option
+    var radioCash = document.querySelector('input[name="paymentMethod"][value="CASH"]');
+    radioCash.checked = true;
+    
+    // Reset active class
+    document.getElementById('paymentCardCASH').classList.add('active');
+    document.getElementById('paymentCardBANK').classList.remove('active');
+
+    var modal = document.getElementById('paymentCheckoutModal');
+    modal.style.display = 'flex';
+    setTimeout(function() {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeCheckoutModal() {
+    var modal = document.getElementById('paymentCheckoutModal');
+    modal.classList.remove('show');
+    setTimeout(function() {
+        modal.style.display = 'none';
+    }, 250);
+}
+
+function selectPaymentMethod(radio) {
+    document.getElementById('paymentCardCASH').classList.remove('active');
+    document.getElementById('paymentCardBANK').classList.remove('active');
+    
+    if (radio.value === 'CASH') {
+        document.getElementById('paymentCardCASH').classList.add('active');
+    } else {
+        document.getElementById('paymentCardBANK').classList.add('active');
+    }
+}
+
+// Close modal when clicking outside content
+window.addEventListener('click', function(event) {
+    var modal = document.getElementById('paymentCheckoutModal');
+    if (event.target == modal) {
+        closeCheckoutModal();
+    }
+});
+</script>
+

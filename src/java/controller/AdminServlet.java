@@ -332,15 +332,24 @@ public class AdminServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         String idParam = req.getParameter("bookingId");
         String paymentMethod = req.getParameter("paymentMethod");
+        String redirect = req.getParameter("redirect");
         try {
             int id = Integer.parseInt(idParam);
             bookingService.collectPayment(id, paymentMethod);
             session.setAttribute("adminMsg", "Xác nhận thanh toán thành công.");
-            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + id);
+            if ("list".equals(redirect)) {
+                res.sendRedirect(req.getContextPath() + "/admin/bookings");
+            } else {
+                res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + id);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("adminError", "Lỗi: " + e.getMessage());
-            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + idParam);
+            if ("list".equals(redirect)) {
+                res.sendRedirect(req.getContextPath() + "/admin/bookings");
+            } else {
+                res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + idParam);
+            }
         }
     }
 
