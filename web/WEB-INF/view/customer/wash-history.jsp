@@ -59,7 +59,7 @@
                             </div>
                             <div>
                                 <span class="item-label">Date &amp; Time</span>
-                                <b><c:out value="${booking.formattedBookingDate}"/></b>
+                                <b><c:out value="${booking.bookingDate}"/></b>
                                 <span><c:out value="${booking.timeSlot}"/></span>
                             </div>
                             <div class="booking-status-box">

@@ -625,4 +625,36 @@ public class BookingDAO {
 
         return b;
     }
+
+    public List<Booking> findByUserId(int userId) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, " +
+                "b.created_at, b.completed_at, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
+                "v.license_plate, v.brand, v.model, v.color, " +
+                "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+                "FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN vehicles v ON b.vehicle_id = v.id " +
+                "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
+                "WHERE b.user_id = ? AND b.is_deleted = 0 " +
+                "ORDER BY b.booking_date DESC, b.time_slot DESC";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getBooking(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding bookings by user id: " + e.getMessage(), e);
+        }
+        return list;
+    }
 }

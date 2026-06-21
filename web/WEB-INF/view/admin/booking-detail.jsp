@@ -113,7 +113,7 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Wash Date</span>
-                <span class="detail-value"><c:out value="${booking.formattedBookingDate}"/></span>
+                <span class="detail-value"><c:out value="${booking.bookingDate}"/></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Time Slot</span>

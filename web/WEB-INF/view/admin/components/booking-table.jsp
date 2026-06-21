@@ -18,9 +18,9 @@
             <!-- Status -->
             <select id="statusFilter" name="status" class="filter-select-field">
                 <option value="">-- Tất cả trạng thái --</option>
-                <c:forEach var="entry" items="${bookingStatuses}">
-                    <option value="${entry.key}" <c:if test="${selectedStatus eq entry.key}">selected</c:if>>
-                        <c:out value="${entry.value}"/>
+                <c:forEach var="status" items="${bookingStatuses}">
+                    <option value="${status}" <c:if test="${selectedStatus eq status}">selected</c:if>>
+                        <c:out value="${status}"/>
                     </option>
                 </c:forEach>
             </select>
@@ -101,7 +101,7 @@
 
                                 <!-- Schedule (Date + Time) -->
                                 <td class="td-schedule">
-                                    <div><c:out value="${b.formattedBookingDate}"/></div>
+                                    <div><c:out value="${b.bookingDate}"/></div>
                                     <div class="schedule-time ${b.bookingStatus eq 'CANCELLED' ? 'cancelled-time' : ''}">
                                         <c:out value="${b.timeSlot}"/>
                                     </div>
