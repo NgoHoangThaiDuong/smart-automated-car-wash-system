@@ -22,6 +22,13 @@
             <a class="primary-button" href="<c:url value='/booking/new'/>">+ New Booking</a>
         </div>
 
+        <c:if test="${not empty bookingMessage}">
+            <div class="alert alert-success"><c:out value="${bookingMessage}"/></div>
+        </c:if>
+        <c:if test="${not empty bookingError}">
+            <div class="alert alert-error"><c:out value="${bookingError}"/></div>
+        </c:if>
+
         <section class="booking-list">
             <c:choose>
                 <c:when test="${empty bookings}">
@@ -65,6 +72,21 @@
                                     <span class="status booking-${booking.bookingStatus}">
                                         <c:out value="${booking.bookingStatus}"/>
                                     </span>
+                                </div>
+                                <div class="booking-actions">
+                                    <c:if test="${booking.customerCancellable}">
+                                        <form method="POST" action="<c:url value='/booking/cancel'/>"
+                                              onsubmit="return confirm('Bạn có chắc muốn hủy booking này?');">
+                                            <input type="hidden" name="bookingId" value="${booking.id}">
+                                            <button class="cancel-button" type="submit">Cancel</button>
+                                        </form>
+                                    </c:if>
+                                    <c:if test="${booking.customerPayable}">
+                                        <a class="pay-button"
+                                           href="<c:url value='/payment'><c:param name='bookingId' value='${booking.id}'/></c:url>">
+                                            Pay Now
+                                        </a>
+                                    </c:if>
                                 </div>
                             </div>
                         </article>

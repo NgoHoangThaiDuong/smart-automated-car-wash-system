@@ -17,6 +17,8 @@ public class Booking {
     private Date createdAt;
     private Date completedAt;
     private boolean deleted;
+    private boolean customerCancellable;
+    private boolean customerPayable;
 
     private User user;
     private Vehicle vehicle;
@@ -78,4 +80,14 @@ public class Booking {
 
     public boolean isDeleted() { return deleted; }
     public void setDeleted(boolean deleted) { this.deleted = deleted; }
+
+    public boolean isCustomerCancellable() { return customerCancellable; }
+    public void setCustomerCancellable(boolean customerCancellable) {
+        this.customerCancellable = customerCancellable;
+    }
+
+    public boolean isCustomerPayable() { return customerPayable; }
+    public void setCustomerPayable(boolean customerPayable) {
+        this.customerPayable = customerPayable;
+    }
 }

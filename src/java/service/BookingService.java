@@ -126,7 +126,92 @@ public class BookingService {
     }
 
     public List<Booking> getBookingsByUserId(int userId) {
-        return bookingDAO.findByUserId(userId);
+        List<Booking> bookings = bookingDAO.findByUserId(userId);
+        for (Booking booking : bookings) {
+            applyCustomerActions(booking);
+        }
+        return bookings;
+    }
+
+    public Booking getCustomerBooking(int bookingId, int userId) {
+        Booking booking = bookingDAO.findById(bookingId);
+        if (booking == null || booking.getUserId() != userId) {
+            return null;
+        }
+        applyCustomerActions(booking);
+        return booking;
+    }
+
+    public boolean canCustomerCancel(Booking booking) {
+        if (booking == null || !"UNPAID".equals(booking.getPaymentStatus())) {
+            return false;
+        }
+        return "PENDING".equals(booking.getBookingStatus())
+                || "CONFIRMED".equals(booking.getBookingStatus());
+    }
+
+    public boolean canCustomerPay(Booking booking) {
+        if (booking == null || !"UNPAID".equals(booking.getPaymentStatus())) {
+            return false;
+        }
+        return "PENDING".equals(booking.getBookingStatus())
+                || "CONFIRMED".equals(booking.getBookingStatus());
+    }
+
+    public void cancelCustomerBooking(int bookingId, int userId) {
+        Booking booking = getCustomerBooking(bookingId, userId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking không tồn tại hoặc không thuộc tài khoản của bạn.");
+        }
+        if (!canCustomerCancel(booking)) {
+            throw new IllegalArgumentException("Booking này không còn được phép hủy.");
+        }
+        if (!bookingDAO.cancelCustomerBooking(bookingId, userId)) {
+            throw new IllegalArgumentException("Không thể hủy booking. Trạng thái có thể đã thay đổi.");
+        }
+    }
+
+    public void payCustomerBooking(int bookingId, int userId, String paymentMethod) {
+        Booking booking = getCustomerBooking(bookingId, userId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking không tồn tại hoặc không thuộc tài khoản của bạn.");
+        }
+        if (!canCustomerPay(booking)) {
+            throw new IllegalArgumentException("Booking này không còn hợp lệ để thanh toán.");
+        }
+        if (!"CARD".equals(paymentMethod) && !"BANK_TRANSFER".equals(paymentMethod)) {
+            throw new IllegalArgumentException("Phương thức thanh toán không hợp lệ.");
+        }
+        if (!bookingDAO.markCustomerPaymentPaid(bookingId, userId, paymentMethod)) {
+            throw new IllegalArgumentException("Thanh toán thất bại. Trạng thái booking có thể đã thay đổi.");
+        }
+    }
+
+    public List<String> getAvailableTimeSlotsForCustomer(int userId, int serviceId,
+            String bookingDateValue) {
+        User user = userDAO.findById(userId);
+        if (user == null || !"CUSTOMER".equals(user.getRole())) {
+            throw new IllegalArgumentException("Tài khoản customer không hợp lệ.");
+        }
+        WashService washService = washServiceDAO.findActiveById(serviceId);
+        if (washService == null) {
+            throw new IllegalArgumentException("Dịch vụ không tồn tại hoặc đã bị vô hiệu hóa.");
+        }
+
+        LocalDate bookingDate;
+        try {
+            bookingDate = LocalDate.parse(bookingDateValue);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Ngày đặt lịch không hợp lệ.");
+        }
+
+        int bookingWindowDays = user.getLoyaltyTier() == null
+                ? 7 : user.getLoyaltyTier().getBookingWindowDays();
+        LocalDateTime now = LocalDateTime.now();
+        if (!isBookingDateAllowed(bookingDate, now.toLocalDate(), bookingWindowDays)) {
+            throw new IllegalArgumentException("Ngày đặt lịch nằm ngoài thời hạn membership.");
+        }
+        return getAvailableTimeSlots(bookingDate, washService.getDurationMinutes(), now);
     }
 
     public boolean isBookingDateAllowed(LocalDate selectedDate, LocalDate today, int bookingWindowDays) {
@@ -262,6 +347,11 @@ public class BookingService {
         return LocalTime.parse(startTime, TIME_FORMAT)
                 .plusMinutes(durationMinutes)
                 .format(TIME_FORMAT);
+    }
+
+    private void applyCustomerActions(Booking booking) {
+        booking.setCustomerCancellable(canCustomerCancel(booking));
+        booking.setCustomerPayable(canCustomerPay(booking));
     }
 
     public PageResult<Booking> getBookingsPage(String search, String status, String date, int page, int pageSize) {

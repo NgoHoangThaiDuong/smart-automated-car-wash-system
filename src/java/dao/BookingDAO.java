@@ -301,6 +301,74 @@ public class BookingDAO {
         }
     }
 
+    public boolean cancelCustomerBooking(int bookingId, int userId) {
+        String updateBookingSql = "UPDATE bookings SET booking_status = 'CANCELLED' " +
+                "WHERE id = ? AND user_id = ? AND is_deleted = 0 " +
+                "AND booking_status IN ('PENDING', 'CONFIRMED') " +
+                "AND EXISTS (SELECT 1 FROM payments WHERE booking_id = bookings.id " +
+                "AND payment_status = 'UNPAID')";
+        String updatePaymentSql = "UPDATE payments SET payment_status = 'CANCELLED', " +
+                "updated_at = GETDATE() WHERE booking_id = ? AND user_id = ? " +
+                "AND payment_status = 'UNPAID'";
+
+        Connection cn = null;
+        try {
+            cn = DBUtils.getConnection();
+            cn.setAutoCommit(false);
+            int updated;
+            try (PreparedStatement ps = cn.prepareStatement(updateBookingSql)) {
+                ps.setInt(1, bookingId);
+                ps.setInt(2, userId);
+                updated = ps.executeUpdate();
+            }
+            if (updated == 0) {
+                cn.rollback();
+                return false;
+            }
+            try (PreparedStatement ps = cn.prepareStatement(updatePaymentSql)) {
+                ps.setInt(1, bookingId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+            cn.commit();
+            return true;
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
+            throw new RuntimeException("Error cancelling customer booking: " + e.getMessage(), e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
+    public boolean markCustomerPaymentPaid(int bookingId, int userId, String paymentMethod) {
+        String sql = "UPDATE p SET p.payment_status = 'PAID', p.payment_method = ?, " +
+                "p.paid_at = GETDATE(), p.updated_at = GETDATE() " +
+                "FROM payments p JOIN bookings b ON p.booking_id = b.id " +
+                "WHERE p.booking_id = ? AND p.user_id = ? AND b.user_id = ? " +
+                "AND b.is_deleted = 0 AND b.booking_status IN ('PENDING', 'CONFIRMED') " +
+                "AND p.payment_status = 'UNPAID'";
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, paymentMethod);
+            ps.setInt(2, bookingId);
+            ps.setInt(3, userId);
+            ps.setInt(4, userId);
+            return ps.executeUpdate() == 1;
+        } catch (Exception e) {
+            throw new RuntimeException("Error paying customer booking: " + e.getMessage(), e);
+        }
+    }
+
     public int countOverlappingBookings(Date bookingDate, String startTime, String endTime) {
         String sql = "SELECT COUNT(*) FROM bookings " +
                 "WHERE booking_date = ? AND is_deleted = 0 " +
