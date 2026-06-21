@@ -13,6 +13,10 @@ public class WashServiceService {
         return washServiceDAO.findAll();
     }
 
+    public List<WashService> getActiveServices() {
+        return washServiceDAO.findAllActive();
+    }
+
     public List<WashService> getAllServicesWithBookingCount() {
         return washServiceDAO.findAllWithBookingCount();
     }
