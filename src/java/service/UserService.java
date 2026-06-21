@@ -71,4 +71,8 @@ public class UserService {
     public CustomerDashboardDTO getCustomerDashboard(int userId) {
         return dashboardDAO.getCustomerDashboard(userId);
     }
+
+    public void banUser(int id, boolean ban) {
+        userDAO.delete(id, ban);
+    }
 }

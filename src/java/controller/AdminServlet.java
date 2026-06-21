@@ -18,19 +18,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
 @WebServlet({"/admin", "/admin/*"})
 public class AdminServlet extends HttpServlet {
 
-    public static final Map<String, String> BOOKING_STATUSES = new LinkedHashMap<>();
+    public static final List<String> BOOKING_STATUSES = new LinkedList<>();
     static {
-        BOOKING_STATUSES.put("CONFIRMED", "Confirmed (Đã xác nhận)");
-        BOOKING_STATUSES.put("IN_PROGRESS", "In Progress (Đang rửa)");
-        BOOKING_STATUSES.put("COMPLETED", "Completed (Hoàn thành)");
-        BOOKING_STATUSES.put("CANCELLED", "Cancelled (Đã hủy)");
-        BOOKING_STATUSES.put("NO_SHOW", "No Show (Không đến)");
+        BOOKING_STATUSES.add("CONFIRMED");
+        BOOKING_STATUSES.add("IN_PROGRESS");
+        BOOKING_STATUSES.add("COMPLETED");
+        BOOKING_STATUSES.add("CANCELLED");
+        BOOKING_STATUSES.add("NO_SHOW");
     }
 
     private final BookingService bookingService = new BookingService();
@@ -60,6 +61,9 @@ public class AdminServlet extends HttpServlet {
                 break;
             case "/customers":
                 handleCustomerList(req, res);
+                break;
+            case "/customers/detail":
+                handleCustomerDetail(req, res);
                 break;
             default:
                 res.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -94,6 +98,9 @@ public class AdminServlet extends HttpServlet {
                 break;
             case "/services/delete":
                 handleDeleteService(req, res);
+                break;
+            case "/customers/ban":
+                handleBanCustomer(req, res);
                 break;
             default:
                 res.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -419,4 +426,53 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    private void handleBanCustomer(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        String idParam = req.getParameter("customerId");
+        String banParam = req.getParameter("ban");
+        boolean ban = banParam == null || "true".equalsIgnoreCase(banParam.trim());
+        try {
+            int customerId = Integer.parseInt(idParam);
+            userService.banUser(customerId, ban);
+            if (session != null) {
+                if (ban) {
+                    session.setAttribute("adminMsg", "Đã chặn tài khoản khách hàng thành công.");
+                } else {
+                    session.setAttribute("adminMsg", "Đã mở khóa tài khoản khách hàng thành công.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null) {
+                session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            }
+        }
+        res.sendRedirect(req.getContextPath() + "/admin/customers/detail?id=" + idParam);
+    }
+
+    private void handleCustomerDetail(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String idParam = req.getParameter("id");
+        try {
+            int customerId = Integer.parseInt(idParam);
+            User customer = userService.findById(customerId);
+            if (customer == null || !"CUSTOMER".equals(customer.getRole())) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy khách hàng.");
+                return;
+            }
+
+            dto.CustomerDashboardDTO stats = userService.getCustomerDashboard(customerId);
+            List<model.Vehicle> vehicles = new dao.VehicleDAO().findByUserId(customerId);
+            List<model.Booking> bookings = new dao.BookingDAO().findByUserId(customerId);
+
+            req.setAttribute("customer", customer);
+            req.setAttribute("stats", stats);
+            req.setAttribute("vehicles", vehicles);
+            req.setAttribute("bookings", bookings);
+            req.setAttribute("activePage", "customers");
+
+            req.getRequestDispatcher("/WEB-INF/view/admin/customer-detail.jsp").forward(req, res);
+        } catch (NumberFormatException e) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID khách hàng không hợp lệ.");
+        }
+    }
 }

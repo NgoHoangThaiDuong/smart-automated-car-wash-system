@@ -57,7 +57,7 @@ public class UserDAO {
 
 
     public int countCustomers(String key, Integer tierId) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users u WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 ");
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users u WHERE u.role = 'CUSTOMER' ");
         List<Object> params = new ArrayList<>();
         
         if (key != null && !key.trim().isEmpty()) {
@@ -99,12 +99,12 @@ public class UserDAO {
     public List<User> searchCustomersPaginated(String key, Integer tierId, String sortBy, int offset, int limit) {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, u.is_deleted, " +
             "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
             "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
             "FROM users u " +
             "LEFT JOIN tiers t ON u.tier_id = t.id " +
-            "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
+            "WHERE u.role = 'CUSTOMER' "
         );
         
         List<Object> params = new ArrayList<>();
@@ -232,11 +232,11 @@ public class UserDAO {
     }
 
     public User findByUsername(String username) {
-        String sql = "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+        String sql = "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, u.is_deleted, " +
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.username = ? AND u.is_deleted = 0";
+                     "WHERE u.username = ?";
         try (Connection cn = DBUtils.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -252,11 +252,11 @@ public class UserDAO {
     }
 
     public User findById(int id) {
-        String sql = "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
+        String sql = "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, u.is_deleted, " +
                      "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend " +
                      "FROM users u " +
                      "LEFT JOIN tiers t ON u.tier_id = t.id " +
-                     "WHERE u.id = ? AND u.is_deleted = 0";
+                     "WHERE u.id = ?";
         try (Connection cn = DBUtils.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -297,6 +297,7 @@ public class UserDAO {
         u.setTotalWashes(rs.getInt("total_washes"));
         u.setLifetimeSpent(rs.getDouble("lifetime_spent"));
         u.setCreatedAt(rs.getTimestamp("created_at"));
+        u.setDeleted(rs.getBoolean("is_deleted"));
 
         if (rs.getObject("tier_id") != null) {
             LoyaltyTier lt = new LoyaltyTier();
@@ -315,6 +316,18 @@ public class UserDAO {
         }
 
         return u;
+    }
+
+    public void delete(int id, boolean ban) {
+        String sql = "UPDATE users SET is_deleted = ? WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, ban ? 1 : 0);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating ban status: " + e.getMessage(), e);
+        }
     }
 
 }
