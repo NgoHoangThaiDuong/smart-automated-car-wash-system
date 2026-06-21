@@ -289,26 +289,25 @@ public class BookingService {
         return intervals;
     }
 
-    public int create(int userId, int vehicleId, int serviceId,
-            String bookingDateValue, String startTime) {
+    public int create(int userId, BookingDTO dto) {
         User user = userDAO.findById(userId);
         if (user == null || !"CUSTOMER".equals(user.getRole())) {
             throw new IllegalArgumentException("Tài khoản customer không hợp lệ.");
         }
 
-        Vehicle vehicle = vehicleDAO.findById(vehicleId);
+        Vehicle vehicle = vehicleDAO.findById(dto.getVehicleId());
         if (vehicle == null || vehicle.getUserId() != userId) {
             throw new IllegalArgumentException("Xe đã chọn không thuộc tài khoản của bạn.");
         }
 
-        WashService washService = washServiceDAO.findActiveById(serviceId);
+        WashService washService = washServiceDAO.findActiveById(dto.getServiceId());
         if (washService == null) {
             throw new IllegalArgumentException("Dịch vụ đã chọn không còn khả dụng.");
         }
 
         LocalDate bookingDate;
         try {
-            bookingDate = LocalDate.parse(bookingDateValue);
+            bookingDate = LocalDate.parse(dto.getBookingDate());
         } catch (Exception e) {
             throw new IllegalArgumentException("Ngày đặt lịch không hợp lệ.");
         }
@@ -319,22 +318,22 @@ public class BookingService {
         if (!isBookingDateAllowed(bookingDate, now.toLocalDate(), bookingWindowDays)) {
             throw new IllegalArgumentException("Ngày đặt lịch nằm ngoài thời hạn membership.");
         }
-        if (!isValidStartTime(startTime, washService.getDurationMinutes())) {
+        if (!isValidStartTime(dto.getTime(), washService.getDurationMinutes())) {
             throw new IllegalArgumentException("Khung giờ đã chọn không hợp lệ.");
         }
         if (bookingDate.equals(now.toLocalDate())
-                && LocalTime.parse(startTime, TIME_FORMAT).isBefore(now.toLocalTime())) {
+                && LocalTime.parse(dto.getTime(), TIME_FORMAT).isBefore(now.toLocalTime())) {
             throw new IllegalArgumentException("Không thể chọn khung giờ đã qua.");
         }
 
-        String endTime = calculateEndTime(startTime, washService.getDurationMinutes());
+        String endTime = calculateEndTime(dto.getTime(), washService.getDurationMinutes());
         return bookingDAO.create(
                 userId,
-                vehicleId,
-                serviceId,
+                dto.getVehicleId(),
+                dto.getServiceId(),
                 Date.valueOf(bookingDate),
-                startTime + "-" + endTime,
-                startTime,
+                dto.getTime() + "-" + endTime,
+                dto.getTime(),
                 endTime,
                 BigDecimal.valueOf(washService.getPrice()),
                 MAX_CONCURRENT_BOOKINGS

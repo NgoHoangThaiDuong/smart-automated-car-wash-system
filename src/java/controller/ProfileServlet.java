@@ -2,9 +2,9 @@ package controller;
 
 import service.UserService;
 import service.VehicleService;
-import model.LoyaltyTier;
 import model.User;
 import model.Vehicle;
+import dto.ProfileDTO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -33,21 +33,11 @@ public class ProfileServlet extends HttpServlet {
             freshUser = sessionUser;
         }
 
-        List<LoyaltyTier> allTiers = userService.getAllLoyaltyTiers();
-        LoyaltyTier nextTier = null;
-        for (LoyaltyTier t : allTiers) {
-            if (t.getMinSpend() > freshUser.getLifetimeSpent()) {
-                nextTier = t;
-                break;
-            }
-        }
-
-        if (nextTier != null) {
-            double remaining = nextTier.getMinSpend() - freshUser.getLifetimeSpent();
-            double progress = Math.min(100.0, (freshUser.getLifetimeSpent() / nextTier.getMinSpend()) * 100.0);
-            req.setAttribute("nextTier", nextTier);
-            req.setAttribute("remainingSpend", remaining);
-            req.setAttribute("progressPercent", progress);
+        ProfileDTO profileCtx = userService.getProfileContext(freshUser);
+        if (profileCtx.getNextTier() != null) {
+            req.setAttribute("nextTier", profileCtx.getNextTier());
+            req.setAttribute("remainingSpend", profileCtx.getRemainingSpend());
+            req.setAttribute("progressPercent", profileCtx.getProgressPercent());
         }
 
         String profileError = (String) session.getAttribute("profileError");
@@ -88,19 +78,15 @@ public class ProfileServlet extends HttpServlet {
         String fullname = req.getParameter("fullname");
         String phone = req.getParameter("phone");
 
-        if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
-            session.setAttribute("profileError", "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)!");
-            res.sendRedirect(req.getContextPath() + "/profile");
-            return;
-        }
-
         try {
-            userService.updateProfile(currentUser.getId(),
-                    fullname != null ? fullname.trim() : "",
-                    phone != null ? phone.trim() : "");
+            ProfileDTO updateDTO = new ProfileDTO(fullname, phone);
+            userService.updateProfile(currentUser.getId(), updateDTO);
             User updatedUser = userService.findById(currentUser.getId());
             session.setAttribute("currentUser", updatedUser);
             res.sendRedirect(req.getContextPath() + "/profile?msg=profile_success");
+        } catch (IllegalArgumentException e) {
+            session.setAttribute("profileError", e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/profile");
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("profileError", "Lỗi hệ thống khi cập nhật hồ sơ cá nhân.");

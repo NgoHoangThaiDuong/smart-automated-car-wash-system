@@ -4,6 +4,7 @@ import model.User;
 import model.Vehicle;
 import mylib.VehicleImageStorage;
 import service.VehicleService;
+import dto.VehicleDTO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 import java.io.IOException;
 
 @WebServlet({"/vehicles", "/vehicles/*"})
@@ -80,22 +80,12 @@ public class VehicleServlet extends HttpServlet {
     private void handleAdd(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws IOException {
         HttpSession session = req.getSession();
-        Vehicle formData = vehicleFromRequest(req);
+        VehicleDTO formData = VehicleDTO.fromRequest(req);
         String uploadedImagePath = null;
         try {
-            validateVehicleForm(formData);
             uploadedImagePath = VehicleImageStorage.save(req.getPart("vehicleImage"));
-            String imagePath = uploadedImagePath == null
-                    ? VehicleService.DEFAULT_IMAGE_PATH : uploadedImagePath;
-            formData.setImagePath(imagePath);
-            vehicleService.create(
-                    currentUser.getId(),
-                    formData.getLicensePlate(),
-                    formData.getBrand(),
-                    formData.getModel(),
-                    formData.getColor(),
-                    imagePath
-            );
+            formData.setImagePath(uploadedImagePath == null ? VehicleService.DEFAULT_IMAGE_PATH : uploadedImagePath);
+            vehicleService.create(currentUser.getId(), formData);
             session.setAttribute("vehicleMessage", "Thêm phương tiện thành công.");
         } catch (IllegalStateException e) {
             VehicleImageStorage.delete(uploadedImagePath);
@@ -117,39 +107,24 @@ public class VehicleServlet extends HttpServlet {
     private void handleUpdate(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws IOException {
         HttpSession session = req.getSession();
-        Vehicle formData = vehicleFromRequest(req);
+        VehicleDTO formData = VehicleDTO.fromRequest(req);
         String uploadedImagePath = null;
         String oldImagePath = null;
         try {
-            int vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
-            formData.setId(vehicleId);
-            Vehicle existing = vehicleService.findById(vehicleId, currentUser.getId());
+            Vehicle existing = vehicleService.findById(formData.getId(), currentUser.getId());
             if (existing == null) {
-                throw new IllegalArgumentException(
-                        "Không tìm thấy phương tiện thuộc tài khoản của bạn.");
+                throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
             }
 
-            validateVehicleForm(formData);
             oldImagePath = existing.getImagePath();
             uploadedImagePath = VehicleImageStorage.save(req.getPart("vehicleImage"));
             String imagePath = uploadedImagePath == null ? oldImagePath : uploadedImagePath;
             formData.setImagePath(imagePath);
-            vehicleService.update(
-                    vehicleId,
-                    currentUser.getId(),
-                    formData.getLicensePlate(),
-                    formData.getBrand(),
-                    formData.getModel(),
-                    formData.getColor(),
-                    imagePath
-            );
+            vehicleService.update(currentUser.getId(), formData);
             if (uploadedImagePath != null) {
                 VehicleImageStorage.delete(oldImagePath);
             }
             session.setAttribute("vehicleMessage", "Cập nhật phương tiện thành công.");
-        } catch (NumberFormatException e) {
-            VehicleImageStorage.delete(uploadedImagePath);
-            session.setAttribute("vehicleError", "Mã phương tiện không hợp lệ.");
         } catch (IllegalStateException e) {
             VehicleImageStorage.delete(uploadedImagePath);
             formData.setImagePath(oldImagePath);
@@ -203,24 +178,6 @@ public class VehicleServlet extends HttpServlet {
         return currentUser;
     }
 
-    private Vehicle vehicleFromRequest(HttpServletRequest req) {
-        Vehicle vehicle = new Vehicle();
-        vehicle.setLicensePlate(req.getParameter("licensePlate"));
-        vehicle.setBrand(req.getParameter("brand"));
-        vehicle.setModel(req.getParameter("model"));
-        vehicle.setColor(req.getParameter("color"));
-        return vehicle;
-    }
-
-    private void validateVehicleForm(Vehicle vehicle) {
-        vehicleService.validateVehicle(
-                vehicleService.normalizeLicensePlate(vehicle.getLicensePlate()),
-                vehicleService.normalizeText(vehicle.getBrand()),
-                vehicleService.normalizeText(vehicle.getModel()),
-                vehicleService.normalizeText(vehicle.getColor())
-        );
-    }
-
     private void moveFlash(HttpSession session, HttpServletRequest req, String name) {
         Object value = session.getAttribute(name);
         if (value != null) {
@@ -230,7 +187,7 @@ public class VehicleServlet extends HttpServlet {
     }
 
     private void setFormError(HttpSession session, String message,
-            String formMode, Vehicle formData) {
+            String formMode, VehicleDTO formData) {
         session.setAttribute("vehicleError", message);
         session.setAttribute("vehicleFormMode", formMode);
         session.setAttribute("vehicleFormData", formData);

@@ -98,24 +98,18 @@ public class BookingServlet extends HttpServlet {
 
     private void createBooking(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws ServletException, IOException {
-        String vehicleIdValue = req.getParameter("vehicleId") == null ? "" : req.getParameter("vehicleId").trim();
-        String serviceIdValue = req.getParameter("serviceId") == null ? "" : req.getParameter("serviceId").trim();
-        String bookingDate = req.getParameter("bookingDate") == null ? "" : req.getParameter("bookingDate").trim();
-        String time = req.getParameter("time") == null ? "" : req.getParameter("time").trim();
-
-        try {
-            int bookingId = bookingService.create(
-                    currentUser.getId(),
-                    Integer.parseInt(vehicleIdValue),
-                    Integer.parseInt(serviceIdValue),
-                    bookingDate,
-                    time
-            );
-            res.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
-        } catch (NumberFormatException e) {
-            req.setAttribute("bookingError", "Vui lòng chọn đầy đủ xe và dịch vụ.");
+        BookingDTO formDTO = BookingDTO.fromRequest(req);
+        String validationError = formDTO.validate();
+        if (validationError != null) {
+            req.setAttribute("bookingError", validationError);
             prepareBookingForm(req, currentUser);
             req.getRequestDispatcher("/WEB-INF/view/customer/booking-form.jsp").forward(req, res);
+            return;
+        }
+
+        try {
+            int bookingId = bookingService.create(currentUser.getId(), formDTO);
+            res.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
         } catch (IllegalArgumentException e) {
             req.setAttribute("bookingError", e.getMessage());
             prepareBookingForm(req, currentUser);

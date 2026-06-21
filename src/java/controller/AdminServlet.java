@@ -383,38 +383,29 @@ public class AdminServlet extends HttpServlet {
     private void handleBookingCreate(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         String customerIdValue = req.getParameter("customerId");
-        String vehicleIdValue = req.getParameter("vehicleId");
-        String serviceIdValue = req.getParameter("serviceId");
-        String bookingDate = req.getParameter("bookingDate");
-        String time = req.getParameter("time");
+        int customerId;
+        try {
+            customerId = Integer.parseInt(customerIdValue != null ? customerIdValue.trim() : "");
+        } catch (NumberFormatException e) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
-        if (customerIdValue != null) customerIdValue = customerIdValue.trim();
-        if (vehicleIdValue != null) vehicleIdValue = vehicleIdValue.trim();
-        if (serviceIdValue != null) serviceIdValue = serviceIdValue.trim();
-        if (bookingDate != null) bookingDate = bookingDate.trim();
-        if (time != null) time = time.trim();
+        BookingDTO formDTO = BookingDTO.fromRequest(req);
+        String validationError = formDTO.validate();
+        if (validationError != null) {
+            req.setAttribute("bookingError", validationError);
+            req.setAttribute("customerId", customerIdValue);
+            handleBookingNew(req, res);
+            return;
+        }
 
         try {
-            int customerId = Integer.parseInt(customerIdValue);
-            int vehicleId = Integer.parseInt(vehicleIdValue);
-            int serviceId = Integer.parseInt(serviceIdValue);
-
-            int bookingId = bookingService.create(
-                    customerId,
-                    vehicleId,
-                    serviceId,
-                    bookingDate,
-                    time
-            );
-            
+            int bookingId = bookingService.create(customerId, formDTO);
             res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + bookingId);
         } catch (Exception e) {
             req.setAttribute("bookingError", e.getMessage() != null ? e.getMessage() : "Không thể tạo booking. Vui lòng thử lại.");
             req.setAttribute("customerId", customerIdValue);
-            req.setAttribute("vehicleId", vehicleIdValue);
-            req.setAttribute("serviceId", serviceIdValue);
-            req.setAttribute("bookingDate", bookingDate);
-            req.setAttribute("time", time);
             handleBookingNew(req, res);
         }
     }

@@ -42,8 +42,30 @@ public class UserService {
         return userDAO.findById(id);
     }
 
-    public void updateProfile(int id, String fullname, String phone) {
-        userDAO.updateProfile(id, fullname, phone);
+    public dto.ProfileDTO getProfileContext(User user) {
+        List<LoyaltyTier> allTiers = getAllLoyaltyTiers();
+        LoyaltyTier nextTier = null;
+        for (LoyaltyTier t : allTiers) {
+            if (t.getMinSpend() > user.getLifetimeSpent()) {
+                nextTier = t;
+                break;
+            }
+        }
+        double remaining = 0.0;
+        double progress = 0.0;
+        if (nextTier != null) {
+            remaining = nextTier.getMinSpend() - user.getLifetimeSpent();
+            progress = Math.min(100.0, (user.getLifetimeSpent() / nextTier.getMinSpend()) * 100.0);
+        }
+        return new dto.ProfileDTO(user, nextTier, remaining, progress);
+    }
+
+    public void updateProfile(int id, dto.ProfileDTO dto) {
+        String error = dto.validate();
+        if (error != null) {
+            throw new IllegalArgumentException(error);
+        }
+        userDAO.updateProfile(id, dto.getFullname(), dto.getPhone());
     }
 
     public CustomerDashboardDTO getCustomerDashboard(int userId) {

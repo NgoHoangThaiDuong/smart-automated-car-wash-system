@@ -138,9 +138,9 @@ public class VehicleDAO {
             ps.setString(1, plate);
             ps.setInt(2, excludeId);
 
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error checking vehicle plate: " + e.getMessage(), e);
@@ -154,9 +154,9 @@ public class VehicleDAO {
 
             ps.setString(1, plate);
 
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error checking vehicle plate: " + e.getMessage(), e);
