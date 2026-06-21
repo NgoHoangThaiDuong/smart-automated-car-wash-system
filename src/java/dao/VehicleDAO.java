@@ -11,8 +11,11 @@ import java.util.List;
 
 public class VehicleDAO {
 
-    public void create(int userId, String licensePlate, String brand, String model, String color) {
-        String sql = "INSERT INTO vehicles (user_id, license_plate, brand, model, color) VALUES (?, ?, ?, ?, ?)";
+    public void create(int userId, String licensePlate, String brand, String model,
+            String color, String imagePath) {
+        String sql = "INSERT INTO vehicles " +
+                "(user_id, license_plate, brand, model, color, image_path) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
@@ -21,6 +24,7 @@ public class VehicleDAO {
             ps.setString(3, brand);
             ps.setString(4, model);
             ps.setString(5, color);
+            ps.setString(6, imagePath);
 
             ps.executeUpdate();
 
@@ -107,6 +111,27 @@ public class VehicleDAO {
 
         } catch (Exception e) {
             throw new RuntimeException("Error updating vehicle: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean updateForUserWithImage(int id, int userId, String licensePlate,
+            String brand, String model, String color, String imagePath) {
+        String sql = "UPDATE vehicles SET license_plate = ?, brand = ?, model = ?, " +
+                "color = ?, image_path = ? " +
+                "WHERE id = ? AND user_id = ? AND is_deleted = 0";
+
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, licensePlate);
+            ps.setString(2, brand);
+            ps.setString(3, model);
+            ps.setString(4, color);
+            ps.setString(5, imagePath);
+            ps.setInt(6, id);
+            ps.setInt(7, userId);
+            return ps.executeUpdate() == 1;
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating vehicle image: " + e.getMessage(), e);
         }
     }
 

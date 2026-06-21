@@ -2,17 +2,25 @@ package controller;
 
 import model.User;
 import model.Vehicle;
+import mylib.VehicleImageStorage;
 import service.VehicleService;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 import java.io.IOException;
 
 @WebServlet("/vehicles/*")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 5 * 1024 * 1024,
+        maxRequestSize = 6 * 1024 * 1024
+)
 public class VehicleServlet extends HttpServlet {
 
     private final VehicleService vehicleService = new VehicleService();
@@ -73,24 +81,35 @@ public class VehicleServlet extends HttpServlet {
             throws IOException {
         HttpSession session = req.getSession();
         Vehicle formData = vehicleFromRequest(req);
+        String uploadedImagePath = null;
         try {
+            validateVehicleForm(formData);
+            uploadedImagePath = VehicleImageStorage.save(req.getPart("vehicleImage"));
+            String imagePath = uploadedImagePath == null
+                    ? VehicleService.DEFAULT_IMAGE_PATH : uploadedImagePath;
+            formData.setImagePath(imagePath);
             vehicleService.createCustomerVehicle(
                     currentUser.getId(),
                     formData.getLicensePlate(),
                     formData.getBrand(),
                     formData.getModel(),
-                    formData.getColor()
+                    formData.getColor(),
+                    imagePath
             );
             session.setAttribute("vehicleMessage", "Thêm phương tiện thành công.");
+        } catch (IllegalStateException e) {
+            VehicleImageStorage.delete(uploadedImagePath);
+            setFormError(session, "Ảnh không được vượt quá 5 MB.", "add", formData);
         } catch (IllegalArgumentException e) {
-            session.setAttribute("vehicleError", e.getMessage());
-            session.setAttribute("vehicleFormMode", "add");
-            session.setAttribute("vehicleFormData", formData);
+            VehicleImageStorage.delete(uploadedImagePath);
+            setFormError(session, e.getMessage(), "add", formData);
+        } catch (ServletException e) {
+            VehicleImageStorage.delete(uploadedImagePath);
+            setFormError(session, "Không thể đọc file ảnh đã chọn.", "add", formData);
         } catch (Exception e) {
+            VehicleImageStorage.delete(uploadedImagePath);
             log("Cannot add customer vehicle", e);
-            session.setAttribute("vehicleError", "Không thể thêm phương tiện lúc này.");
-            session.setAttribute("vehicleFormMode", "add");
-            session.setAttribute("vehicleFormData", formData);
+            setFormError(session, "Không thể thêm phương tiện lúc này.", "add", formData);
         }
         res.sendRedirect(req.getContextPath() + "/vehicles");
     }
@@ -99,29 +118,55 @@ public class VehicleServlet extends HttpServlet {
             throws IOException {
         HttpSession session = req.getSession();
         Vehicle formData = vehicleFromRequest(req);
+        String uploadedImagePath = null;
+        String oldImagePath = null;
         try {
             int vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
             formData.setId(vehicleId);
+            Vehicle existing = vehicleService.findOwnedVehicle(vehicleId, currentUser.getId());
+            if (existing == null) {
+                throw new IllegalArgumentException(
+                        "Không tìm thấy phương tiện thuộc tài khoản của bạn.");
+            }
+
+            validateVehicleForm(formData);
+            oldImagePath = existing.getImagePath();
+            uploadedImagePath = VehicleImageStorage.save(req.getPart("vehicleImage"));
+            String imagePath = uploadedImagePath == null ? oldImagePath : uploadedImagePath;
+            formData.setImagePath(imagePath);
             vehicleService.updateCustomerVehicle(
                     vehicleId,
                     currentUser.getId(),
                     formData.getLicensePlate(),
                     formData.getBrand(),
                     formData.getModel(),
-                    formData.getColor()
+                    formData.getColor(),
+                    imagePath
             );
+            if (uploadedImagePath != null) {
+                VehicleImageStorage.delete(oldImagePath);
+            }
             session.setAttribute("vehicleMessage", "Cập nhật phương tiện thành công.");
         } catch (NumberFormatException e) {
+            VehicleImageStorage.delete(uploadedImagePath);
             session.setAttribute("vehicleError", "Mã phương tiện không hợp lệ.");
+        } catch (IllegalStateException e) {
+            VehicleImageStorage.delete(uploadedImagePath);
+            formData.setImagePath(oldImagePath);
+            setFormError(session, "Ảnh không được vượt quá 5 MB.", "edit", formData);
         } catch (IllegalArgumentException e) {
-            session.setAttribute("vehicleError", e.getMessage());
-            session.setAttribute("vehicleFormMode", "edit");
-            session.setAttribute("vehicleFormData", formData);
+            VehicleImageStorage.delete(uploadedImagePath);
+            formData.setImagePath(oldImagePath);
+            setFormError(session, e.getMessage(), "edit", formData);
+        } catch (ServletException e) {
+            VehicleImageStorage.delete(uploadedImagePath);
+            formData.setImagePath(oldImagePath);
+            setFormError(session, "Không thể đọc file ảnh đã chọn.", "edit", formData);
         } catch (Exception e) {
+            VehicleImageStorage.delete(uploadedImagePath);
+            formData.setImagePath(oldImagePath);
             log("Cannot update customer vehicle", e);
-            session.setAttribute("vehicleError", "Không thể cập nhật phương tiện lúc này.");
-            session.setAttribute("vehicleFormMode", "edit");
-            session.setAttribute("vehicleFormData", formData);
+            setFormError(session, "Không thể cập nhật phương tiện lúc này.", "edit", formData);
         }
         res.sendRedirect(req.getContextPath() + "/vehicles");
     }
@@ -167,11 +212,27 @@ public class VehicleServlet extends HttpServlet {
         return vehicle;
     }
 
+    private void validateVehicleForm(Vehicle vehicle) {
+        vehicleService.validateVehicle(
+                vehicleService.normalizeLicensePlate(vehicle.getLicensePlate()),
+                vehicleService.normalizeText(vehicle.getBrand()),
+                vehicleService.normalizeText(vehicle.getModel()),
+                vehicleService.normalizeText(vehicle.getColor())
+        );
+    }
+
     private void moveFlash(HttpSession session, HttpServletRequest req, String name) {
         Object value = session.getAttribute(name);
         if (value != null) {
             req.setAttribute(name, value);
             session.removeAttribute(name);
         }
+    }
+
+    private void setFormError(HttpSession session, String message,
+            String formMode, Vehicle formData) {
+        session.setAttribute("vehicleError", message);
+        session.setAttribute("vehicleFormMode", formMode);
+        session.setAttribute("vehicleFormData", formData);
     }
 }

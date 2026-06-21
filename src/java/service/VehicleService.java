@@ -5,17 +5,26 @@ import model.Vehicle;
 import java.util.List;
 
 public class VehicleService {
+    public static final String DEFAULT_IMAGE_PATH = "/images/vehicles/car-default.svg";
+
     private static final String LICENSE_PLATE_PATTERN =
             "^[0-9]{2}[A-Z]{1,2}-([0-9]{4,5}|[0-9]{3}\\.[0-9]{2})$";
+    private static final String VEHICLE_IMAGE_PATTERN =
+            "^(/images/vehicles/[A-Za-z0-9_-]+\\.(png|jpg|jpeg|webp|svg)"
+            + "|/vehicle-images/[0-9a-fA-F-]{36}\\.(jpg|png|webp))$";
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
     public void createVehicle(int userId, String licensePlate, String brand, String model, String color) {
-        vehicleDAO.create(userId, licensePlate, brand, model, color);
+        vehicleDAO.create(userId, licensePlate, brand, model, color, DEFAULT_IMAGE_PATH);
     }
 
     public List<Vehicle> findByUserId(int userId) {
-        return vehicleDAO.findByUserId(userId);
+        List<Vehicle> vehicles = vehicleDAO.findByUserId(userId);
+        for (Vehicle vehicle : vehicles) {
+            vehicle.setImagePath(resolveImagePath(vehicle.getImagePath()));
+        }
+        return vehicles;
     }
 
     public Vehicle findById(int id) {
@@ -28,6 +37,11 @@ public class VehicleService {
 
     public void createCustomerVehicle(int userId, String licensePlate,
             String brand, String model, String color) {
+        createCustomerVehicle(userId, licensePlate, brand, model, color, DEFAULT_IMAGE_PATH);
+    }
+
+    public void createCustomerVehicle(int userId, String licensePlate,
+            String brand, String model, String color, String imagePath) {
         String normalizedPlate = normalizeLicensePlate(licensePlate);
         String normalizedBrand = normalizeText(brand);
         String normalizedModel = normalizeText(model);
@@ -37,11 +51,22 @@ public class VehicleService {
         if (vehicleDAO.existsByPlate(normalizedPlate)) {
             throw new IllegalArgumentException("Biển số xe đã tồn tại.");
         }
-        vehicleDAO.create(userId, normalizedPlate, normalizedBrand, normalizedModel, normalizedColor);
+        vehicleDAO.create(userId, normalizedPlate, normalizedBrand, normalizedModel,
+                normalizedColor, resolveImagePath(imagePath));
     }
 
     public void updateCustomerVehicle(int vehicleId, int userId, String licensePlate,
             String brand, String model, String color) {
+        Vehicle existing = vehicleDAO.findByIdAndUserId(vehicleId, userId);
+        if (existing == null) {
+            throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
+        }
+        updateCustomerVehicle(vehicleId, userId, licensePlate, brand, model, color,
+                existing.getImagePath());
+    }
+
+    public void updateCustomerVehicle(int vehicleId, int userId, String licensePlate,
+            String brand, String model, String color, String imagePath) {
         if (vehicleDAO.findByIdAndUserId(vehicleId, userId) == null) {
             throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
         }
@@ -55,8 +80,8 @@ public class VehicleService {
         if (vehicleDAO.existsByPlateExceptId(normalizedPlate, vehicleId)) {
             throw new IllegalArgumentException("Biển số xe đã tồn tại.");
         }
-        if (!vehicleDAO.updateForUser(vehicleId, userId, normalizedPlate,
-                normalizedBrand, normalizedModel, normalizedColor)) {
+        if (!vehicleDAO.updateForUserWithImage(vehicleId, userId, normalizedPlate,
+                normalizedBrand, normalizedModel, normalizedColor, resolveImagePath(imagePath))) {
             throw new IllegalArgumentException("Không thể cập nhật phương tiện.");
         }
     }
@@ -73,6 +98,17 @@ public class VehicleService {
 
     public String normalizeText(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    public String resolveImagePath(String imagePath) {
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            return DEFAULT_IMAGE_PATH;
+        }
+        String normalized = imagePath.trim().replace('\\', '/');
+        if (normalized.matches(VEHICLE_IMAGE_PATTERN)) {
+            return normalized;
+        }
+        return DEFAULT_IMAGE_PATH;
     }
 
     public void validateVehicle(String licensePlate, String brand, String model, String color) {

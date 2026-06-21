@@ -12,6 +12,10 @@
 </head>
 <body>
     <jsp:include page="/WEB-INF/view/common/navbar.jsp"/>
+    <c:url var="defaultVehicleImage" value="/images/vehicles/car-default.svg"/>
+    <c:set var="editImagePath"
+           value="${empty vehicleFormData.imagePath ? '/images/vehicles/car-default.svg' : vehicleFormData.imagePath}"/>
+    <c:url var="editImageUrl" value="${editImagePath}"/>
 
     <main class="vehicles-page">
         <header class="vehicles-heading">
@@ -51,13 +55,21 @@
                 </c:when>
                 <c:otherwise>
                     <c:forEach var="vehicle" items="${vehicles}">
+                        <c:set var="vehicleImage"
+                               value="${empty vehicle.imagePath ? '/images/vehicles/car-default.svg' : vehicle.imagePath}"/>
+                        <c:url var="vehicleImageUrl" value="${vehicleImage}"/>
                         <article class="vehicle-card">
-                            <div class="vehicle-card-top">
-                                <span class="vehicle-icon material-symbols-outlined">directions_car</span>
+                            <div class="vehicle-image-section">
                                 <span class="active-badge">ACTIVE</span>
+                                <div class="vehicle-image-wrapper">
+                                    <img src="${vehicleImageUrl}"
+                                         alt="<c:out value='${vehicle.brand} ${vehicle.model}'/>"
+                                         class="vehicle-image"
+                                         onerror="this.onerror=null;this.src='${defaultVehicleImage}';">
+                                </div>
+                                <span class="license-plate"><c:out value="${vehicle.licensePlate}"/></span>
                             </div>
                             <div class="vehicle-details">
-                                <span class="license-plate"><c:out value="${vehicle.licensePlate}"/></span>
                                 <h2>
                                     <c:out value="${empty vehicle.brand ? 'Vehicle' : vehicle.brand}"/>
                                     <c:out value="${vehicle.model}"/>
@@ -74,6 +86,7 @@
                                         data-brand="<c:out value='${vehicle.brand}'/>"
                                         data-model="<c:out value='${vehicle.model}'/>"
                                         data-color="<c:out value='${vehicle.color}'/>"
+                                        data-image="${vehicleImageUrl}"
                                         onclick="openEditForm(this)">
                                     Edit
                                 </button>
@@ -94,7 +107,8 @@
         <div class="modal-panel">
             <button type="button" class="modal-close" onclick="closeVehicleForm()">×</button>
 
-            <form id="addVehicleForm" method="POST" action="<c:url value='/vehicles/add'/>">
+            <form id="addVehicleForm" method="POST" enctype="multipart/form-data"
+                  action="<c:url value='/vehicles/add'/>">
                 <h2>Add Vehicle</h2>
                 <jsp:include page="/WEB-INF/view/customer/components/vehicle-fields.jsp"/>
                 <div class="form-actions">
@@ -103,7 +117,8 @@
                 </div>
             </form>
 
-            <form id="editVehicleForm" method="POST" action="<c:url value='/vehicles/update'/>">
+            <form id="editVehicleForm" method="POST" enctype="multipart/form-data"
+                  action="<c:url value='/vehicles/update'/>">
                 <h2>Edit Vehicle</h2>
                 <input id="editVehicleId" type="hidden" name="vehicleId"
                        value="${vehicleFormMode eq 'edit' ? vehicleFormData.id : ''}">
@@ -125,6 +140,15 @@
                         <input id="editColor" type="text" name="color" maxlength="30" placeholder="White"
                                value="<c:out value='${vehicleFormMode eq "edit" ? vehicleFormData.color : ""}'/>">
                     </label>
+                    <label class="image-field">Vehicle Image
+                        <input id="editVehicleImage" type="file" name="vehicleImage"
+                               accept="image/jpeg,image/png,image/webp">
+                    </label>
+                </div>
+                <div class="vehicle-preview-wrapper">
+                    <img id="editImagePreview" src="${editImageUrl}"
+                         alt="Vehicle preview" class="vehicle-preview-image"
+                         onerror="this.onerror=null;this.src='${defaultVehicleImage}';">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="secondary-button" onclick="closeVehicleForm()">Cancel</button>
@@ -138,6 +162,8 @@
         var modal = document.getElementById('vehicleModal');
         var addForm = document.getElementById('addVehicleForm');
         var editForm = document.getElementById('editVehicleForm');
+        var addPreviewUrl = null;
+        var editPreviewUrl = null;
 
         function showModal(form) {
             addForm.style.display = form === addForm ? 'block' : 'none';
@@ -148,6 +174,8 @@
 
         function openAddForm() {
             addForm.reset();
+            setPreview(document.getElementById('addImagePreview'),
+                    '${defaultVehicleImage}', 'add');
             showModal(addForm);
         }
 
@@ -157,10 +185,57 @@
             document.getElementById('editBrand').value = button.dataset.brand || '';
             document.getElementById('editModel').value = button.dataset.model || '';
             document.getElementById('editColor').value = button.dataset.color || '';
+            document.getElementById('editVehicleImage').value = '';
+            setPreview(document.getElementById('editImagePreview'),
+                    button.dataset.image || '${defaultVehicleImage}', 'edit');
             showModal(editForm);
         }
 
+        function setPreview(preview, source, type) {
+            if (type === 'add' && addPreviewUrl) {
+                URL.revokeObjectURL(addPreviewUrl);
+                addPreviewUrl = null;
+            }
+            if (type === 'edit' && editPreviewUrl) {
+                URL.revokeObjectURL(editPreviewUrl);
+                editPreviewUrl = null;
+            }
+            preview.src = source;
+        }
+
+        function bindImagePreview(inputId, previewId, type) {
+            var input = document.getElementById(inputId);
+            var preview = document.getElementById(previewId);
+            input.addEventListener('change', function () {
+                var file = input.files && input.files[0];
+                if (!file) {
+                    return;
+                }
+                if (type === 'add' && addPreviewUrl) {
+                    URL.revokeObjectURL(addPreviewUrl);
+                }
+                if (type === 'edit' && editPreviewUrl) {
+                    URL.revokeObjectURL(editPreviewUrl);
+                }
+                var objectUrl = URL.createObjectURL(file);
+                if (type === 'add') {
+                    addPreviewUrl = objectUrl;
+                } else {
+                    editPreviewUrl = objectUrl;
+                }
+                preview.src = objectUrl;
+            });
+        }
+
         function closeVehicleForm() {
+            if (addPreviewUrl) {
+                URL.revokeObjectURL(addPreviewUrl);
+                addPreviewUrl = null;
+            }
+            if (editPreviewUrl) {
+                URL.revokeObjectURL(editPreviewUrl);
+                editPreviewUrl = null;
+            }
             modal.classList.remove('show');
             modal.setAttribute('aria-hidden', 'true');
         }
@@ -170,6 +245,9 @@
                 closeVehicleForm();
             }
         });
+
+        bindImagePreview('addVehicleImage', 'addImagePreview', 'add');
+        bindImagePreview('editVehicleImage', 'editImagePreview', 'edit');
 
         <c:if test="${vehicleFormMode eq 'add'}">
             showModal(addForm);
