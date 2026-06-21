@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -299,6 +301,163 @@ public class BookingDAO {
         }
     }
 
+    public int countOverlappingBookings(Date bookingDate, String startTime, String endTime) {
+        String sql = "SELECT COUNT(*) FROM bookings " +
+                "WHERE booking_date = ? AND is_deleted = 0 " +
+                "AND booking_status NOT IN ('CANCELLED', 'NO_SHOW') " +
+                "AND CONVERT(time, LEFT(time_slot, 5)) < CONVERT(time, ?) " +
+                "AND CONVERT(time, RIGHT(time_slot, 5)) > CONVERT(time, ?)";
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setDate(1, bookingDate);
+            ps.setString(2, endTime);
+            ps.setString(3, startTime);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting overlapping bookings: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Booking> findByUserId(int userId) {
+        List<Booking> list = new ArrayList<>();
+        String sql = "SELECT b.id, b.user_id, b.vehicle_id, b.service_id, " +
+                "b.booking_date, b.time_slot, b.booking_status, " +
+                "ISNULL(p.payment_status, 'UNPAID') AS payment_status, p.payment_method, " +
+                "b.total_amount, b.points_earned, b.created_at, b.completed_at, " +
+                "u.username, u.fullname, u.phone, u.tier_id, t.name AS tier_name, " +
+                "v.license_plate, v.brand, v.model, v.color, " +
+                "ws.name AS service_name, ws.price AS service_price, ws.duration_minutes " +
+                "FROM bookings b " +
+                "JOIN users u ON b.user_id = u.id " +
+                "JOIN vehicles v ON b.vehicle_id = v.id " +
+                "JOIN wash_services ws ON b.service_id = ws.id " +
+                "LEFT JOIN tiers t ON u.tier_id = t.id " +
+                "LEFT JOIN payments p ON b.id = p.booking_id " +
+                "WHERE b.user_id = ? AND b.is_deleted = 0 " +
+                "ORDER BY b.booking_date DESC, b.time_slot DESC";
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getBooking(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading customer bookings: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    public int createBookingWithAvailabilityCheck(int userId, int vehicleId, int serviceId,
+            Date bookingDate, String timeSlot, String startTime, String endTime,
+            BigDecimal totalAmount, int maxConcurrentBookings) {
+        String countCapacitySql = "SELECT COUNT(*) FROM bookings WITH (UPDLOCK, HOLDLOCK) " +
+                "WHERE booking_date = ? AND is_deleted = 0 " +
+                "AND booking_status NOT IN ('CANCELLED', 'NO_SHOW') " +
+                "AND CONVERT(time, LEFT(time_slot, 5)) < CONVERT(time, ?) " +
+                "AND CONVERT(time, RIGHT(time_slot, 5)) > CONVERT(time, ?)";
+        String countVehicleSql = "SELECT COUNT(*) FROM bookings WITH (UPDLOCK, HOLDLOCK) " +
+                "WHERE vehicle_id = ? AND booking_date = ? AND is_deleted = 0 " +
+                "AND booking_status NOT IN ('CANCELLED', 'NO_SHOW') " +
+                "AND CONVERT(time, LEFT(time_slot, 5)) < CONVERT(time, ?) " +
+                "AND CONVERT(time, RIGHT(time_slot, 5)) > CONVERT(time, ?)";
+        String insertBookingSql = "INSERT INTO bookings " +
+                "(user_id, vehicle_id, service_id, booking_date, time_slot, booking_status, total_amount, points_earned) " +
+                "VALUES (?, ?, ?, ?, ?, 'CONFIRMED', ?, 0)";
+        String insertPaymentSql = "INSERT INTO payments " +
+                "(booking_id, user_id, amount, payment_status, payment_method) " +
+                "VALUES (?, ?, ?, 'UNPAID', NULL)";
+
+        Connection cn = null;
+        try {
+            cn = DBUtils.getConnection();
+            cn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            cn.setAutoCommit(false);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            LocalTime intervalStart = LocalTime.parse(startTime, formatter);
+            LocalTime bookingEnd = LocalTime.parse(endTime, formatter);
+            while (intervalStart.isBefore(bookingEnd)) {
+                LocalTime intervalEnd = intervalStart.plusMinutes(30);
+                if (intervalEnd.isAfter(bookingEnd)) {
+                    intervalEnd = bookingEnd;
+                }
+
+                try (PreparedStatement ps = cn.prepareStatement(countCapacitySql)) {
+                    ps.setDate(1, bookingDate);
+                    ps.setString(2, intervalEnd.format(formatter));
+                    ps.setString(3, intervalStart.format(formatter));
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) >= maxConcurrentBookings) {
+                            throw new IllegalArgumentException("Khung giờ này đã đủ 3 xe.");
+                        }
+                    }
+                }
+                intervalStart = intervalEnd;
+            }
+
+            try (PreparedStatement ps = cn.prepareStatement(countVehicleSql)) {
+                ps.setInt(1, vehicleId);
+                ps.setDate(2, bookingDate);
+                ps.setString(3, endTime);
+                ps.setString(4, startTime);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new IllegalArgumentException("Xe này đã có booking trùng thời gian.");
+                    }
+                }
+            }
+
+            int bookingId;
+            try (PreparedStatement ps = cn.prepareStatement(insertBookingSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, userId);
+                ps.setInt(2, vehicleId);
+                ps.setInt(3, serviceId);
+                ps.setDate(4, bookingDate);
+                ps.setString(5, timeSlot);
+                ps.setBigDecimal(6, totalAmount);
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (!keys.next()) {
+                        throw new RuntimeException("Generated booking ID was not returned");
+                    }
+                    bookingId = keys.getInt(1);
+                }
+            }
+
+            try (PreparedStatement ps = cn.prepareStatement(insertPaymentSql)) {
+                ps.setInt(1, bookingId);
+                ps.setInt(2, userId);
+                ps.setBigDecimal(3, totalAmount);
+                ps.executeUpdate();
+            }
+
+            cn.commit();
+            return bookingId;
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
+            if (e instanceof IllegalArgumentException) {
+                throw (IllegalArgumentException) e;
+            }
+            throw new RuntimeException("Error creating customer booking: " + e.getMessage(), e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
     public int createBooking(int userId, int vehicleId, int serviceId, Date bookingDate,
             String timeSlot, BigDecimal totalAmount) {
         String insertBookingSql = "INSERT INTO bookings " +
@@ -466,6 +625,7 @@ public class BookingDAO {
         b.setBookingStatus(rs.getString("booking_status"));
         b.setPaymentStatus(rs.getString("payment_status"));
         b.setPaymentMethod(rs.getString("payment_method"));
+        b.setTotalAmount(rs.getDouble("total_amount"));
         
         Payment p = new Payment();
         p.setBookingId(b.getId());
@@ -475,7 +635,6 @@ public class BookingDAO {
         p.setPaymentMethod(b.getPaymentMethod());
         b.setPayment(p);
 
-        b.setTotalAmount(rs.getDouble("total_amount"));
         b.setPointsEarned(rs.getInt("points_earned"));
         b.setCreatedAt(rs.getTimestamp("created_at"));
         b.setCompletedAt(rs.getTimestamp("completed_at"));

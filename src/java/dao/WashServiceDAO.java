@@ -28,6 +28,22 @@ public class WashServiceDAO {
         return list;
     }
 
+    public List<WashService> findAllActive() {
+        List<WashService> list = new ArrayList<>();
+        String sql = "SELECT id, name, description, price, duration_minutes, is_active, is_deleted " +
+                     "FROM wash_services WHERE is_active = 1 AND is_deleted = 0 ORDER BY price ASC";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(getWashService(rs));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error listing active wash services: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
     public List<WashService> findAllWithBookingCount() {
         List<WashService> list = new ArrayList<>();
         String sql = "SELECT ws.id, ws.name, ws.description, ws.price, ws.duration_minutes, ws.is_active, ws.is_deleted, " +
@@ -66,6 +82,20 @@ public class WashServiceDAO {
             throw new RuntimeException("Error finding wash service by ID: " + e.getMessage(), e);
         }
         return null;
+    }
+
+    public WashService findActiveById(int id) {
+        String sql = "SELECT id, name, description, price, duration_minutes, is_active, is_deleted " +
+                     "FROM wash_services WHERE id = ? AND is_active = 1 AND is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? getWashService(rs) : null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding active wash service: " + e.getMessage(), e);
+        }
     }
 
     public void create(WashService service) {
