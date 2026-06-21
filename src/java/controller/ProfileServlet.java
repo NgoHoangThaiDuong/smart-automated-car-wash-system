@@ -68,6 +68,8 @@ public class ProfileServlet extends HttpServlet {
 
         if ("/update".equals(pathInfo)) {
             handleUpdate(req, res, session);
+        } else if ("/change-password".equals(pathInfo)) {
+            handleChangePassword(req, res, session);
         } else {
             res.sendRedirect(req.getContextPath() + "/profile");
         }
@@ -90,6 +92,25 @@ public class ProfileServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("profileError", "Lỗi hệ thống khi cập nhật hồ sơ cá nhân.");
+            res.sendRedirect(req.getContextPath() + "/profile");
+        }
+    }
+
+    private void handleChangePassword(HttpServletRequest req, HttpServletResponse res, HttpSession session) throws IOException {
+        User currentUser = (User) session.getAttribute("currentUser");
+        String oldPassword = req.getParameter("oldPassword");
+        String newPassword = req.getParameter("newPassword");
+        String confirmPassword = req.getParameter("confirmPassword");
+
+        try {
+            userService.changePassword(currentUser.getId(), oldPassword, newPassword, confirmPassword);
+            res.sendRedirect(req.getContextPath() + "/profile?msg=password_success");
+        } catch (IllegalArgumentException e) {
+            session.setAttribute("profileError", e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/profile");
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("profileError", "Lỗi hệ thống khi đổi mật khẩu.");
             res.sendRedirect(req.getContextPath() + "/profile");
         }
     }

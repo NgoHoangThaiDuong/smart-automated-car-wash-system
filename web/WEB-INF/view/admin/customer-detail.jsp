@@ -162,6 +162,22 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <!-- Reset Password form block -->
+                <div class="vehicles-section" style="margin-top: 1.5rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem;">
+                    <h3 class="vehicles-title" style="margin-bottom: 0.75rem;">
+                        <span class="material-symbols-outlined" style="font-size: 1.25rem; color: #EF4444;">lock_open</span>
+                        Mật khẩu khách hàng
+                    </h3>
+                    <form action="<c:url value='/admin/customers/reset-password'/>" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục mật khẩu khách hàng này về mặc định (123456)?')">
+                        <input type="hidden" name="customerId" value="${customer.id}">
+                        <button type="submit" class="btn-admin-secondary" 
+                                style="width: 100%; justify-content: center; background-color: #EF4444; color: #ffffff; border: none; padding: 0.6rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; text-decoration: none;">
+                            <span class="material-symbols-outlined" style="font-size: 1.15rem;">lock_reset</span>
+                            Khôi phục mật khẩu (123456)
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         

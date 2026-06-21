@@ -330,4 +330,17 @@ public class UserDAO {
         }
     }
 
+    public void updatePassword(int id, String hashedPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating user password: " + e.getMessage(), e);
+        }
+    }
+
 }
+

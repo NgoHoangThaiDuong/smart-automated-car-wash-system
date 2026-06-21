@@ -102,6 +102,9 @@ public class AdminServlet extends HttpServlet {
             case "/customers/ban":
                 handleBanCustomer(req, res);
                 break;
+            case "/customers/reset-password":
+                handleResetPasswordCustomer(req, res);
+                break;
             default:
                 res.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -474,5 +477,23 @@ public class AdminServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID khách hàng không hợp lệ.");
         }
+    }
+
+    private void handleResetPasswordCustomer(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        String idParam = req.getParameter("customerId");
+        try {
+            int customerId = Integer.parseInt(idParam);
+            userService.resetPassword(customerId, "123456");
+            if (session != null) {
+                session.setAttribute("adminMsg", "Đặt lại mật khẩu của khách hàng về mặc định (123456) thành công.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null) {
+                session.setAttribute("adminError", "Lỗi đặt lại mật khẩu: " + e.getMessage());
+            }
+        }
+        res.sendRedirect(req.getContextPath() + "/admin/customers/detail?id=" + idParam);
     }
 }

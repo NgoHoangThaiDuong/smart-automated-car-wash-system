@@ -180,6 +180,12 @@
             margin-top: auto;
         }
 
+        .service-info {
+            flex: 1;
+            min-width: 0;
+            margin-right: 16px;
+        }
+
         .service-info h4 {
             margin: 0 0 6px;
             font-size: 18px;
@@ -199,6 +205,8 @@
             font-size: 26px;
             font-weight: 800;
             color: var(--primary);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* Form styling */
@@ -352,6 +360,7 @@
         .receipt-value {
             font-weight: 600;
             text-align: right;
+            white-space: nowrap;
         }
 
         .receipt-total {

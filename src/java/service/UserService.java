@@ -75,4 +75,48 @@ public class UserService {
     public void banUser(int id, boolean ban) {
         userDAO.delete(id, ban);
     }
+
+    public void changePassword(int userId, String oldPassword, String newPassword, String confirmPassword) {
+        if (oldPassword == null || oldPassword.trim().isEmpty() ||
+            newPassword == null || newPassword.trim().isEmpty() ||
+            confirmPassword == null || confirmPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tất cả các trường mật khẩu đều bắt buộc.");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("Mật khẩu mới và xác nhận mật khẩu không khớp.");
+        }
+        if (newPassword.length() < 6) {
+            throw new IllegalArgumentException("Mật khẩu mới phải từ 6 ký tự trở lên.");
+        }
+        
+        User user = userDAO.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Tài khoản không tồn tại.");
+        }
+        
+        if (!org.mindrot.jbcrypt.BCrypt.checkpw(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không chính xác.");
+        }
+        
+        String hashedNew = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword, org.mindrot.jbcrypt.BCrypt.gensalt());
+        userDAO.updatePassword(userId, hashedNew);
+    }
+
+    public void resetPassword(int userId, String newPassword) {
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("Mật khẩu mới không được để trống.");
+        }
+        if (newPassword.length() < 6) {
+            throw new IllegalArgumentException("Mật khẩu mới phải từ 6 ký tự trở lên.");
+        }
+        
+        User user = userDAO.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Khách hàng không tồn tại.");
+        }
+        
+        String hashedNew = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword, org.mindrot.jbcrypt.BCrypt.gensalt());
+        userDAO.updatePassword(userId, hashedNew);
+    }
 }
+
