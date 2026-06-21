@@ -374,7 +374,6 @@
     <div class="checkout-modal-content">
         <div class="checkout-modal-header">
             <h2>Payment Checkout</h2>
-            <p>Review booking information and select a payment method.</p>
             <button type="button" class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
         </div>
         

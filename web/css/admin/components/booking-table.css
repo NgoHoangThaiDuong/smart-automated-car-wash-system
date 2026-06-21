@@ -333,6 +333,8 @@
     position: relative;
     transition: all 0.2s;
     background: #FFFFFF;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .payment-option-card.active .custom-radio {
@@ -348,8 +350,9 @@
     height: 8px;
     border-radius: 50%;
     background: #0B45BD;
-    left: 3px;
-    top: 3px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .payment-option-card.active .custom-radio::after {
