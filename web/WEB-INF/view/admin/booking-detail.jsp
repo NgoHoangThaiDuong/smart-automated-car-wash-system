@@ -113,7 +113,7 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Wash Date</span>
-                <span class="detail-value"><c:out value="${booking.bookingDate}"/></span>
+                <span class="detail-value"><c:out value="${booking.formattedBookingDate}"/></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Time Slot</span>
@@ -157,12 +157,12 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Created At</span>
-                <span class="detail-value" style="font-size: 0.8rem; color: #475569;"><fmt:formatDate value="${booking.createdAt}" pattern="yyyy-MM-dd HH:mm"/></span>
+                <span class="detail-value" style="font-size: 0.8rem; color: #475569;"><fmt:formatDate value="${booking.createdAt}" pattern="dd/MM/yyyy HH:mm"/></span>
             </div>
             <c:if test="${not empty booking.completedAt}">
                 <div class="detail-row">
                     <span class="detail-label">Finished At</span>
-                    <span class="detail-value" style="color: #047857; font-size: 0.8rem;"><fmt:formatDate value="${booking.completedAt}" pattern="yyyy-MM-dd HH:mm"/></span>
+                    <span class="detail-value" style="color: #047857; font-size: 0.8rem;"><fmt:formatDate value="${booking.completedAt}" pattern="dd/MM/yyyy HH:mm"/></span>
                 </div>
             </c:if>
             <c:if test="${booking.pointsEarned > 0}">

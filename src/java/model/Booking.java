@@ -42,6 +42,15 @@ public class Booking {
     public String getBookingDate() { return bookingDate; }
     public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
 
+    public String getFormattedBookingDate() {
+        if (bookingDate == null) return "";
+        String[] parts = bookingDate.split("-");
+        if (parts.length == 3) {
+            return parts[2] + "/" + parts[1] + "/" + parts[0];
+        }
+        return bookingDate;
+    }
+
     public String getTimeSlot() { return timeSlot; }
     public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
 

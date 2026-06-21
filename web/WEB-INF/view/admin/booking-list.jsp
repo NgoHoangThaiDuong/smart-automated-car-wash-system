@@ -33,7 +33,7 @@
                 <h1 class="page-title">Bookings</h1>
             </div>
             <div>
-                <a href="#" class="btn-admin-primary" style="text-decoration: none;">
+                <a href="${pageContext.request.contextPath}/admin/bookings/new" class="btn-admin-primary" style="text-decoration: none;">
                     <span class="material-symbols-outlined">add</span>
                     New Booking
                 </a>

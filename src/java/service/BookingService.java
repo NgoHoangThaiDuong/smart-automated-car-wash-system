@@ -9,6 +9,7 @@ import model.User;
 import model.Vehicle;
 import model.WashService;
 import dto.PageResult;
+import dto.BookingDTO;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -33,9 +34,6 @@ public class BookingService {
     private final VehicleDAO vehicleDAO = new VehicleDAO();
     private final WashServiceDAO washServiceDAO = new WashServiceDAO();
 
-    public List<Booking> getAllBookings(String search, String status, String date) {
-        return bookingDAO.searchBookings(search, status, date);
-    }
 
     public Booking getBookingById(int id) {
         return bookingDAO.findById(id);
@@ -117,16 +115,16 @@ public class BookingService {
         return bookingDAO.countTodayBookings();
     }
 
-    public Booking getUpcomingBookingByUserId(int userId) {
-        return bookingDAO.getUpcomingBookingByUserId(userId);
+    public Booking getUpcomingBooking(int userId) {
+        return bookingDAO.getUpcomingBooking(userId);
     }
 
-    public List<Booking> getRecentWashHistoryByUserId(int userId, int limit) {
-        return bookingDAO.getRecentWashHistoryByUserId(userId, limit);
+    public List<Booking> getRecentWashHistory(int userId, int limit) {
+        return bookingDAO.getRecentWashHistory(userId, limit);
     }
 
-    public List<Booking> getBookingsByUserId(int userId) {
-        List<Booking> bookings = bookingDAO.findByUserId(userId);
+    public List<Booking> getBookingsByUser(int userId) {
+        List<Booking> bookings = bookingDAO.findByUser(userId);
         for (Booking booking : bookings) {
             applyCustomerActions(booking);
         }
@@ -158,7 +156,7 @@ public class BookingService {
                 || "CONFIRMED".equals(booking.getBookingStatus());
     }
 
-    public void cancelCustomerBooking(int bookingId, int userId) {
+    public void cancel(int bookingId, int userId) {
         Booking booking = getCustomerBooking(bookingId, userId);
         if (booking == null) {
             throw new IllegalArgumentException("Booking không tồn tại hoặc không thuộc tài khoản của bạn.");
@@ -166,12 +164,12 @@ public class BookingService {
         if (!canCustomerCancel(booking)) {
             throw new IllegalArgumentException("Booking này không còn được phép hủy.");
         }
-        if (!bookingDAO.cancelCustomerBooking(bookingId, userId)) {
+        if (!bookingDAO.cancel(bookingId, userId)) {
             throw new IllegalArgumentException("Không thể hủy booking. Trạng thái có thể đã thay đổi.");
         }
     }
 
-    public void payCustomerBooking(int bookingId, int userId, String paymentMethod) {
+    public void pay(int bookingId, int userId, String paymentMethod) {
         Booking booking = getCustomerBooking(bookingId, userId);
         if (booking == null) {
             throw new IllegalArgumentException("Booking không tồn tại hoặc không thuộc tài khoản của bạn.");
@@ -182,12 +180,12 @@ public class BookingService {
         if (!"CARD".equals(paymentMethod) && !"BANK_TRANSFER".equals(paymentMethod)) {
             throw new IllegalArgumentException("Phương thức thanh toán không hợp lệ.");
         }
-        if (!bookingDAO.markCustomerPaymentPaid(bookingId, userId, paymentMethod)) {
+        if (!bookingDAO.markPaymentPaid(bookingId, userId, paymentMethod)) {
             throw new IllegalArgumentException("Thanh toán thất bại. Trạng thái booking có thể đã thay đổi.");
         }
     }
 
-    public List<String> getAvailableTimeSlotsForCustomer(int userId, int serviceId,
+    public List<String> getAvailableTimeSlots(int userId, int serviceId,
             String bookingDateValue) {
         User user = userDAO.findById(userId);
         if (user == null || !"CUSTOMER".equals(user.getRole())) {
@@ -291,7 +289,7 @@ public class BookingService {
         return intervals;
     }
 
-    public int createCustomerBooking(int userId, int vehicleId, int serviceId,
+    public int create(int userId, int vehicleId, int serviceId,
             String bookingDateValue, String startTime) {
         User user = userDAO.findById(userId);
         if (user == null || !"CUSTOMER".equals(user.getRole())) {
@@ -330,7 +328,7 @@ public class BookingService {
         }
 
         String endTime = calculateEndTime(startTime, washService.getDurationMinutes());
-        return bookingDAO.createBookingWithAvailabilityCheck(
+        return bookingDAO.create(
                 userId,
                 vehicleId,
                 serviceId,
@@ -354,7 +352,7 @@ public class BookingService {
         booking.setCustomerPayable(canCustomerPay(booking));
     }
 
-    public PageResult<Booking> getBookingsPage(String search, String status, String date, int page, int pageSize) {
+    public PageResult<Booking> getBookingsPage(String search, String status, String date, String sortBy, int page, int pageSize) {
         if (page < 1) page = 1;
         int totalEntries = bookingDAO.countBookings(search, status, date);
         
@@ -366,7 +364,73 @@ public class BookingService {
         int offset = (page - 1) * pageSize;
         if (offset < 0) offset = 0;
         
-        List<Booking> data = bookingDAO.searchBookingsPaginated(search, status, date, offset, pageSize);
+        List<Booking> data = bookingDAO.searchBookingsPaginated(search, status, date, sortBy, offset, pageSize);
         return new PageResult<>(data, page, pageSize, totalEntries);
+    }
+
+    public BookingDTO prepareBookingFormContext(int customerId, String vehicleIdParam,
+            String serviceIdParam, String bookingDate, String selectedTime) {
+        User customer = userDAO.findById(customerId);
+        if (customer == null || !"CUSTOMER".equals(customer.getRole())) {
+            throw new IllegalArgumentException("Khách hàng không hợp lệ.");
+        }
+
+        List<model.Vehicle> vehicles = vehicleDAO.findByUserId(customerId);
+        List<model.WashService> services = washServiceDAO.findAllActive();
+
+        Integer selectedVehicleId = null;
+        try {
+            int id = Integer.parseInt(vehicleIdParam);
+            if (id > 0) selectedVehicleId = id;
+        } catch (Exception e) {}
+
+        Integer selectedServiceId = null;
+        try {
+            int id = Integer.parseInt(serviceIdParam);
+            if (id > 0) selectedServiceId = id;
+        } catch (Exception e) {}
+
+        final Integer finalVehicleId = selectedVehicleId;
+        Vehicle selectedVehicle = (finalVehicleId == null) ? null : vehicles.stream()
+                .filter(v -> v.getId() == finalVehicleId.intValue())
+                .findFirst()
+                .orElse(null);
+
+        final Integer finalServiceId = selectedServiceId;
+        WashService selectedService = (finalServiceId == null) ? null : services.stream()
+                .filter(s -> s.getId() == finalServiceId.intValue())
+                .findFirst()
+                .orElse(null);
+
+        String trimmedDate = (bookingDate != null) ? bookingDate.trim() : null;
+        String trimmedTime = (selectedTime != null) ? selectedTime.trim() : null;
+
+        List<String> availableSlots = new java.util.ArrayList<>();
+        if (selectedService != null && trimmedDate != null && !trimmedDate.isEmpty()) {
+            try {
+                availableSlots = getAvailableTimeSlots(customerId, selectedService.getId(), trimmedDate);
+            } catch (Exception e) {
+                // Ignore validation errors to keep UI flow
+            }
+        }
+
+        int bookingWindowDays = customer.getLoyaltyTier() == null
+                ? 7 : customer.getLoyaltyTier().getBookingWindowDays();
+        LocalDate today = LocalDate.now();
+
+        return new BookingDTO(
+                vehicles,
+                services,
+                selectedVehicleId,
+                selectedServiceId,
+                selectedVehicle,
+                selectedService,
+                trimmedDate,
+                trimmedTime,
+                availableSlots,
+                bookingWindowDays,
+                today.toString(),
+                today.plusDays(bookingWindowDays).toString()
+        );
     }
 }

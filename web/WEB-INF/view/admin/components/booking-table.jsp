@@ -18,15 +18,25 @@
             <!-- Status -->
             <select id="statusFilter" name="status" class="filter-select-field">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="CONFIRMED" <c:if test="${selectedStatus eq 'CONFIRMED'}">selected</c:if>>Confirmed (Đã xác nhận)</option>
-                <option value="IN_PROGRESS" <c:if test="${selectedStatus eq 'IN_PROGRESS'}">selected</c:if>>In Progress (Đang rửa)</option>
-                <option value="COMPLETED" <c:if test="${selectedStatus eq 'COMPLETED'}">selected</c:if>>Completed (Hoàn thành)</option>
-                <option value="CANCELLED" <c:if test="${selectedStatus eq 'CANCELLED'}">selected</c:if>>Cancelled (Đã hủy)</option>
-                <option value="NO_SHOW" <c:if test="${selectedStatus eq 'NO_SHOW'}">selected</c:if>>No Show (Không đến)</option>
+                <c:forEach var="entry" items="${bookingStatuses}">
+                    <option value="${entry.key}" <c:if test="${selectedStatus eq entry.key}">selected</c:if>>
+                        <c:out value="${entry.value}"/>
+                    </option>
+                </c:forEach>
             </select>
 
             <!-- Date -->
             <input id="dateFilter" name="date" type="date" class="filter-date-field" value="<c:out value='${date}'/>">
+
+            <!-- Sort By -->
+            <select id="sortBy" name="sortBy" class="filter-select-field">
+                <option value="created_desc" <c:if test="${empty sortBy or sortBy eq 'created_desc'}">selected</c:if>>Mới tạo gần nhất</option>
+                <option value="created_asc" <c:if test="${sortBy eq 'created_asc'}">selected</c:if>>Mới tạo xa nhất</option>
+                <option value="date_desc" <c:if test="${sortBy eq 'date_desc'}">selected</c:if>>Ngày đặt (Mới -> Cũ)</option>
+                <option value="date_asc" <c:if test="${sortBy eq 'date_asc'}">selected</c:if>>Ngày đặt (Cũ -> Mới)</option>
+                <option value="amount_desc" <c:if test="${sortBy eq 'amount_desc'}">selected</c:if>>Tổng tiền (Cao -> Thấp)</option>
+                <option value="amount_asc" <c:if test="${sortBy eq 'amount_asc'}">selected</c:if>>Tổng tiền (Thấp -> Cao)</option>
+            </select>
 
             <!-- Submit Button -->
             <button type="submit" class="btn-submit-filter">
@@ -91,7 +101,7 @@
 
                                 <!-- Schedule (Date + Time) -->
                                 <td class="td-schedule">
-                                    <div><c:out value="${b.bookingDate}"/></div>
+                                    <div><c:out value="${b.formattedBookingDate}"/></div>
                                     <div class="schedule-time ${b.bookingStatus eq 'CANCELLED' ? 'cancelled-time' : ''}">
                                         <c:out value="${b.timeSlot}"/>
                                     </div>
@@ -164,6 +174,7 @@
                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                 <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                 <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                 <c:param name="page" value="${currentPage - 1}"/>
                             </c:url>
                             <a href="${prevUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
@@ -192,6 +203,7 @@
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                 <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="${i}"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -217,6 +229,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -230,6 +243,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="${totalPages}"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -243,6 +257,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="1"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -259,6 +274,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -275,6 +291,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="1"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -291,6 +308,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -304,6 +322,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="${totalPages}"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -320,6 +339,7 @@
                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                         <c:param name="page" value="${currentPage + 1}"/>
                                     </c:url>
                                     <a href="${nextUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">

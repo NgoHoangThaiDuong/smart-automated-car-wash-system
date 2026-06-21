@@ -58,7 +58,9 @@
         <!-- User Controls / Account -->
         <div class="app-user">
             <div class="app-user-info">
-                <span class="role-label">Admin</span>
+                <span class="role-label">
+                    <c:out value="${sessionScope.currentUser.role eq 'ADMIN' ? 'Admin' : (sessionScope.currentUser.role eq 'CUSTOMER' ? 'Customer' : sessionScope.currentUser.role)}"/>
+                </span>
                 <span class="username-label">
                     <c:out value="${sessionScope.currentUser.role eq 'ADMIN' ? 'MANAGER' : (not empty sessionScope.currentUser.fullname ? sessionScope.currentUser.fullname : sessionScope.currentUser.username)}"/>
                 </span>

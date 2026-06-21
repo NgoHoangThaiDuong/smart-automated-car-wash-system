@@ -89,7 +89,7 @@
                                 <b><c:out value="${upcomingBooking.bookingStatus}"/></b>
                             </div>
                             <h3>
-                                <c:out value="${upcomingBooking.bookingDate}"/>,
+                                <c:out value="${upcomingBooking.formattedBookingDate}"/>,
                                 <c:out value="${upcomingBooking.timeSlot}"/>
                             </h3>
                             <p>

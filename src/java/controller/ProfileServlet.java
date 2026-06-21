@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/profile/*")
+@WebServlet({"/profile", "/profile/*"})
 public class ProfileServlet extends HttpServlet {
 
     private final UserService userService = new UserService();
@@ -62,7 +62,7 @@ public class ProfileServlet extends HttpServlet {
             session.removeAttribute("vehicleError");
         }
 
-        List<Vehicle> vehicles = vehicleService.findByUserId(freshUser.getId());
+        List<Vehicle> vehicles = vehicleService.findByUser(freshUser.getId());
         req.setAttribute("vehicles", vehicles);
 
         req.setAttribute("activePage", "profile");

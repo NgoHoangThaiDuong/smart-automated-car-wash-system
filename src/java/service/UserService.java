@@ -13,14 +13,11 @@ public class UserService {
     private final LoyaltyTierDAO loyaltyTierDAO = new LoyaltyTierDAO();
     private final CustomerDashboardDAO dashboardDAO = new CustomerDashboardDAO();
 
-    public List<User> searchCustomers(String key, Integer tierId) {
-        return userDAO.searchCustomers(key, tierId);
-    }
 
-    public dto.PageResult<User> getCustomersPage(String search, Integer tierId, int page, int pageSize) {
+    public dto.PageResult<User> getCustomersPage(String search, Integer tierId, String sortBy, int page, int pageSize) {
         int totalEntries = userDAO.countCustomers(search, tierId);
         int offset = (page - 1) * pageSize;
-        List<User> list = userDAO.searchCustomersPaginated(search, tierId, offset, pageSize);
+        List<User> list = userDAO.searchCustomersPaginated(search, tierId, sortBy, offset, pageSize);
         return new dto.PageResult<>(list, page, pageSize, totalEntries);
     }
 

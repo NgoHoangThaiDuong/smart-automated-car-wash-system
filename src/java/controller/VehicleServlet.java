@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.IOException;
 
-@WebServlet("/vehicles/*")
+@WebServlet({"/vehicles", "/vehicles/*"})
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
         maxFileSize = 5 * 1024 * 1024,
@@ -72,7 +72,7 @@ public class VehicleServlet extends HttpServlet {
             moveFlash(session, req, "vehicleFormData");
         }
 
-        req.setAttribute("vehicles", vehicleService.findByUserId(currentUser.getId()));
+        req.setAttribute("vehicles", vehicleService.findByUser(currentUser.getId()));
         req.setAttribute("activePage", "vehicles");
         req.getRequestDispatcher("/WEB-INF/view/customer/vehicles.jsp").forward(req, res);
     }
@@ -88,7 +88,7 @@ public class VehicleServlet extends HttpServlet {
             String imagePath = uploadedImagePath == null
                     ? VehicleService.DEFAULT_IMAGE_PATH : uploadedImagePath;
             formData.setImagePath(imagePath);
-            vehicleService.createCustomerVehicle(
+            vehicleService.create(
                     currentUser.getId(),
                     formData.getLicensePlate(),
                     formData.getBrand(),
@@ -123,7 +123,7 @@ public class VehicleServlet extends HttpServlet {
         try {
             int vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
             formData.setId(vehicleId);
-            Vehicle existing = vehicleService.findOwnedVehicle(vehicleId, currentUser.getId());
+            Vehicle existing = vehicleService.findById(vehicleId, currentUser.getId());
             if (existing == null) {
                 throw new IllegalArgumentException(
                         "Không tìm thấy phương tiện thuộc tài khoản của bạn.");
@@ -134,7 +134,7 @@ public class VehicleServlet extends HttpServlet {
             uploadedImagePath = VehicleImageStorage.save(req.getPart("vehicleImage"));
             String imagePath = uploadedImagePath == null ? oldImagePath : uploadedImagePath;
             formData.setImagePath(imagePath);
-            vehicleService.updateCustomerVehicle(
+            vehicleService.update(
                     vehicleId,
                     currentUser.getId(),
                     formData.getLicensePlate(),
@@ -176,7 +176,7 @@ public class VehicleServlet extends HttpServlet {
         HttpSession session = req.getSession();
         try {
             int vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
-            vehicleService.deleteCustomerVehicle(vehicleId, currentUser.getId());
+            vehicleService.delete(vehicleId, currentUser.getId());
             session.setAttribute("vehicleMessage", "Xóa phương tiện thành công.");
         } catch (NumberFormatException e) {
             session.setAttribute("vehicleError", "Mã phương tiện không hợp lệ.");

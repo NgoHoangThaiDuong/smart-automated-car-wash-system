@@ -55,56 +55,6 @@ public class UserDAO {
         return 0.0;
     }
 
-    public List<User> searchCustomers(String key, Integer tierId) {
-        List<User> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-            "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
-            "t.name AS tier_name, t.point_multiplier, t.booking_window_days, t.min_washes, t.min_spend, " +
-            "(SELECT COUNT(*) FROM vehicles v WHERE v.user_id = u.id AND v.is_deleted = 0) AS vehicle_count " +
-            "FROM users u " +
-            "LEFT JOIN tiers t ON u.tier_id = t.id " +
-            "WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 "
-        );
-        
-        List<Object> params = new ArrayList<>();
-        
-        if (key != null && !key.trim().isEmpty()) {
-            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
-            String keyParam = "%" + key.trim() + "%";
-            params.add(keyParam);
-            params.add(keyParam);
-            params.add(keyParam);
-        }
-        
-        if (tierId != null && tierId > 0) {
-            sql.append("AND u.tier_id = ? ");
-            params.add(tierId);
-        }
-        
-        sql.append("ORDER BY u.fullname ASC");
-        
-        try (Connection cn = DBUtils.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql.toString())) {
-            
-            for (int i = 0; i < params.size(); i++) {
-                Object p = params.get(i);
-                if (p instanceof String) {
-                    ps.setString(i + 1, (String) p);
-                } else if (p instanceof Integer) {
-                    ps.setInt(i + 1, (Integer) p);
-                }
-            }
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(getUser(rs));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error searching customers: " + e.getMessage(), e);
-        }
-        return list;
-    }
 
     public int countCustomers(String key, Integer tierId) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users u WHERE u.role = 'CUSTOMER' AND u.is_deleted = 0 ");
@@ -146,7 +96,7 @@ public class UserDAO {
         return 0;
     }
 
-    public List<User> searchCustomersPaginated(String key, Integer tierId, int offset, int limit) {
+    public List<User> searchCustomersPaginated(String key, Integer tierId, String sortBy, int offset, int limit) {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
             "SELECT u.id, u.username, u.password, u.fullname, u.phone, u.role, u.tier_id, u.points_balance, u.total_washes, u.lifetime_spent, u.created_at, " +
@@ -172,7 +122,38 @@ public class UserDAO {
             params.add(tierId);
         }
         
-        sql.append("ORDER BY u.fullname ASC ");
+        String orderBy = "u.fullname ASC";
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "name_desc":
+                    orderBy = "u.fullname DESC";
+                    break;
+                case "spent_desc":
+                    orderBy = "u.lifetime_spent DESC";
+                    break;
+                case "spent_asc":
+                    orderBy = "u.lifetime_spent ASC";
+                    break;
+                case "washes_desc":
+                    orderBy = "u.total_washes DESC";
+                    break;
+                case "washes_asc":
+                    orderBy = "u.total_washes ASC";
+                    break;
+                case "points_desc":
+                    orderBy = "u.points_balance DESC";
+                    break;
+                case "points_asc":
+                    orderBy = "u.points_balance ASC";
+                    break;
+                case "name_asc":
+                default:
+                    orderBy = "u.fullname ASC";
+                    break;
+            }
+        }
+        
+        sql.append("ORDER BY ").append(orderBy).append(" ");
         sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         params.add(offset);
         params.add(limit);
@@ -336,14 +317,4 @@ public class UserDAO {
         return u;
     }
 
-    public void delete(int id) {
-        String sql = "UPDATE users SET is_deleted = 1 WHERE id = ?";
-        try (Connection cn = DBUtils.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
-        }
-    }
 }

@@ -15,11 +15,7 @@ public class VehicleService {
 
     private final VehicleDAO vehicleDAO = new VehicleDAO();
 
-    public void createVehicle(int userId, String licensePlate, String brand, String model, String color) {
-        vehicleDAO.create(userId, licensePlate, brand, model, color, DEFAULT_IMAGE_PATH);
-    }
-
-    public List<Vehicle> findByUserId(int userId) {
+    public List<Vehicle> findByUser(int userId) {
         List<Vehicle> vehicles = vehicleDAO.findByUserId(userId);
         for (Vehicle vehicle : vehicles) {
             vehicle.setImagePath(resolveImagePath(vehicle.getImagePath()));
@@ -27,20 +23,12 @@ public class VehicleService {
         return vehicles;
     }
 
-    public Vehicle findById(int id) {
-        return vehicleDAO.findById(id);
+
+    public Vehicle findById(int vehicleId, int userId) {
+        return vehicleDAO.findById(vehicleId, userId);
     }
 
-    public Vehicle findOwnedVehicle(int vehicleId, int userId) {
-        return vehicleDAO.findByIdAndUserId(vehicleId, userId);
-    }
-
-    public void createCustomerVehicle(int userId, String licensePlate,
-            String brand, String model, String color) {
-        createCustomerVehicle(userId, licensePlate, brand, model, color, DEFAULT_IMAGE_PATH);
-    }
-
-    public void createCustomerVehicle(int userId, String licensePlate,
+    public void create(int userId, String licensePlate,
             String brand, String model, String color, String imagePath) {
         String normalizedPlate = normalizeLicensePlate(licensePlate);
         String normalizedBrand = normalizeText(brand);
@@ -55,19 +43,9 @@ public class VehicleService {
                 normalizedColor, resolveImagePath(imagePath));
     }
 
-    public void updateCustomerVehicle(int vehicleId, int userId, String licensePlate,
-            String brand, String model, String color) {
-        Vehicle existing = vehicleDAO.findByIdAndUserId(vehicleId, userId);
-        if (existing == null) {
-            throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
-        }
-        updateCustomerVehicle(vehicleId, userId, licensePlate, brand, model, color,
-                existing.getImagePath());
-    }
-
-    public void updateCustomerVehicle(int vehicleId, int userId, String licensePlate,
+    public void update(int vehicleId, int userId, String licensePlate,
             String brand, String model, String color, String imagePath) {
-        if (vehicleDAO.findByIdAndUserId(vehicleId, userId) == null) {
+        if (vehicleDAO.findById(vehicleId, userId) == null) {
             throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
         }
 
@@ -77,17 +55,17 @@ public class VehicleService {
         String normalizedColor = normalizeText(color);
         validateVehicle(normalizedPlate, normalizedBrand, normalizedModel, normalizedColor);
 
-        if (vehicleDAO.existsByPlateExceptId(normalizedPlate, vehicleId)) {
+        if (vehicleDAO.existsByPlate(normalizedPlate, vehicleId)) {
             throw new IllegalArgumentException("Biển số xe đã tồn tại.");
         }
-        if (!vehicleDAO.updateForUserWithImage(vehicleId, userId, normalizedPlate,
+        if (!vehicleDAO.update(vehicleId, userId, normalizedPlate,
                 normalizedBrand, normalizedModel, normalizedColor, resolveImagePath(imagePath))) {
             throw new IllegalArgumentException("Không thể cập nhật phương tiện.");
         }
     }
 
-    public void deleteCustomerVehicle(int vehicleId, int userId) {
-        if (!vehicleDAO.deleteForUser(vehicleId, userId)) {
+    public void delete(int vehicleId, int userId) {
+        if (!vehicleDAO.delete(vehicleId, userId)) {
             throw new IllegalArgumentException("Không tìm thấy phương tiện thuộc tài khoản của bạn.");
         }
     }
@@ -128,13 +106,5 @@ public class VehicleService {
         if (color != null && color.length() > 30) {
             throw new IllegalArgumentException("Màu xe không được vượt quá 30 ký tự.");
         }
-    }
-
-    public boolean existsByPlate(String plate) {
-        return vehicleDAO.existsByPlate(plate);
-    }
-
-    public boolean existsByPlateExceptId(String plate, int id) {
-        return vehicleDAO.existsByPlateExceptId(plate, id);
     }
 }

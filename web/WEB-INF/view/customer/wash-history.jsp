@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Bookings - Smart Car Wash</title>
+    <title>Wash History - Smart Car Wash</title>
     <link rel="stylesheet" href="<c:url value='/css/typography.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/customer/booking.css'/>">
 </head>
@@ -14,12 +14,11 @@
     <jsp:include page="/WEB-INF/view/common/navbar.jsp"/>
 
     <main class="booking-page">
-        <div class="page-heading heading-with-action">
+        <div class="page-heading">
             <div>
-                <h1>My Bookings</h1>
-                <p>Manage your upcoming and past service appointments.</p>
+                <h1>Wash History</h1>
+                <p>View details of your past completed and paid car wash services.</p>
             </div>
-            <a class="primary-button" href="<c:url value='/booking/new'/>">+ New Booking</a>
         </div>
 
         <c:if test="${not empty bookingMessage}">
@@ -33,9 +32,9 @@
             <c:choose>
                 <c:when test="${empty bookings}">
                     <div class="empty-state">
-                        <span class="material-symbols-outlined">calendar_month</span>
-                        <h2>No bookings yet</h2>
-                        <p>Select a vehicle, service, date and time to create your first booking.</p>
+                        <span class="material-symbols-outlined">history</span>
+                        <h2>No wash history yet</h2>
+                        <p>You haven't completed any car wash bookings yet.</p>
                         <a class="primary-button" href="<c:url value='/booking/new'/>">Book a Service</a>
                     </div>
                 </c:when>
@@ -72,21 +71,6 @@
                                     <span class="status booking-${booking.bookingStatus}">
                                         <c:out value="${booking.bookingStatus}"/>
                                     </span>
-                                </div>
-                                <div class="booking-actions">
-                                    <c:if test="${booking.customerCancellable}">
-                                        <form method="POST" action="<c:url value='/booking/cancel'/>"
-                                              onsubmit="return confirm('Bạn có chắc muốn hủy booking này?');">
-                                            <input type="hidden" name="bookingId" value="${booking.id}">
-                                            <button class="cancel-button" type="submit">Cancel</button>
-                                        </form>
-                                    </c:if>
-                                    <c:if test="${booking.customerPayable}">
-                                        <a class="pay-button"
-                                           href="<c:url value='/payment'><c:param name='bookingId' value='${booking.id}'/></c:url>">
-                                            Pay Now
-                                        </a>
-                                    </c:if>
                                 </div>
                             </div>
                         </article>
