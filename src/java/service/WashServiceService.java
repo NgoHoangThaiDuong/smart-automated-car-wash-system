@@ -9,9 +9,6 @@ public class WashServiceService {
 
     private final WashServiceDAO washServiceDAO = new WashServiceDAO();
 
-    public List<WashService> getAllServices() {
-        return washServiceDAO.findAll();
-    }
 
     public List<WashService> getActiveServices() {
         return washServiceDAO.findAllActive();

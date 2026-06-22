@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebFilter({"/dashboard", "/profile", "/profile/*", "/vehicles", "/vehicles/*",
-    "/booking", "/booking/*", "/payment"})
+    "/booking", "/booking/*", "/payment", "/wash-history"})
 
 public class AuthFilter implements Filter {
 

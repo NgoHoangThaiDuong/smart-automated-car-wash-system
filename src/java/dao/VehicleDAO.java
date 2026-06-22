@@ -77,7 +77,7 @@ public class VehicleDAO {
         return null;
     }
 
-    public Vehicle findByIdAndUserId(int id, int userId) {
+    public Vehicle findById(int id, int userId) {
         String sql = "SELECT id, user_id, license_plate, brand, model, color, image_path " +
                 "FROM vehicles WHERE id = ? AND user_id = ? AND is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
@@ -92,29 +92,8 @@ public class VehicleDAO {
         }
     }
 
-    public boolean updateForUser(int id, int userId, String licensePlate,
-            String brand, String model, String color) {
-        String sql = "UPDATE vehicles SET license_plate = ?, brand = ?, model = ?, color = ? " +
-                "WHERE id = ? AND user_id = ? AND is_deleted = 0";
 
-        try (Connection cn = DBUtils.getConnection();
-                PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setString(1, licensePlate);
-            ps.setString(2, brand);
-            ps.setString(3, model);
-            ps.setString(4, color);
-            ps.setInt(5, id);
-            ps.setInt(6, userId);
-
-            return ps.executeUpdate() == 1;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating vehicle: " + e.getMessage(), e);
-        }
-    }
-
-    public boolean updateForUserWithImage(int id, int userId, String licensePlate,
+    public boolean update(int id, int userId, String licensePlate,
             String brand, String model, String color, String imagePath) {
         String sql = "UPDATE vehicles SET license_plate = ?, brand = ?, model = ?, " +
                 "color = ?, image_path = ? " +
@@ -131,11 +110,11 @@ public class VehicleDAO {
             ps.setInt(7, userId);
             return ps.executeUpdate() == 1;
         } catch (Exception e) {
-            throw new RuntimeException("Error updating vehicle image: " + e.getMessage(), e);
+            throw new RuntimeException("Error updating vehicle: " + e.getMessage(), e);
         }
     }
 
-    public boolean deleteForUser(int id, int userId) {
+    public boolean delete(int id, int userId) {
         String sql = "UPDATE vehicles SET is_deleted = 1 " +
                 "WHERE id = ? AND user_id = ? AND is_deleted = 0";
 
@@ -151,17 +130,17 @@ public class VehicleDAO {
         }
     }
 
-    public boolean existsByPlateExceptId(String plate, int id) {
+    public boolean existsByPlate(String plate, int excludeId) {
         String sql = "SELECT id FROM vehicles WHERE license_plate = ? AND id <> ?";
 
         try ( Connection cn = DBUtils.getConnection();  PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, plate);
-            ps.setInt(2, id);
+            ps.setInt(2, excludeId);
 
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error checking vehicle plate: " + e.getMessage(), e);
@@ -175,9 +154,9 @@ public class VehicleDAO {
 
             ps.setString(1, plate);
 
-            ResultSet rs = ps.executeQuery();
-
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             throw new RuntimeException("Error checking vehicle plate: " + e.getMessage(), e);

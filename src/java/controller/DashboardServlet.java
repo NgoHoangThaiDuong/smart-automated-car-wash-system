@@ -49,8 +49,8 @@ public class DashboardServlet extends HttpServlet {
 
         session.setAttribute("currentUser", freshUser);
         req.setAttribute("dashboard", dashboard);
-        req.setAttribute("upcomingBooking", bookingService.getUpcomingBookingByUserId(freshUser.getId()));
-        req.setAttribute("recentWashHistory", bookingService.getRecentWashHistoryByUserId(freshUser.getId(), 5));
+        req.setAttribute("upcomingBooking", bookingService.getUpcomingBooking(freshUser.getId()));
+        req.setAttribute("recentWashHistory", bookingService.getRecentWashHistory(freshUser.getId(), 5));
         req.setAttribute("activePage", "dashboard");
 
         req.getRequestDispatcher("/WEB-INF/view/customer/dashboard.jsp").forward(req, res);

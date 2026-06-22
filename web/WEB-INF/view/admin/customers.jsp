@@ -42,6 +42,22 @@
         </div>
     </div>
 
+    <!-- Alert Notifications Session Feedbacks -->
+    <c:if test="${not empty sessionScope.adminMsg}">
+        <div class="alert-box alert-success" style="margin-bottom: 1.5rem;">
+            <span><c:out value="${sessionScope.adminMsg}"/></span>
+            <button class="alert-close-btn" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        <c:remove var="adminMsg" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.adminError}">
+        <div class="alert-box alert-error" style="margin-bottom: 1.5rem;">
+            <span><c:out value="${sessionScope.adminError}"/></span>
+            <button class="alert-close-btn" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        <c:remove var="adminError" scope="session"/>
+    </c:if>
+
     <!-- Analytics Cards (Bento style) -->
     <div class="analytics-grid">
         <!-- Total Customers -->
@@ -101,6 +117,18 @@
                     </c:forEach>
                 </select>
 
+                <!-- Sort By Select -->
+                <select name="sortBy" class="filter-select-field">
+                    <option value="name_asc" <c:if test="${empty sortBy or sortBy eq 'name_asc'}">selected</c:if>>Tên (A-Z)</option>
+                    <option value="name_desc" <c:if test="${sortBy eq 'name_desc'}">selected</c:if>>Tên (Z-A)</option>
+                    <option value="spent_desc" <c:if test="${sortBy eq 'spent_desc'}">selected</c:if>>Số tiền đã tiêu (Cao -> Thấp)</option>
+                    <option value="spent_asc" <c:if test="${sortBy eq 'spent_asc'}">selected</c:if>>Số tiền đã tiêu (Thấp -> Cao)</option>
+                    <option value="washes_desc" <c:if test="${sortBy eq 'washes_desc'}">selected</c:if>>Số lượt rửa (Nhiều -> Ít)</option>
+                    <option value="washes_asc" <c:if test="${sortBy eq 'washes_asc'}">selected</c:if>>Số lượt rửa (Ít -> Nhiều)</option>
+                    <option value="points_desc" <c:if test="${sortBy eq 'points_desc'}">selected</c:if>>Điểm tích lũy (Nhiều -> Ít)</option>
+                    <option value="points_asc" <c:if test="${sortBy eq 'points_asc'}">selected</c:if>>Điểm tích lũy (Ít -> Nhiều)</option>
+                </select>
+
                 <!-- Filter Submit -->
                 <button type="submit" class="btn-submit-filter">
                     <span class="material-symbols-outlined" style="font-size: 1.15rem;">tune</span> Filter
@@ -123,7 +151,7 @@
                         <th style="width: 15%; text-align: right;">Lifetime Spent</th>
                         <th style="width: 10%; text-align: center;">Wash Count</th>
                         <th style="width: 8%; text-align: center;">Vehicles</th>
-                        <th style="width: 18%;">Tier Upgrade Progress</th>
+                        <th style="width: 18%; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,63 +200,13 @@
                                         <span class="vehicle-count-tag">${u.vehicleCount}</span>
                                     </td>
 
-                                    <!-- Upgrade Progress Bar -->
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${tierName eq 'Platinum'}">
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span style="color: #2563EB; font-weight: 700;">MAX TIER REACHED</span>
-                                                        <span class="material-symbols-outlined" style="font-size: 14px; color: #3B82F6;">stars</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: 100%; background: #3B82F6;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:when test="${tierName eq 'Gold'}">
-                                                <c:set var="targetWashes" value="30"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #F59E0B;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:when test="${tierName eq 'Silver'}">
-                                                <c:set var="targetWashes" value="15"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #475569;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:set var="targetWashes" value="5"/>
-                                                <c:set var="progPercent" value="${u.totalWashes * 100 / targetWashes}"/>
-                                                <c:if test="${progPercent > 100}"><c:set var="progPercent" value="100"/></c:if>
-                                                <div class="progress-container">
-                                                    <div class="progress-info">
-                                                        <span>${u.totalWashes} / ${targetWashes} washes</span>
-                                                        <span><fmt:formatNumber value="${progPercent}" maxFractionDigits="0"/>%</span>
-                                                    </div>
-                                                    <div class="progress-bar-bg">
-                                                        <div class="progress-bar-fill" style="width: ${progPercent}%; background: #10B981;"></div>
-                                                    </div>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <!-- Actions -->
+                                    <td style="text-align: center;">
+                                        <div class="actions-cell-group" style="justify-content: center;">
+                                            <a href="<c:url value='/admin/customers/detail?id=${u.id}'/>" class="btn-detail-icon" title="View Detail">
+                                                <span class="material-symbols-outlined" style="font-size: 1.25rem;">arrow_forward</span>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -259,6 +237,7 @@
                                     <c:url value="/admin/customers" var="prevUrl">
                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                         <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                         <c:param name="page" value="${currentPage - 1}"/>
                                     </c:url>
                                     <a href="${prevUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
@@ -285,6 +264,7 @@
                                                 <c:url value="/admin/customers" var="pageUrl">
                                                     <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                     <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                    <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                     <c:param name="page" value="${i}"/>
                                                 </c:url>
                                                 <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -309,6 +289,7 @@
                                                         <c:url value="/admin/customers" var="pageUrl">
                                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                             <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                             <c:param name="page" value="${i}"/>
                                                         </c:url>
                                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -321,6 +302,7 @@
                                             <c:url value="/admin/customers" var="pageUrl">
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="${totalPages}"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -333,6 +315,7 @@
                                             <c:url value="/admin/customers" var="pageUrl">
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="1"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -348,6 +331,7 @@
                                                         <c:url value="/admin/customers" var="pageUrl">
                                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                             <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                             <c:param name="page" value="${i}"/>
                                                         </c:url>
                                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -363,6 +347,7 @@
                                             <c:url value="/admin/customers" var="pageUrl">
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="1"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -378,6 +363,7 @@
                                                         <c:url value="/admin/customers" var="pageUrl">
                                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                             <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                             <c:param name="page" value="${i}"/>
                                                         </c:url>
                                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -390,6 +376,7 @@
                                             <c:url value="/admin/customers" var="pageUrl">
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="${totalPages}"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -404,6 +391,7 @@
                                     <c:url value="/admin/customers" var="nextUrl">
                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                         <c:if test="${not empty selectedTierId}"><c:param name="tierId" value="${selectedTierId}"/></c:if>
+                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                         <c:param name="page" value="${currentPage + 1}"/>
                                     </c:url>
                                     <a href="${nextUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">

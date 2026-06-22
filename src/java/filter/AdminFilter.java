@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter("/admin/*")
+@WebFilter({"/admin", "/admin/*"})
 public class AdminFilter implements Filter {
 
     @Override
