@@ -28,7 +28,8 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
-        if (pathInfo == null) pathInfo = "/dashboard";
+        if (pathInfo == null)
+            pathInfo = "/dashboard";
 
         switch (pathInfo) {
             case "/dashboard":
@@ -118,7 +119,8 @@ public class AdminServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/view/admin/dashboard.jsp").forward(req, res);
     }
 
-    private void handleBookingList(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleBookingList(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
         String search = req.getParameter("search");
         String status = req.getParameter("status");
         String date = req.getParameter("date");
@@ -147,7 +149,8 @@ public class AdminServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/view/admin/booking-list.jsp").forward(req, res);
     }
 
-    private void handleBookingDetail(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleBookingDetail(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
         String idParam = req.getParameter("id");
         if (idParam == null) {
             res.sendRedirect(req.getContextPath() + "/admin/bookings");
@@ -163,8 +166,14 @@ public class AdminServlet extends HttpServlet {
             HttpSession session = req.getSession(false);
             String msg = (String) session.getAttribute("adminMsg");
             String err = (String) session.getAttribute("adminError");
-            if (msg != null) { req.setAttribute("adminMsg", msg); session.removeAttribute("adminMsg"); }
-            if (err != null) { req.setAttribute("adminError", err); session.removeAttribute("adminError"); }
+            if (msg != null) {
+                req.setAttribute("adminMsg", msg);
+                session.removeAttribute("adminMsg");
+            }
+            if (err != null) {
+                req.setAttribute("adminError", err);
+                session.removeAttribute("adminError");
+            }
             req.getRequestDispatcher("/WEB-INF/view/admin/booking-detail.jsp").forward(req, res);
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -186,7 +195,8 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private void handleServiceList(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleServiceList(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
         List<WashService> services = washServiceService.getAllServicesWithBookingCount();
         req.setAttribute("services", services);
 
@@ -194,8 +204,14 @@ public class AdminServlet extends HttpServlet {
         if (session != null) {
             String msg = (String) session.getAttribute("adminMsg");
             String err = (String) session.getAttribute("adminError");
-            if (msg != null) { req.setAttribute("adminMsg", msg); session.removeAttribute("adminMsg"); }
-            if (err != null) { req.setAttribute("adminError", err); session.removeAttribute("adminError"); }
+            if (msg != null) {
+                req.setAttribute("adminMsg", msg);
+                session.removeAttribute("adminMsg");
+            }
+            if (err != null) {
+                req.setAttribute("adminError", err);
+                session.removeAttribute("adminError");
+            }
         }
 
         req.getRequestDispatcher("/WEB-INF/view/admin/services.jsp").forward(req, res);
@@ -279,7 +295,8 @@ public class AdminServlet extends HttpServlet {
         res.sendRedirect(req.getContextPath() + "/admin/services");
     }
 
-    private void handleCustomerList(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    private void handleCustomerList(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
         String search = req.getParameter("search");
         String tierIdParam = req.getParameter("tierId");
         Integer tierId = null;
