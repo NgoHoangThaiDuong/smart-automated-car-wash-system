@@ -7,7 +7,7 @@
 
 <!-- Shared Search and Filter Card -->
 <div class="filter-card">
-    <form method="GET" action="${paginationBaseUrl}" style="margin: 0;">
+    <form method="GET" action="<c:url value='${paginationBaseUrl}'/>" style="margin: 0;">
         <div class="filter-form-grid">
             <!-- Search -->
             <div class="search-input-wrapper">
@@ -18,15 +18,25 @@
             <!-- Status -->
             <select id="statusFilter" name="status" class="filter-select-field">
                 <option value="">-- Tất cả trạng thái --</option>
-                <option value="CONFIRMED" <c:if test="${selectedStatus eq 'CONFIRMED'}">selected</c:if>>Confirmed (Đã xác nhận)</option>
-                <option value="IN_PROGRESS" <c:if test="${selectedStatus eq 'IN_PROGRESS'}">selected</c:if>>In Progress (Đang rửa)</option>
-                <option value="COMPLETED" <c:if test="${selectedStatus eq 'COMPLETED'}">selected</c:if>>Completed (Hoàn thành)</option>
-                <option value="CANCELLED" <c:if test="${selectedStatus eq 'CANCELLED'}">selected</c:if>>Cancelled (Đã hủy)</option>
-                <option value="NO_SHOW" <c:if test="${selectedStatus eq 'NO_SHOW'}">selected</c:if>>No Show (Không đến)</option>
+                <c:forEach var="status" items="${bookingStatuses}">
+                    <option value="${status}" <c:if test="${selectedStatus eq status}">selected</c:if>>
+                        <c:out value="${status}"/>
+                    </option>
+                </c:forEach>
             </select>
 
             <!-- Date -->
             <input id="dateFilter" name="date" type="date" class="filter-date-field" value="<c:out value='${date}'/>">
+
+            <!-- Sort By -->
+            <select id="sortBy" name="sortBy" class="filter-select-field">
+                <option value="created_desc" <c:if test="${empty sortBy or sortBy eq 'created_desc'}">selected</c:if>>Mới tạo gần nhất</option>
+                <option value="created_asc" <c:if test="${sortBy eq 'created_asc'}">selected</c:if>>Mới tạo xa nhất</option>
+                <option value="date_desc" <c:if test="${sortBy eq 'date_desc'}">selected</c:if>>Ngày đặt (Mới -> Cũ)</option>
+                <option value="date_asc" <c:if test="${sortBy eq 'date_asc'}">selected</c:if>>Ngày đặt (Cũ -> Mới)</option>
+                <option value="amount_desc" <c:if test="${sortBy eq 'amount_desc'}">selected</c:if>>Tổng tiền (Cao -> Thấp)</option>
+                <option value="amount_asc" <c:if test="${sortBy eq 'amount_asc'}">selected</c:if>>Tổng tiền (Thấp -> Cao)</option>
+            </select>
 
             <!-- Submit Button -->
             <button type="submit" class="btn-submit-filter">
@@ -110,10 +120,20 @@
                                             <span class="payment-voided">Voided</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="payment-collect-btn">
+                                            <button type="button" 
+                                                    class="payment-collect-btn js-collect-payment-btn" 
+                                                    onclick="openCheckoutModal(this)"
+                                                    data-id="${b.id}"
+                                                    data-customer-name="<c:out value='${not empty b.user.fullname ? b.user.fullname : b.user.username}'/>"
+                                                    data-customer-tier="${tierName}"
+                                                    data-vehicle-model="<c:out value='${b.vehicle.brand} ${b.vehicle.model}'/>"
+                                                    data-vehicle-plate="<c:out value='${b.vehicle.licensePlate}'/>"
+                                                    data-service-name="<c:out value='${b.service.name}'/>"
+                                                    data-service-duration="${b.service.durationMinutes}"
+                                                    data-total-amount="<fmt:formatNumber value='${b.totalAmount}' type='number' groupingUsed='true'/>">
                                                 <span class="material-symbols-outlined">credit_card</span>
                                                 Collect <fmt:formatNumber value="${b.totalAmount}" type="number" groupingUsed="true"/> ₫
-                                            </a>
+                                            </button>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
@@ -164,6 +184,7 @@
                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                 <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                 <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                 <c:param name="page" value="${currentPage - 1}"/>
                             </c:url>
                             <a href="${prevUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
@@ -192,6 +213,7 @@
                                                 <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                 <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                 <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                 <c:param name="page" value="${i}"/>
                                             </c:url>
                                             <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -217,6 +239,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -230,6 +253,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="${totalPages}"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -243,6 +267,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="1"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -259,6 +284,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -275,6 +301,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="1"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">1</a>
@@ -291,6 +318,7 @@
                                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                                         <c:param name="page" value="${i}"/>
                                                     </c:url>
                                                     <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${i}</a>
@@ -304,6 +332,7 @@
                                             <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                             <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                             <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                            <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                             <c:param name="page" value="${totalPages}"/>
                                         </c:url>
                                         <a href="${pageUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">${totalPages}</a>
@@ -320,6 +349,7 @@
                                         <c:if test="${not empty search}"><c:param name="search" value="${search}"/></c:if>
                                         <c:if test="${not empty selectedStatus}"><c:param name="status" value="${selectedStatus}"/></c:if>
                                         <c:if test="${not empty date}"><c:param name="date" value="${date}"/></c:if>
+                                        <c:if test="${not empty sortBy}"><c:param name="sortBy" value="${sortBy}"/></c:if>
                                         <c:param name="page" value="${currentPage + 1}"/>
                                     </c:url>
                                     <a href="${nextUrl}" class="page-item-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
@@ -338,3 +368,149 @@
             </div>
         </div>
 </div>
+
+<!-- Payment Checkout Modal (Khớp 100% hình 2) -->
+<div id="paymentCheckoutModal" class="checkout-modal">
+    <div class="checkout-modal-content">
+        <div class="checkout-modal-header">
+            <h2>Payment Checkout</h2>
+            <button type="button" class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
+        </div>
+        
+        <form id="checkoutPaymentForm" method="POST" action="<c:url value='/admin/bookings/collect-payment'/>">
+            <input type="hidden" name="bookingId" id="checkoutBookingId">
+            <input type="hidden" name="redirect" value="list">
+            
+            <div class="checkout-card">
+                <div class="checkout-booking-title">
+                    Booking <span id="checkoutBookingRef">#SW-8942</span>
+                </div>
+                
+                <div class="checkout-info-grid">
+                    <div class="checkout-info-col">
+                        <div class="checkout-info-label">CUSTOMER</div>
+                        <div class="checkout-info-value" id="checkoutCustomerName">Michael Chen</div>
+                        <div>
+                            <span class="tier-badge-small" id="checkoutCustomerTier">GOLD TIER</span>
+                        </div>
+                    </div>
+                    <div class="checkout-info-col">
+                        <div class="checkout-info-label">VEHICLE</div>
+                        <div class="checkout-info-value" id="checkoutVehicleModel">Tesla Model 3</div>
+                        <div class="checkout-info-sub" id="checkoutVehiclePlate">CA-XYZ789</div>
+                    </div>
+                </div>
+                
+                <div class="checkout-divider"></div>
+                
+                <div class="checkout-service-row">
+                    <div class="checkout-service-left">
+                        <div class="checkout-service-name" id="checkoutServiceName">Premium Detail Wash</div>
+                        <div class="checkout-service-duration">
+                            <span class="material-symbols-outlined" style="font-size: 0.9rem; margin-right: 2px;">schedule</span>
+                            <span id="checkoutServiceDuration">90 mins</span>
+                        </div>
+                    </div>
+                    <div class="checkout-service-price">
+                        <span id="checkoutTotalAmount">1,200,000</span> ₫
+                    </div>
+                </div>
+                
+                <div class="checkout-payment-section">
+                    <div class="checkout-payment-title">Payment Method</div>
+                    
+                    <div class="payment-options">
+                        <label class="payment-option-card active" id="paymentCardCASH">
+                            <input type="radio" name="paymentMethod" value="CASH" checked onclick="selectPaymentMethod(this)">
+                            <div class="payment-option-content">
+                                <span class="custom-radio"></span>
+                                <span class="material-symbols-outlined payment-icon">payments</span>
+                                <span class="payment-text">Cash</span>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-option-card" id="paymentCardBANK">
+                            <input type="radio" name="paymentMethod" value="BANK_TRANSFER" onclick="selectPaymentMethod(this)">
+                            <div class="payment-option-content">
+                                <span class="custom-radio"></span>
+                                <span class="material-symbols-outlined payment-icon">account_balance</span>
+                                <span class="payment-text">Banking</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-confirm-payment">Confirm Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCheckoutModal(btn) {
+    var id = btn.getAttribute('data-id');
+    var customerName = btn.getAttribute('data-customer-name');
+    var customerTier = btn.getAttribute('data-customer-tier');
+    var vehicleModel = btn.getAttribute('data-vehicle-model');
+    var vehiclePlate = btn.getAttribute('data-vehicle-plate');
+    var serviceName = btn.getAttribute('data-service-name');
+    var serviceDuration = btn.getAttribute('data-service-duration');
+    var totalAmount = btn.getAttribute('data-total-amount');
+
+    document.getElementById('checkoutBookingId').value = id;
+    document.getElementById('checkoutBookingRef').innerText = '#BK-' + id;
+    document.getElementById('checkoutCustomerName').innerText = customerName;
+    
+    var tierBadge = document.getElementById('checkoutCustomerTier');
+    tierBadge.innerText = customerTier.toUpperCase() + ' TIER';
+    tierBadge.className = 'tier-badge-small tier-badge-' + customerTier.toUpperCase();
+
+    document.getElementById('checkoutVehicleModel').innerText = vehicleModel;
+    document.getElementById('checkoutVehiclePlate').innerText = vehiclePlate;
+    document.getElementById('checkoutServiceName').innerText = serviceName;
+    document.getElementById('checkoutServiceDuration').innerText = serviceDuration + ' mins';
+    document.getElementById('checkoutTotalAmount').innerText = totalAmount;
+
+    // Reset payment option
+    var radioCash = document.querySelector('input[name="paymentMethod"][value="CASH"]');
+    radioCash.checked = true;
+    
+    // Reset active class
+    document.getElementById('paymentCardCASH').classList.add('active');
+    document.getElementById('paymentCardBANK').classList.remove('active');
+
+    var modal = document.getElementById('paymentCheckoutModal');
+    modal.style.display = 'flex';
+    setTimeout(function() {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeCheckoutModal() {
+    var modal = document.getElementById('paymentCheckoutModal');
+    modal.classList.remove('show');
+    setTimeout(function() {
+        modal.style.display = 'none';
+    }, 250);
+}
+
+function selectPaymentMethod(radio) {
+    document.getElementById('paymentCardCASH').classList.remove('active');
+    document.getElementById('paymentCardBANK').classList.remove('active');
+    
+    if (radio.value === 'CASH') {
+        document.getElementById('paymentCardCASH').classList.add('active');
+    } else {
+        document.getElementById('paymentCardBANK').classList.add('active');
+    }
+}
+
+// Close modal when clicking outside content
+window.addEventListener('click', function(event) {
+    var modal = document.getElementById('paymentCheckoutModal');
+    if (event.target == modal) {
+        closeCheckoutModal();
+    }
+});
+</script>
+

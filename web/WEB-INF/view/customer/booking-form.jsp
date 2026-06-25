@@ -110,8 +110,24 @@
 
                         <section class="selection-card">
                             <h2>4. Select Time</h2>
-                            <div id="timeMessage" class="helper-text">Select a service and booking date.</div>
-                            <div id="timeGrid" class="time-grid"></div>
+                            <div id="timeMessage" class="helper-text">
+                                <c:choose>
+                                    <c:when test="${empty selectedServiceId || empty selectedDate}">
+                                        Select a service and booking date.
+                                    </c:when>
+                                    <c:when test="${empty availableSlots}">
+                                        No available time slots.
+                                    </c:when>
+                                </c:choose>
+                            </div>
+                            <div id="timeGrid" class="time-grid">
+                                <c:forEach var="slot" items="${availableSlots}">
+                                    <button type="button" class="time-button ${selectedTime eq slot ? 'selected' : ''}" data-time="${slot}">
+                                        <c:out value="${slot}"/>
+                                        <small>${selectedTime eq slot ? 'Selected' : 'Available'}</small>
+                                    </button>
+                                </c:forEach>
+                            </div>
                             <input id="selectedTime" type="hidden" name="time"
                                    value="<c:out value='${selectedTime}'/>">
                         </section>
@@ -185,9 +201,7 @@
             var bookingDate = document.getElementById('bookingDate');
             var selectedTime = document.getElementById('selectedTime');
             var timeGrid = document.getElementById('timeGrid');
-            var timeMessage = document.getElementById('timeMessage');
             var confirmButton = document.getElementById('confirmBooking');
-            var slotUrl = '<c:url value="/booking/slots"/>';
 
             function selectedInput(name) {
                 return form.querySelector('input[name="' + name + '"]:checked');
@@ -213,7 +227,7 @@
                         service ? service.dataset.duration + ' mins' : '';
                 document.getElementById('summaryDate').textContent =
                         bookingDate.value || 'Not selected';
-                document.getElementById('summaryTime').textContent = selectedTime.value;
+                document.getElementById('summaryTime').textContent = selectedTime.value || 'Not selected';
                 document.getElementById('summaryTotal').textContent = service
                         ? Number(service.dataset.price).toLocaleString('en-US') + ' VND'
                         : '0 VND';
@@ -225,72 +239,27 @@
             function chooseTime(button) {
                 timeGrid.querySelectorAll('.time-button').forEach(function (item) {
                     item.classList.remove('selected');
-                    item.querySelector('small').textContent = 'Available';
+                    var small = item.querySelector('small');
+                    if (small) small.textContent = 'Available';
                 });
                 button.classList.add('selected');
-                button.querySelector('small').textContent = 'Selected';
+                var small = button.querySelector('small');
+                if (small) small.textContent = 'Selected';
                 selectedTime.value = button.dataset.time;
                 updateSummary();
             }
 
-            function renderSlots(slots) {
-                var previousTime = selectedTime.value;
-                timeGrid.innerHTML = '';
-                timeMessage.textContent = slots.length ? '' : 'No available time slot for this date.';
-
-                slots.forEach(function (slot) {
-                    var button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'time-button';
-                    button.dataset.time = slot;
-                    button.innerHTML = slot + '<small>Available</small>';
-                    button.addEventListener('click', function () {
-                        chooseTime(button);
-                    });
-                    timeGrid.appendChild(button);
-
-                    if (slot === previousTime) {
-                        chooseTime(button);
-                    }
-                });
-
-                if (slots.indexOf(previousTime) === -1) {
-                    selectedTime.value = '';
-                    updateSummary();
-                }
-            }
-
-            function loadSlots() {
+            function reloadWithParams() {
+                var vehicle = selectedInput('vehicleId');
                 var service = selectedInput('serviceId');
-                selectedTime.value = '';
-                timeGrid.innerHTML = '';
-                updateSummary();
-
-                if (!service || !bookingDate.value) {
-                    timeMessage.textContent = 'Select a service and booking date.';
-                    return;
-                }
-
-                timeMessage.textContent = 'Loading available slots...';
-                fetch(slotUrl + '?serviceId=' + encodeURIComponent(service.value)
-                        + '&bookingDate=' + encodeURIComponent(bookingDate.value), {
-                    headers: {'Accept': 'application/json'}
-                })
-                    .then(function (response) {
-                        return response.json().then(function (data) {
-                            if (!response.ok) {
-                                throw new Error(data.error || 'Cannot load time slots.');
-                            }
-                            return data;
-                        });
-                    })
-                    .then(function (data) {
-                        renderSlots(data.slots || []);
-                    })
-                    .catch(function (error) {
-                        timeGrid.innerHTML = '';
-                        timeMessage.textContent = error.message;
-                    });
+                var vehicleId = vehicle ? vehicle.value : '';
+                var serviceId = service ? service.value : '';
+                var dateVal = bookingDate.value || '';
+                
+                var url = '?vehicleId=' + encodeURIComponent(vehicleId)
+                        + '&serviceId=' + encodeURIComponent(serviceId)
+                        + '&bookingDate=' + encodeURIComponent(dateVal);
+                window.location.href = url;
             }
 
             form.querySelectorAll('input[name="vehicleId"]').forEach(function (input) {
@@ -303,11 +272,17 @@
             form.querySelectorAll('input[name="serviceId"]').forEach(function (input) {
                 input.addEventListener('change', function () {
                     updateCardSelection('serviceId');
-                    loadSlots();
+                    reloadWithParams();
                 });
             });
 
-            bookingDate.addEventListener('change', loadSlots);
+            bookingDate.addEventListener('change', reloadWithParams);
+
+            timeGrid.querySelectorAll('.time-button').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    chooseTime(button);
+                });
+            });
 
             form.addEventListener('submit', function (event) {
                 if (confirmButton.disabled) {
@@ -318,11 +293,6 @@
             updateCardSelection('vehicleId');
             updateCardSelection('serviceId');
             updateSummary();
-            if (selectedInput('serviceId') && bookingDate.value) {
-                var preservedTime = selectedTime.value;
-                loadSlots();
-                selectedTime.value = preservedTime;
-            }
         })();
     </script>
 </body>

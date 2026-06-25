@@ -12,21 +12,6 @@ import java.util.List;
 
 public class WashServiceDAO {
 
-    public List<WashService> findAll() {
-        List<WashService> list = new ArrayList<>();
-        String sql = "SELECT id, name, description, price, duration_minutes, is_active, is_deleted " +
-                     "FROM wash_services WHERE is_deleted = 0 ORDER BY price ASC";
-        try (Connection cn = DBUtils.getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(getWashService(rs));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error listing wash services: " + e.getMessage(), e);
-        }
-        return list;
-    }
 
     public List<WashService> findAllActive() {
         List<WashService> list = new ArrayList<>();

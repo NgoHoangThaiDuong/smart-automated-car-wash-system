@@ -33,7 +33,7 @@
                 <h1 class="page-title">Bookings</h1>
             </div>
             <div>
-                <a href="#" class="btn-admin-primary" style="text-decoration: none;">
+                <a href="${pageContext.request.contextPath}/admin/bookings/new" class="btn-admin-primary" style="text-decoration: none;">
                     <span class="material-symbols-outlined">add</span>
                     New Booking
                 </a>
@@ -42,7 +42,7 @@
     </div>
     
     <!-- Reusable Unified Booking Panel Component -->
-    <c:set var="paginationBaseUrl" value="${pageContext.request.contextPath}/admin/bookings" scope="request"/>
+    <c:set var="paginationBaseUrl" value="/admin/bookings" scope="request"/>
     <jsp:include page="/WEB-INF/view/admin/components/booking-table.jsp"/>
 </div>
 

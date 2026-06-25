@@ -2,9 +2,9 @@ package controller;
 
 import service.UserService;
 import service.VehicleService;
-import model.LoyaltyTier;
 import model.User;
 import model.Vehicle;
+import dto.ProfileDTO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/profile/*")
+@WebServlet({"/profile", "/profile/*"})
 public class ProfileServlet extends HttpServlet {
 
     private final UserService userService = new UserService();
@@ -33,21 +33,11 @@ public class ProfileServlet extends HttpServlet {
             freshUser = sessionUser;
         }
 
-        List<LoyaltyTier> allTiers = userService.getAllLoyaltyTiers();
-        LoyaltyTier nextTier = null;
-        for (LoyaltyTier t : allTiers) {
-            if (t.getMinSpend() > freshUser.getLifetimeSpent()) {
-                nextTier = t;
-                break;
-            }
-        }
-
-        if (nextTier != null) {
-            double remaining = nextTier.getMinSpend() - freshUser.getLifetimeSpent();
-            double progress = Math.min(100.0, (freshUser.getLifetimeSpent() / nextTier.getMinSpend()) * 100.0);
-            req.setAttribute("nextTier", nextTier);
-            req.setAttribute("remainingSpend", remaining);
-            req.setAttribute("progressPercent", progress);
+        ProfileDTO profileCtx = userService.getProfileContext(freshUser);
+        if (profileCtx.getNextTier() != null) {
+            req.setAttribute("nextTier", profileCtx.getNextTier());
+            req.setAttribute("remainingSpend", profileCtx.getRemainingSpend());
+            req.setAttribute("progressPercent", profileCtx.getProgressPercent());
         }
 
         String profileError = (String) session.getAttribute("profileError");
@@ -62,7 +52,7 @@ public class ProfileServlet extends HttpServlet {
             session.removeAttribute("vehicleError");
         }
 
-        List<Vehicle> vehicles = vehicleService.findByUserId(freshUser.getId());
+        List<Vehicle> vehicles = vehicleService.findByUser(freshUser.getId());
         req.setAttribute("vehicles", vehicles);
 
         req.setAttribute("activePage", "profile");
@@ -78,6 +68,8 @@ public class ProfileServlet extends HttpServlet {
 
         if ("/update".equals(pathInfo)) {
             handleUpdate(req, res, session);
+        } else if ("/change-password".equals(pathInfo)) {
+            handleChangePassword(req, res, session);
         } else {
             res.sendRedirect(req.getContextPath() + "/profile");
         }
@@ -88,22 +80,37 @@ public class ProfileServlet extends HttpServlet {
         String fullname = req.getParameter("fullname");
         String phone = req.getParameter("phone");
 
-        if (phone != null && !phone.trim().isEmpty() && !phone.trim().matches("^0\\d{9}$")) {
-            session.setAttribute("profileError", "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)!");
-            res.sendRedirect(req.getContextPath() + "/profile");
-            return;
-        }
-
         try {
-            userService.updateProfile(currentUser.getId(),
-                    fullname != null ? fullname.trim() : "",
-                    phone != null ? phone.trim() : "");
+            ProfileDTO updateDTO = new ProfileDTO(fullname, phone);
+            userService.updateProfile(currentUser.getId(), updateDTO);
             User updatedUser = userService.findById(currentUser.getId());
             session.setAttribute("currentUser", updatedUser);
             res.sendRedirect(req.getContextPath() + "/profile?msg=profile_success");
+        } catch (IllegalArgumentException e) {
+            session.setAttribute("profileError", e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/profile");
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("profileError", "Lỗi hệ thống khi cập nhật hồ sơ cá nhân.");
+            res.sendRedirect(req.getContextPath() + "/profile");
+        }
+    }
+
+    private void handleChangePassword(HttpServletRequest req, HttpServletResponse res, HttpSession session) throws IOException {
+        User currentUser = (User) session.getAttribute("currentUser");
+        String oldPassword = req.getParameter("oldPassword");
+        String newPassword = req.getParameter("newPassword");
+        String confirmPassword = req.getParameter("confirmPassword");
+
+        try {
+            userService.changePassword(currentUser.getId(), oldPassword, newPassword, confirmPassword);
+            res.sendRedirect(req.getContextPath() + "/profile?msg=password_success");
+        } catch (IllegalArgumentException e) {
+            session.setAttribute("profileError", e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/profile");
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("profileError", "Lỗi hệ thống khi đổi mật khẩu.");
             res.sendRedirect(req.getContextPath() + "/profile");
         }
     }

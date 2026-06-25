@@ -275,6 +275,42 @@
                 </form>
             </div>
 
+            <div class="card" style="margin-top: 2rem;">
+                <div class="card-title">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:1.25rem; height:1.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                    </svg>
+                    Đổi mật khẩu
+                </div>
+                
+                <c:if test="${param.msg eq 'password_success'}">
+                    <div class="alert alert-success" style="display:block; margin-bottom: 1rem;">Đổi mật khẩu thành công!</div>
+                </c:if>
+
+                <form id="passwordForm" method="POST" action="<c:url value='/profile/change-password'/>">
+                    <div class="account-grid">
+                        <div class="form-field">
+                            <label>Mật khẩu hiện tại *</label>
+                            <input type="password" name="oldPassword" required placeholder="Nhập mật khẩu hiện tại" style="width: 100%; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.875rem;">
+                        </div>
+                        <div class="form-field">
+                            <label>Mật khẩu mới *</label>
+                            <input type="password" name="newPassword" required minlength="6" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)" style="width: 100%; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.875rem;">
+                        </div>
+                        <div class="form-field">
+                            <label>Xác nhận mật khẩu mới *</label>
+                            <input type="password" name="confirmPassword" required minlength="6" placeholder="Xác nhận mật khẩu mới" style="width: 100%; padding: 0.6rem; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.875rem;">
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 1rem;">
+                        <button type="submit" id="pwdSubmitBtn" class="btn-form btn-form-submit" style="padding: 0.6rem 1.2rem; background: #059669; border-color: #059669;">
+                            <span class="spinner" id="pwdSpinner" style="display:none;"></span>
+                            <span id="pwdBtnText">Đổi Mật Khẩu</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
 
         <script>
@@ -327,6 +363,12 @@
                 document.getElementById('profileSpinner').style.display = 'inline-block';
                 document.getElementById('profileBtnText').textContent = 'Đang lưu...';
                 document.getElementById('profileSubmitBtn').disabled = true;
+            });
+
+            document.getElementById('passwordForm').addEventListener('submit', function () {
+                document.getElementById('pwdSpinner').style.display = 'inline-block';
+                document.getElementById('pwdBtnText').textContent = 'Đang đổi...';
+                document.getElementById('pwdSubmitBtn').disabled = true;
             });
 
             const alertDivs = document.querySelectorAll('.alert > div');
