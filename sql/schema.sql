@@ -1,4 +1,4 @@
--- DDL Schema definition for Smart Automated Car Wash System
+ -- DDL Schema definition for Smart Automated Car Wash System
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoCarWash')
 BEGIN
     CREATE DATABASE AutoCarWash;
@@ -104,3 +104,69 @@ BEGIN
     );
 END;
 GO
+
+IF NOT EXISTS (
+    SELECT *
+    FROM sysobjects
+    WHERE name = 'promotions'
+      AND xtype = 'U'
+)
+BEGIN
+    CREATE TABLE promotions (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+
+        promotion_name NVARCHAR(150) NOT NULL,
+
+        description NVARCHAR(500),
+
+        discount_type VARCHAR(20) NOT NULL,
+
+        discount_value DECIMAL(18,2) NOT NULL,
+
+        target_tier_id INT NULL,
+
+        start_date DATE NOT NULL,
+
+        end_date DATE NOT NULL,
+
+        status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+
+        is_deleted BIT NOT NULL DEFAULT 0,
+
+        created_at DATETIME NOT NULL DEFAULT GETDATE(),
+
+        updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+
+        CONSTRAINT FK_promotions_tiers
+            FOREIGN KEY (target_tier_id)
+            REFERENCES tiers(id),
+
+        CONSTRAINT CK_promotions_discount_type
+            CHECK (
+                discount_type IN ('PERCENT', 'FIXED')
+            ),
+
+        CONSTRAINT CK_promotions_status
+            CHECK (
+                status IN ('ACTIVE', 'INACTIVE')
+            ),
+
+        CONSTRAINT CK_promotions_discount_value
+            CHECK (
+                discount_value > 0
+            ),
+
+        CONSTRAINT CK_promotions_percent_value
+            CHECK (
+                discount_type <> 'PERCENT'
+                OR discount_value <= 100
+            ),
+
+        CONSTRAINT CK_promotions_date
+            CHECK (
+                end_date >= start_date
+            )
+    );
+END;
+GO
+
