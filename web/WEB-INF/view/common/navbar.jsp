@@ -28,6 +28,10 @@
                     <a class="${activePage eq 'services' ? 'active' : ''}" href="<c:url value='/admin/services'/>">
                         <span class="material-symbols-outlined">settings</span> Services
                     </a>
+                    <a class="${activePage eq 'promotions' ? 'active' : ''}"
+                       href="<c:url value='/admin/promotions'/>">
+                        <span class="material-symbols-outlined">campaign</span> Promotions
+                    </a>
                     <a class="${activePage eq 'customers' ? 'active' : ''}" href="<c:url value='/admin/customers'/>">
                         <span class="material-symbols-outlined">group</span> Customers
                     </a>
