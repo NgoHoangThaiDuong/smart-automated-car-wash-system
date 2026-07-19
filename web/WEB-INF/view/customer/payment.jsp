@@ -513,7 +513,7 @@
                             
                             <div class="action-buttons">
                                 <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">Bảng Điều Khiển</a>
-                                <a href="${pageContext.request.contextPath}/booking/list" class="btn btn-secondary">Xem Lịch Đặt</a>
+                                <a href="${pageContext.request.contextPath}/booking" class="btn btn-secondary">Xem Lịch Đặt</a>
                             </div>
                         </div>
                     </div>

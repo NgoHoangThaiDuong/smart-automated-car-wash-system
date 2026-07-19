@@ -39,38 +39,19 @@ public class BookingService {
         return bookingDAO.findById(id);
     }
 
-    public void updateBookingStatus(int bookingId, String newStatus) {
+    public boolean updateBookingStatus(int bookingId, String newStatus) {
         Booking booking = bookingDAO.findById(bookingId);
         if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại: " + bookingId);
+            return false;
         }
-        validateTransition(booking.getBookingStatus(), newStatus);
-        if ("COMPLETED".equals(newStatus) && !"PAID".equals(booking.getPaymentStatus())) {
-            throw new IllegalArgumentException("Không thể hoàn thành booking chưa thanh toán");
-        }
-        bookingDAO.updateStatus(bookingId, newStatus);
-        
-        if ("COMPLETED".equals(newStatus) && "PAID".equals(booking.getPaymentStatus())) {
+        boolean updated = bookingDAO.updateStatus(bookingId, newStatus);
+        if (updated && "COMPLETED".equals(newStatus) && "PAID".equals(booking.getPaymentStatus())) {
             Booking updatedBooking = bookingDAO.findById(bookingId);
             processLoyaltyUpgrade(updatedBooking);
         }
+        return updated;
     }
 
-    public void collectPayment(int bookingId, String paymentMethod) {
-        Booking booking = bookingDAO.findById(bookingId);
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại: " + bookingId);
-        }
-        if ("PAID".equals(booking.getPaymentStatus())) {
-            return;
-        }
-        bookingDAO.updatePaymentStatus(bookingId, "PAID", paymentMethod);
-        
-        if ("COMPLETED".equals(booking.getBookingStatus())) {
-            Booking updatedBooking = bookingDAO.findById(bookingId);
-            processLoyaltyUpgrade(updatedBooking);
-        }
-    }
 
     private void processLoyaltyUpgrade(Booking booking) {
         if (booking.getPointsEarned() > 0) {
@@ -89,22 +70,13 @@ public class BookingService {
         userDAO.updateUserStatsAndTier(user.getId(), booking.getTotalAmount(), pointsEarned);
     }
 
-    private void validateTransition(String current, String next) {
-        switch (current) {
-            case "CONFIRMED":
-                if ("IN_PROGRESS".equals(next) || "CANCELLED".equals(next) || "NO_SHOW".equals(next)) return;
-                break;
-            case "IN_PROGRESS":
-                if ("COMPLETED".equals(next) || "CANCELLED".equals(next) || "NO_SHOW".equals(next)) return;
-                break;
-            default:
-                break;
-        }
-        throw new IllegalArgumentException("Không thể chuyển trạng thái từ " + current + " sang " + next);
-    }
 
     public int countByStatus(String status) {
         return bookingDAO.countByStatus(status);
+    }
+
+    public int countByPaymentStatus(String paymentStatus) {
+        return bookingDAO.countByPaymentStatus(paymentStatus);
     }
 
     public double sumRevenue() {

@@ -104,7 +104,7 @@
                 <!-- Search Field -->
                 <div class="search-input-wrapper">
                     <span class="material-symbols-outlined">search</span>
-                    <input name="search" class="search-input-field" placeholder="Search by name, phone number, or username..." type="text" value="<c:out value='${search}'/>">
+                    <input name="search" class="search-input-field" placeholder="Tìm kiếm" type="text" value="<c:out value='${search}'/>">
                 </div>
 
                 <!-- Tier Filter Select -->

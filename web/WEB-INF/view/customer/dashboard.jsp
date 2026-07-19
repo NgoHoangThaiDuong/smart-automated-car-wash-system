@@ -25,7 +25,7 @@
                 <div class="loyalty-card-top">
                     <div>
                         <span class="tier-label">CURRENT TIER</span>
-                        <h2><c:out value="${dashboard.tierName}"/> Member</h2>
+                        <h2><c:out value="${dashboard.tierName}"/></h2>
                     </div>
                     <div class="points-box">
                         <span>Points Balance</span>
@@ -39,7 +39,7 @@
                             <div class="progress-text">
                                 <span>Progress to <c:out value="${dashboard.nextTierName}"/> Tier</span>
                                 <span>
-                                    <fmt:formatNumber value="${dashboard.remainingSpend}" type="number"/> VND
+                                    <fmt:formatNumber value="${dashboard.remainingSpend}" type="number"/> points
                                     or ${dashboard.remainingWashes} washes needed
                                 </span>
                             </div>
