@@ -110,9 +110,8 @@ public class UserDAO {
         List<Object> params = new ArrayList<>();
         
         if (key != null && !key.trim().isEmpty()) {
-            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ? OR u.username LIKE ?) ");
+            sql.append("AND (u.fullname LIKE ? OR u.phone LIKE ?) ");
             String keyParam = "%" + key.trim() + "%";
-            params.add(keyParam);
             params.add(keyParam);
             params.add(keyParam);
         }
@@ -192,11 +191,25 @@ public class UserDAO {
         double newSpent = user.getLifetimeSpent() + spendAmount;
         int newPoints = user.getPointsBalance() + pointsEarned;
 
-        int targetTierId = user.getTierId();
+        int currentTierId = user.getTierId();
         List<LoyaltyTier> tiers = new LoyaltyTierDAO().findAll();
-        for (LoyaltyTier tier : tiers) {
-            if (newWashes >= tier.getMinWashes() || newSpent >= tier.getMinSpend()) {
-                targetTierId = tier.getId();
+
+        // Loop để xử lý trường hợp nhảy nhiều tier cùng lúc
+        boolean upgraded = true;
+        while (upgraded) {
+            upgraded = false;
+            LoyaltyTier nextTier = null;
+            for (int i = 0; i < tiers.size() - 1; i++) {
+                if (tiers.get(i).getId() == currentTierId) {
+                    nextTier = tiers.get(i + 1);
+                    break;
+                }
+            }
+            if (nextTier != null && (newPoints >= (int) nextTier.getMinSpend() || newWashes >= nextTier.getMinWashes())) {
+                newPoints -= (int) nextTier.getMinSpend();
+                newWashes -= nextTier.getMinWashes();
+                currentTierId = nextTier.getId();
+                upgraded = true;
             }
         }
 
@@ -206,7 +219,7 @@ public class UserDAO {
             ps.setInt(1, newWashes);
             ps.setDouble(2, newSpent);
             ps.setInt(3, newPoints);
-            ps.setInt(4, targetTierId);
+            ps.setInt(4, currentTierId);
             ps.setInt(5, userId);
             ps.executeUpdate();
         } catch (Exception e) {

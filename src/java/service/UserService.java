@@ -15,8 +15,16 @@ public class UserService {
 
 
     public dto.PageResult<User> getCustomersPage(String search, Integer tierId, String sortBy, int page, int pageSize) {
+        if (page < 1) page = 1;
         int totalEntries = userDAO.countCustomers(search, tierId);
+
+        int totalPages = (int) Math.ceil((double) totalEntries / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+
         int offset = (page - 1) * pageSize;
+        if (offset < 0) offset = 0;
+
         List<User> list = userDAO.searchCustomersPaginated(search, tierId, sortBy, offset, pageSize);
         return new dto.PageResult<>(list, page, pageSize, totalEntries);
     }
@@ -45,17 +53,17 @@ public class UserService {
     public dto.ProfileDTO getProfileContext(User user) {
         List<LoyaltyTier> allTiers = getAllLoyaltyTiers();
         LoyaltyTier nextTier = null;
-        for (LoyaltyTier t : allTiers) {
-            if (t.getMinSpend() > user.getLifetimeSpent()) {
-                nextTier = t;
+        for (int i = 0; i < allTiers.size() - 1; i++) {
+            if (allTiers.get(i).getId() == user.getTierId()) {
+                nextTier = allTiers.get(i + 1);
                 break;
             }
         }
         double remaining = 0.0;
         double progress = 0.0;
-        if (nextTier != null) {
-            remaining = nextTier.getMinSpend() - user.getLifetimeSpent();
-            progress = Math.min(100.0, (user.getLifetimeSpent() / nextTier.getMinSpend()) * 100.0);
+        if (nextTier != null && nextTier.getMinSpend() > 0) {
+            remaining = nextTier.getMinSpend() - user.getPointsBalance();
+            progress = Math.min(100.0, (user.getPointsBalance() / nextTier.getMinSpend()) * 100.0);
         }
         return new dto.ProfileDTO(user, nextTier, remaining, progress);
     }
