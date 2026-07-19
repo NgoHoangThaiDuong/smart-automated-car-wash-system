@@ -99,7 +99,7 @@
                             </p>
                             <span class="payment-status">
                                 Payment:
-                                <c:out value="${empty upcomingBooking.payment ? 'NOT CREATED' : upcomingBooking.payment.paymentStatus}"/>
+                                <c:out value="${empty upcomingBooking.payment ? 'UNPAID' : upcomingBooking.payment.paymentStatus}"/>
                             </span>
                         </c:when>
                         <c:otherwise>
@@ -146,8 +146,8 @@
                                             <c:out value="${booking.vehicle.model}"/>
                                             (<c:out value="${booking.vehicle.licensePlate}"/>)
                                         </td>
-                                        <td><fmt:formatNumber value="${booking.payment.amount}" type="number"/> VND</td>
-                                        <td><span class="completed-badge">Completed</span></td>
+                                        <td><fmt:formatNumber value="${booking.payment.amount1}" type="number"/> VND</td>
+                                        <td><span class="completed-badge"><c:out value="${booking.bookingStatus}"/></span></td>
                                     </tr>
                                 </c:forEach>
                             </c:otherwise>
