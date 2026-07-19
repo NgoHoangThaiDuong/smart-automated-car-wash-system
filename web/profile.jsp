@@ -77,7 +77,7 @@
                                 <div id="progress-fill" class="progress-fill" style="width: ${progressPercent}%;"></div>
                             </div>
                             <div class="progress-labels">
-                                <span id="label-current"><fmt:formatNumber value="${currentUser.lifetimeSpent}" type="number"/> điểm</span>
+                                <span id="label-current"><fmt:formatNumber value="${currentUser.pointsBalance}" type="number"/> điểm</span>
                                 <span id="label-target"><fmt:formatNumber value="${nextTier.minSpend}" type="number"/> điểm</span>
                             </div>
                         </div>
