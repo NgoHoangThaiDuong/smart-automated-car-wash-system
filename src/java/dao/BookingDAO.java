@@ -26,7 +26,7 @@ public class BookingDAO {
                 "JOIN users u ON b.user_id = u.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "WHERE b.is_deleted = 0 " +
-                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR u.fullname LIKE ? OR v.license_plate LIKE ?) " +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) ";
 
@@ -39,12 +39,10 @@ public class BookingDAO {
             ps.setString(1, search);
             ps.setString(2, search);
             ps.setString(3, search);
-            ps.setString(4, search);
-            ps.setString(5, search);
-            ps.setString(6, bookingStatus);
-            ps.setString(7, bookingStatus);
-            ps.setString(8, bookingDate);
-            ps.setString(9, bookingDate);
+            ps.setString(4, bookingStatus);
+            ps.setString(5, bookingStatus);
+            ps.setString(6, bookingDate);
+            ps.setString(7, bookingDate);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -97,7 +95,7 @@ public class BookingDAO {
                 "LEFT JOIN tiers t ON u.tier_id = t.id " +
                 "LEFT JOIN payments p ON b.id = p.booking_id " +
                 "WHERE b.is_deleted = 0 " +
-                "AND (? IS NULL OR CAST(b.id AS VARCHAR) LIKE ? OR u.fullname LIKE ? OR u.username LIKE ? OR v.license_plate LIKE ?) " +
+                "AND (? IS NULL OR u.fullname LIKE ? OR v.license_plate LIKE ?) " +
                 "AND (? IS NULL OR b.booking_status = ?) " +
                 "AND (? IS NULL OR CAST(b.booking_date AS DATE) = ?) " +
                 "ORDER BY " + orderBy + " " +
@@ -113,14 +111,12 @@ public class BookingDAO {
             ps.setString(1, search);
             ps.setString(2, search);
             ps.setString(3, search);
-            ps.setString(4, search);
-            ps.setString(5, search);
-            ps.setString(6, bookingStatus);
-            ps.setString(7, bookingStatus);
-            ps.setString(8, bookingDate);
-            ps.setString(9, bookingDate);
-            ps.setInt(10, offset);
-            ps.setInt(11, limit);
+            ps.setString(4, bookingStatus);
+            ps.setString(5, bookingStatus);
+            ps.setString(6, bookingDate);
+            ps.setString(7, bookingDate);
+            ps.setInt(8, offset);
+            ps.setInt(9, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next())
                     list.add(getBooking(rs));
@@ -160,7 +156,7 @@ public class BookingDAO {
         return null;
     }
 
-    public void updateStatus(int id, String newStatus) {
+    public boolean updateStatus(int id, String newStatus) {
         String sql = "UPDATE bookings SET booking_status = ?, " +
                 "completed_at = CASE WHEN ? = 'COMPLETED' THEN GETDATE() ELSE completed_at END " +
                 "WHERE id = ?";
@@ -169,7 +165,7 @@ public class BookingDAO {
             ps.setString(1, newStatus);
             ps.setString(2, newStatus);
             ps.setInt(3, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             throw new RuntimeException("Error updating booking status: " + e.getMessage(), e);
         }
@@ -223,7 +219,7 @@ public class BookingDAO {
     }
 
     public int countByStatus(String status) {
-        String sql = "SELECT COUNT(*) FROM bookings WHERE booking_status = ?";
+        String sql = "SELECT COUNT(*) FROM bookings WHERE booking_status = ? AND is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -233,6 +229,22 @@ public class BookingDAO {
             }
         } catch (Exception e) {
             throw new RuntimeException("Error counting bookings by status: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
+    public int countByPaymentStatus(String paymentStatus) {
+        String sql = "SELECT COUNT(*) FROM bookings b JOIN payments p ON b.id = p.booking_id " +
+                "WHERE p.payment_status = ? AND b.is_deleted = 0";
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, paymentStatus);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting bookings by payment status: " + e.getMessage(), e);
         }
         return 0;
     }
@@ -251,7 +263,7 @@ public class BookingDAO {
     }
 
     public int countTodayBookings() {
-        String sql = "SELECT COUNT(*) FROM bookings WHERE CAST(booking_date AS DATE) = CAST(GETDATE() AS DATE)";
+        String sql = "SELECT COUNT(*) FROM bookings WHERE CAST(booking_date AS DATE) = CAST(GETDATE() AS DATE) AND is_deleted = 0";
         try (Connection cn = DBUtils.getConnection();
                 PreparedStatement ps = cn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

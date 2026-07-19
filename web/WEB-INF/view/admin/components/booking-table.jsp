@@ -12,7 +12,7 @@
             <!-- Search -->
             <div class="search-input-wrapper">
                 <span class="material-symbols-outlined">search</span>
-                <input id="search" name="search" type="text" placeholder="Tìm kiếm (Mã đặt lịch, tên KH, biển số...)" class="search-input-field" value="<c:out value='${search}'/>">
+                <input id="search" name="search" type="text" placeholder="Tìm kiếm" class="search-input-field" value="<c:out value='${search}'/>">
             </div>
             
             <!-- Status -->

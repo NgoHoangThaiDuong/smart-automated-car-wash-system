@@ -43,13 +43,13 @@ public class CustomerDashboardDAO {
                         if (nextRs.next()) {
                             double nextSpend = nextRs.getDouble("min_spend");
                             int nextWashes = nextRs.getInt("min_washes");
-                            double spendProgress = nextSpend > 0 ? dto.getLifetimeSpent() / nextSpend : 1.0;
+                            double spendProgress = nextSpend > 0 ? (double) dto.getPointsBalance() / nextSpend : 1.0;
                             double washProgress = nextWashes > 0 ? (double) dto.getTotalWashes() / nextWashes : 1.0;
 
                             dto.setNextTierName(nextRs.getString("name"));
                             dto.setNextTierMinSpend(nextSpend);
                             dto.setNextTierMinWashes(nextWashes);
-                            dto.setRemainingSpend(Math.max(0, nextSpend - dto.getLifetimeSpent()));
+                            dto.setRemainingSpend(Math.max(0, nextSpend - dto.getPointsBalance()));
                             dto.setRemainingWashes(Math.max(0, nextWashes - dto.getTotalWashes()));
                             dto.setProgressPercent(Math.min(100.0, Math.max(spendProgress, washProgress) * 100.0));
                         } else {

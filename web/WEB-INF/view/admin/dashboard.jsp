@@ -46,8 +46,8 @@
         <!-- Total Customers Card -->
         <div class="card-large">
             <div class="card-label">Total Customers</div>
-            <!-- Mocked total customers count as 89 to align with the visual spec layout -->
-            <div class="card-value">89</div>
+            <!-- Total Customers -->
+            <div class="card-value">${totalCustomers}</div>
             <div class="card-icon-wrapper">
                 <span class="material-symbols-outlined" style="font-size: 1.3rem;">group</span>
             </div>
@@ -70,8 +70,7 @@
         </div>
         <div class="card-small">
             <div class="card-label">Unpaid</div>
-            <!-- Mocked unpaid count as 8 to align with the visual spec layout -->
-            <div class="card-value">8</div>
+            <div class="card-value">${unpaidCount}</div>
         </div>
     </div>
 
