@@ -39,7 +39,6 @@ public class AdminDashboardServlet extends HttpServlet {
         req.setAttribute("totalCustomers", userService.getCustomerCount());
         req.setAttribute("unpaidCount", bookingService.countByPaymentStatus("UNPAID"));
 
-        // Booking table trên dashboard
         String search = req.getParameter("search");
         String status = req.getParameter("status");
         String date = req.getParameter("date");
