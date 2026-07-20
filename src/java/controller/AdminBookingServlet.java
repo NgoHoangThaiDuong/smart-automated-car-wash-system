@@ -183,7 +183,6 @@ public class AdminBookingServlet extends HttpServlet {
     private void handleBookingNew(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String customerIdParam = req.getParameter("customerId");
         if (customerIdParam == null || customerIdParam.trim().isEmpty()) {
-            // Chưa chọn customer → hiện danh sách customer để chọn
             String search = req.getParameter("search");
             String tierIdParam = req.getParameter("tierId");
             String sortBy = req.getParameter("sortBy");
