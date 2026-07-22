@@ -5,7 +5,7 @@ import dao.UserDAO;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
-    private final UserDAO userRepo = new UserDAO();
+    private UserDAO userRepo = new UserDAO();
 
     public User login(String username, String password) {
         if (username == null || username.trim().isEmpty()) {

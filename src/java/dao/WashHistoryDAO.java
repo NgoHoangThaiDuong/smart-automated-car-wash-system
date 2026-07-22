@@ -11,7 +11,7 @@ import java.util.List;
 
 public class WashHistoryDAO {
 
-    private static final String FROM_AND_WHERE =
+    private static String FROM_AND_WHERE =
             " FROM bookings b "
             + "JOIN payments p ON p.booking_id = b.id "
             + "JOIN vehicles v ON v.id = b.vehicle_id "
@@ -135,8 +135,8 @@ public class WashHistoryDAO {
 
     private static class QueryParts {
 
-        private final String where;
-        private final List<Object> parameters;
+        private String where;
+        private List<Object> parameters;
 
         QueryParts(String where, List<Object> parameters) {
             this.where = where;

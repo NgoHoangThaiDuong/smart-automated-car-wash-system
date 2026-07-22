@@ -17,8 +17,8 @@ import java.io.IOException;
 @WebServlet({"/booking", "/booking/*", "/wash-history"})
 public class BookingServlet extends HttpServlet {
 
-    private final BookingService bookingService = new BookingService();
-    private final UserService userService = new UserService();
+    private BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)

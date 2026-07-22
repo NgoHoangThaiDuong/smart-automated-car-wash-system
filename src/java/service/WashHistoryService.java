@@ -8,8 +8,8 @@ import java.util.List;
 
 public class WashHistoryService {
 
-    public static final int PAGE_SIZE = 5;
-    private final WashHistoryDAO washHistoryDAO = new WashHistoryDAO();
+    public static int PAGE_SIZE = 5;
+    private WashHistoryDAO washHistoryDAO = new WashHistoryDAO();
 
     public PageResult<WashHistoryDTO> getPage(int userId, String search, String period,
             Integer serviceId, Integer vehicleId, int requestedPage) {

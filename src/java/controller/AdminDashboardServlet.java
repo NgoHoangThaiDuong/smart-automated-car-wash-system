@@ -12,22 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.LinkedList;
 
 @WebServlet({"/admin", "/admin/dashboard"})
 public class AdminDashboardServlet extends HttpServlet {
 
-    public static final List<String> BOOKING_STATUSES = new LinkedList<>();
-    static {
-        BOOKING_STATUSES.add("CONFIRMED");
-        BOOKING_STATUSES.add("IN_PROGRESS");
-        BOOKING_STATUSES.add("COMPLETED");
-        BOOKING_STATUSES.add("CANCELLED");
-        BOOKING_STATUSES.add("NO_SHOW");
-    }
-
-    private final BookingService bookingService = new BookingService();
-    private final UserService userService = new UserService();
+    private BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -39,7 +30,6 @@ public class AdminDashboardServlet extends HttpServlet {
         req.setAttribute("totalCustomers", userService.getCustomerCount());
         req.setAttribute("unpaidCount", bookingService.countByPaymentStatus("UNPAID"));
 
-        // Booking table trên dashboard
         String search = req.getParameter("search");
         String status = req.getParameter("status");
         String date = req.getParameter("date");
@@ -62,7 +52,7 @@ public class AdminDashboardServlet extends HttpServlet {
         req.setAttribute("selectedStatus", status);
         req.setAttribute("date", date);
         req.setAttribute("sortBy", sortBy);
-        req.setAttribute("bookingStatuses", BOOKING_STATUSES);
+        req.setAttribute("bookingStatuses", bookingStatusDAO.findAll());
         req.setAttribute("currentPage", pageResult.getCurrentPage());
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("totalEntries", pageResult.getTotalEntries());

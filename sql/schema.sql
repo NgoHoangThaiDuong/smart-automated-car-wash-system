@@ -68,6 +68,14 @@ BEGIN
 END;
 GO
 
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='booking_statuses' AND xtype='U')
+BEGIN
+    CREATE TABLE booking_statuses (
+        name VARCHAR(20) PRIMARY KEY
+    );
+END;
+GO
+
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='bookings' AND xtype='U')
 BEGIN
     CREATE TABLE bookings (
@@ -77,7 +85,7 @@ BEGIN
         service_id INT FOREIGN KEY REFERENCES wash_services(id),
         booking_date DATE NOT NULL,
         time_slot VARCHAR(20) NOT NULL,
-        booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
+        booking_status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED' FOREIGN KEY REFERENCES booking_statuses(name),
         total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
         points_earned INT DEFAULT 0,
         created_at DATETIME DEFAULT GETDATE(),

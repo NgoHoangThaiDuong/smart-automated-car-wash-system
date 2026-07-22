@@ -23,16 +23,16 @@ import java.util.List;
 
 public class BookingService {
 
-    private static final LocalTime OPENING_TIME = LocalTime.of(8, 0);
-    private static final LocalTime CLOSING_TIME = LocalTime.of(18, 0);
-    private static final int SLOT_INTERVAL_MINUTES = 30;
-    private static final int MAX_CONCURRENT_BOOKINGS = 3;
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
+    private static LocalTime OPENING_TIME = LocalTime.of(8, 0);
+    private static LocalTime CLOSING_TIME = LocalTime.of(18, 0);
+    private static int SLOT_INTERVAL_MINUTES = 30;
+    private static int MAX_CONCURRENT_BOOKINGS = 3;
+    private static DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
-    private final BookingDAO bookingDAO = new BookingDAO();
-    private final UserDAO userDAO = new UserDAO();
-    private final VehicleDAO vehicleDAO = new VehicleDAO();
-    private final WashServiceDAO washServiceDAO = new WashServiceDAO();
+    private BookingDAO bookingDAO = new BookingDAO();
+    private UserDAO userDAO = new UserDAO();
+    private VehicleDAO vehicleDAO = new VehicleDAO();
+    private WashServiceDAO washServiceDAO = new WashServiceDAO();
 
     public int countByStatus(String status) {
         return bookingDAO.countByStatus(status);

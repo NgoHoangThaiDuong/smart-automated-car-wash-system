@@ -10,9 +10,9 @@ import java.sql.SQLException;
  */
 public class DBUtils {
     // Do not change this code
-    private static final String DB_NAME = "AutoCarWash";
-    private static final String DB_USER_NAME = "SA";
-    private static final String DB_PASSWORD = "12345";
+    private static String DB_NAME = "AutoCarWash";
+    private static String DB_USER_NAME = "SA";
+    private static String DB_PASSWORD = "12345";
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Connection conn = null;

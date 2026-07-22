@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Payment {
-    public static final String UNPAID = "UNPAID";
-    public static final String PAID = "PAID";
-    public static final String FAILED = "FAILED";
-    public static final String CANCELLED = "CANCELLED";
+    public static String UNPAID = "UNPAID";
+    public static String PAID = "PAID";
+    public static String FAILED = "FAILED";
+    public static String CANCELLED = "CANCELLED";
 
     private int id;
     private int bookingId;

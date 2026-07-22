@@ -3,11 +3,11 @@ package dto;
 import java.util.List;
 
 public class PageResult<T> {
-    private final List<T> data;
-    private final int currentPage;
-    private final int totalPages;
-    private final int pageSize;
-    private final int totalEntries;
+    private List<T> data;
+    private int currentPage;
+    private int totalPages;
+    private int pageSize;
+    private int totalEntries;
 
     public PageResult(List<T> data, int currentPage, int pageSize, int totalEntries) {
         this.data = data;

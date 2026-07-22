@@ -18,8 +18,8 @@ import java.util.List;
 @WebServlet({"/profile", "/profile/*"})
 public class ProfileServlet extends HttpServlet {
 
-    private final UserService userService = new UserService();
-    private final VehicleService vehicleService = new VehicleService();
+    private UserService userService = new UserService();
+    private VehicleService vehicleService = new VehicleService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
