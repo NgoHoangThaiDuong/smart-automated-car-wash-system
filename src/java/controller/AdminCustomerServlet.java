@@ -21,9 +21,9 @@ import java.util.List;
 @WebServlet({"/admin/customers", "/admin/customers/*"})
 public class AdminCustomerServlet extends HttpServlet {
 
-    private final UserService userService = new UserService();
-    private final VehicleService vehicleService = new VehicleService();
-    private final BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private VehicleService vehicleService = new VehicleService();
+    private BookingService bookingService = new BookingService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -105,7 +105,7 @@ public class AdminCustomerServlet extends HttpServlet {
             int customerId = Integer.parseInt(idParam);
             User customer = userService.findById(customerId);
             if (customer == null || !"CUSTOMER".equals(customer.getRole())) {
-                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy khách hàng.");
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Customer not found.");
                 return;
             }
 
@@ -129,7 +129,7 @@ public class AdminCustomerServlet extends HttpServlet {
 
             req.getRequestDispatcher("/WEB-INF/view/admin/customer-detail.jsp").forward(req, res);
         } catch (NumberFormatException e) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID khách hàng không hợp lệ.");
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid customer ID.");
         }
     }
 
@@ -143,15 +143,15 @@ public class AdminCustomerServlet extends HttpServlet {
             userService.banUser(customerId, ban);
             if (session != null) {
                 if (ban) {
-                    session.setAttribute("adminMsg", "Đã chặn tài khoản khách hàng thành công.");
+                    session.setAttribute("adminMsg", "Customer account banned successfully.");
                 } else {
-                    session.setAttribute("adminMsg", "Đã mở khóa tài khoản khách hàng thành công.");
+                    session.setAttribute("adminMsg", "Customer account unbanned successfully.");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             if (session != null) {
-                session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+                session.setAttribute("adminError", "Error: " + e.getMessage());
             }
         }
         res.sendRedirect(req.getContextPath() + "/admin/customers/detail?id=" + idParam);
@@ -164,12 +164,12 @@ public class AdminCustomerServlet extends HttpServlet {
             int customerId = Integer.parseInt(idParam);
             userService.resetPassword(customerId, "123456");
             if (session != null) {
-                session.setAttribute("adminMsg", "Đặt lại mật khẩu của khách hàng về mặc định (123456) thành công.");
+                session.setAttribute("adminMsg", "Customer password reset to default (123456) successfully.");
             }
         } catch (Exception e) {
             e.printStackTrace();
             if (session != null) {
-                session.setAttribute("adminError", "Lỗi đặt lại mật khẩu: " + e.getMessage());
+                session.setAttribute("adminError", "Error resetting password: " + e.getMessage());
             }
         }
         res.sendRedirect(req.getContextPath() + "/admin/customers/detail?id=" + idParam);

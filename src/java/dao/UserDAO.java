@@ -194,7 +194,6 @@ public class UserDAO {
         int currentTierId = user.getTierId();
         List<LoyaltyTier> tiers = new LoyaltyTierDAO().findAll();
 
-        // Loop để xử lý trường hợp nhảy nhiều tier cùng lúc
         boolean upgraded = true;
         while (upgraded) {
             upgraded = false;

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PromotionService {
 
-    private final PromotionDAO promotionDAO = new PromotionDAO();
+    private PromotionDAO promotionDAO = new PromotionDAO();
 
     public List<Promotion> getAllPromotions() {
         try {

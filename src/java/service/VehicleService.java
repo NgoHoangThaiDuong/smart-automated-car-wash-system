@@ -6,15 +6,15 @@ import dto.VehicleDTO;
 import java.util.List;
 
 public class VehicleService {
-    public static final String DEFAULT_IMAGE_PATH = "/images/vehicles/car-default.svg";
+    public static String DEFAULT_IMAGE_PATH = "/images/vehicles/car-default.svg";
 
-    private static final String LICENSE_PLATE_PATTERN =
+    private static String LICENSE_PLATE_PATTERN =
             "^[0-9]{2}[A-Z]{1,2}-([0-9]{4,5}|[0-9]{3}\\.[0-9]{2})$";
-    private static final String VEHICLE_IMAGE_PATTERN =
+    private static String VEHICLE_IMAGE_PATTERN =
             "^(/images/vehicles/[A-Za-z0-9_-]+\\.(png|jpg|jpeg|webp|svg)"
             + "|/vehicle-images/[0-9a-fA-F-]{36}\\.(jpg|png|webp))$";
 
-    private final VehicleDAO vehicleDAO = new VehicleDAO();
+    private VehicleDAO vehicleDAO = new VehicleDAO();
 
     public List<Vehicle> findByUser(int userId) {
         List<Vehicle> vehicles = vehicleDAO.findByUserId(userId);

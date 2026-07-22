@@ -15,7 +15,7 @@ import java.util.List;
 @WebServlet({"/admin/services", "/admin/services/*"})
 public class AdminServiceServlet extends HttpServlet {
 
-    private final WashServiceService washServiceService = new WashServiceService();
+    private WashServiceService washServiceService = new WashServiceService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -79,10 +79,10 @@ public class AdminServiceServlet extends HttpServlet {
             ws.setActive(isActive);
 
             washServiceService.createService(ws);
-            session.setAttribute("adminMsg", "Thêm dịch vụ mới thành công.");
+            session.setAttribute("adminMsg", "New wash service created successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            session.setAttribute("adminError", "Error: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
     }
@@ -106,10 +106,10 @@ public class AdminServiceServlet extends HttpServlet {
             ws.setActive(isActive);
 
             washServiceService.updateService(ws);
-            session.setAttribute("adminMsg", "Cập nhật dịch vụ thành công.");
+            session.setAttribute("adminMsg", "Wash service updated successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            session.setAttribute("adminError", "Error: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
     }
@@ -119,10 +119,10 @@ public class AdminServiceServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(req.getParameter("id"));
             washServiceService.toggleServiceStatus(id);
-            session.setAttribute("adminMsg", "Đã thay đổi trạng thái hoạt động của dịch vụ.");
+            session.setAttribute("adminMsg", "Service status toggled successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            session.setAttribute("adminError", "Error: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
     }
@@ -132,10 +132,10 @@ public class AdminServiceServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(req.getParameter("id"));
             washServiceService.deleteService(id);
-            session.setAttribute("adminMsg", "Xóa dịch vụ thành công.");
+            session.setAttribute("adminMsg", "Wash service deleted successfully.");
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            session.setAttribute("adminError", "Error: " + e.getMessage());
         }
         res.sendRedirect(req.getContextPath() + "/admin/services");
     }

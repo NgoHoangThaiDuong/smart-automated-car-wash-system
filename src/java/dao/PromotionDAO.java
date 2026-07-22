@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PromotionDAO {
 
-    private static final String SELECT_ALL
+    private static String SELECT_ALL
             = "SELECT "
             + "p.id, "
             + "p.promotion_name, "
@@ -35,7 +35,7 @@ public class PromotionDAO {
             + "WHERE p.is_deleted = 0 "
             + "ORDER BY p.id DESC";
 
-    private static final String SELECT_BY_ID
+    private static String SELECT_BY_ID
             = "SELECT "
             + "p.id, "
             + "p.promotion_name, "
@@ -56,7 +56,7 @@ public class PromotionDAO {
             + "WHERE p.id = ? "
             + "AND p.is_deleted = 0";
 
-    private static final String UPDATE_PROMOTION
+    private static String UPDATE_PROMOTION
             = "UPDATE promotions "
             + "SET promotion_name = ?, "
             + "description = ?, "
@@ -70,7 +70,7 @@ public class PromotionDAO {
             + "WHERE id = ? "
             + "AND is_deleted = 0";
 
-    private static final String SOFT_DELETE
+    private static String SOFT_DELETE
             = "UPDATE promotions "
             + "SET is_deleted = 1, "
             + "updated_at = GETDATE() "
@@ -234,7 +234,7 @@ public class PromotionDAO {
 
         return promotion;
     }
-    private static final String INSERT_PROMOTION
+    private static String INSERT_PROMOTION
         = "INSERT INTO promotions ("
         + "promotion_name, "
         + "description, "

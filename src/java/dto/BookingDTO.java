@@ -6,7 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 public class BookingDTO {
-    // 1. Data for rendering booking form & list
     private List<Vehicle> vehicles;
     private List<WashService> services;
     private Integer selectedVehicleId;
@@ -20,7 +19,6 @@ public class BookingDTO {
     private String minBookingDate;
     private String maxBookingDate;
 
-    // 2. Data from submitting booking form
     private Integer vehicleId;
     private Integer serviceId;
     private String bookingDate;
@@ -57,14 +55,12 @@ public class BookingDTO {
             try {
                 dto.setVehicleId(Integer.parseInt(vehicleIdStr.trim()));
             } catch (NumberFormatException e) {
-                // Keep null to trigger validation
             }
         }
         if (serviceIdStr != null && !serviceIdStr.trim().isEmpty()) {
             try {
                 dto.setServiceId(Integer.parseInt(serviceIdStr.trim()));
             } catch (NumberFormatException e) {
-                // Keep null to trigger validation
             }
         }
         
