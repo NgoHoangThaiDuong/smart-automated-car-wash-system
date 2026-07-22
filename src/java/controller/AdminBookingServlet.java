@@ -117,8 +117,14 @@ public class AdminBookingServlet extends HttpServlet {
             if (session != null) {
                 String msg = (String) session.getAttribute("adminMsg");
                 String err = (String) session.getAttribute("adminError");
-                if (msg != null) { req.setAttribute("adminMsg", msg); session.removeAttribute("adminMsg"); }
-                if (err != null) { req.setAttribute("adminError", err); session.removeAttribute("adminError"); }
+                if (msg != null) {
+                    req.setAttribute("adminMsg", msg);
+                    session.removeAttribute("adminMsg");
+                }
+                if (err != null) {
+                    req.setAttribute("adminError", err);
+                    session.removeAttribute("adminError");
+                }
             }
             req.getRequestDispatcher("/WEB-INF/view/admin/booking-detail.jsp").forward(req, res);
         } catch (NumberFormatException e) {
@@ -128,21 +134,19 @@ public class AdminBookingServlet extends HttpServlet {
 
     private void handleUpdateStatus(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HttpSession session = req.getSession(false);
-        String idParam = req.getParameter("bookingId");
-        String newStatus = req.getParameter("newStatus");
+        int bookingId = Integer.parseInt(req.getParameter("bookingId"));
+        String status = req.getParameter("newStatus");
         try {
-            int id = Integer.parseInt(idParam);
-            boolean success = bookingService.updateBookingStatus(id, newStatus);
-            if (success) {
-                session.setAttribute("adminMsg", "Cập nhật trạng thái thành công.");
+            boolean updated = bookingService.updateBookingStatus(bookingId, status);
+            if (updated) {
+                session.setAttribute("adminMsg", "Booking status updated successfully.");
             } else {
-                session.setAttribute("adminError", "Không thể cập nhật trạng thái.");
+                session.setAttribute("adminError", "Failed to update booking status.");
             }
-            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + id);
+            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + bookingId);
         } catch (Exception e) {
-            e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
-            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + idParam);
+            session.setAttribute("adminError", "Error: " + e.getMessage());
+            res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + bookingId);
         }
     }
 
@@ -154,7 +158,7 @@ public class AdminBookingServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(idParam);
             paymentService.processPayment(id, paymentMethod);
-            session.setAttribute("adminMsg", "Xác nhận thanh toán thành công.");
+            session.setAttribute("adminMsg", "Payment collected successfully.");
             if ("list".equals(redirect)) {
                 res.sendRedirect(req.getContextPath() + "/admin/bookings");
             } else {
@@ -162,7 +166,7 @@ public class AdminBookingServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("adminError", "Lỗi: " + e.getMessage());
+            session.setAttribute("adminError", "Error: " + e.getMessage());
             if ("list".equals(redirect)) {
                 res.sendRedirect(req.getContextPath() + "/admin/bookings");
             } else {
@@ -218,7 +222,7 @@ public class AdminBookingServlet extends HttpServlet {
             int customerId = Integer.parseInt(customerIdParam);
             User customer = userService.findById(customerId);
             if (customer == null || !"CUSTOMER".equals(customer.getRole())) {
-                req.setAttribute("bookingError", "Không tìm thấy khách hàng hợp lệ.");
+                req.setAttribute("bookingError", "Valid customer not found.");
                 req.getRequestDispatcher("/WEB-INF/view/admin/booking-create.jsp").forward(req, res);
                 return;
             }
@@ -265,9 +269,11 @@ public class AdminBookingServlet extends HttpServlet {
             int bookingId = bookingService.create(customerId, formDTO);
             res.sendRedirect(req.getContextPath() + "/admin/bookings/detail?id=" + bookingId);
         } catch (Exception e) {
-            req.setAttribute("bookingError", e.getMessage() != null ? e.getMessage() : "Không thể tạo booking. Vui lòng thử lại.");
+            req.setAttribute("bookingError", e.getMessage() != null ? e.getMessage() : "Failed to create booking. Please try again.");
             req.setAttribute("customerId", customerIdValue);
             handleBookingNew(req, res);
         }
+        req.setAttribute("customerId", customerIdValue);
+        handleBookingNew(req, res);
     }
 }

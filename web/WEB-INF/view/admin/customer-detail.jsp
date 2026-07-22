@@ -84,14 +84,14 @@
                     <div class="info-item">
                         <span class="material-symbols-outlined info-item-icon">phone</span>
                         <div class="info-item-content">
-                            <span class="info-label">Số điện thoại</span>
-                            <span class="info-value"><c:out value="${not empty customer.phone ? customer.phone : 'Chưa cập nhật'}"/></span>
+                            <span class="info-label">Phone Number</span>
+                            <span class="info-value"><c:out value="${not empty customer.phone ? customer.phone : 'Not updated'}"/></span>
                         </div>
                     </div>
                     <div class="info-item">
                         <span class="material-symbols-outlined info-item-icon">calendar_month</span>
                         <div class="info-item-content">
-                            <span class="info-label">Ngày tham gia</span>
+                            <span class="info-label">Joined Date</span>
                             <span class="info-value">
                                 <fmt:formatDate value="${customer.createdAt}" pattern="dd/MM/yyyy"/>
                             </span>
@@ -100,11 +100,11 @@
                     <div class="info-item">
                         <span class="material-symbols-outlined info-item-icon">shield</span>
                         <div class="info-item-content">
-                            <span class="info-label">Trạng thái tài khoản</span>
+                            <span class="info-label">Account Status</span>
                             <span class="info-value" style="color: ${customer.deleted ? '#EF4444' : '#10B981'};">
                                 <c:choose>
-                                    <c:when test="${customer.deleted}">Bị chặn (Banned)</c:when>
-                                    <c:otherwise>Hoạt động bình thường</c:otherwise>
+                                    <c:when test="${customer.deleted}">Banned</c:when>
+                                    <c:otherwise>Active</c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
@@ -115,7 +115,7 @@
                 <div class="vehicles-section">
                     <h3 class="vehicles-title">
                         <span class="material-symbols-outlined" style="font-size: 1.25rem;">directions_car</span>
-                        Phương tiện đăng ký (${fn:length(vehicles)})
+                        Registered Vehicles (${fn:length(vehicles)})
                     </h3>
                     <c:choose>
                         <c:when test="${not empty vehicles}">
@@ -129,7 +129,7 @@
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <p style="font-size: 0.875rem; color: var(--text-slate-muted); font-style: italic; margin: 0.5rem 0;">Chưa đăng ký phương tiện.</p>
+                            <p style="font-size: 0.875rem; color: var(--text-slate-muted); font-style: italic; margin: 0.5rem 0;">No vehicles registered.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -138,11 +138,11 @@
                 <div class="profile-actions">
                     <c:choose>
                         <c:when test="${customer.deleted}">
-                            <!-- Tài khoản đang bị Banned, nhấn vào sẽ Unban (ban=false) -->
-                            <form action="<c:url value='/admin/customers/ban'/>" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn mở khóa tài khoản khách hàng này?')">
+                            <!-- Banned account, click to Unban -->
+                            <form action="<c:url value='/admin/customers/ban'/>" method="POST" onsubmit="return confirm('Are you sure you want to unban this customer account?')">
                                 <input type="hidden" name="customerId" value="${customer.id}">
                                 <input type="hidden" name="ban" value="false">
-                                <button type="submit" class="btn-ban-action state-banned" title="Bấm để mở khóa tài khoản">
+                                <button type="submit" class="btn-ban-action state-banned" title="Click to unban account">
                                     <span class="material-symbols-outlined" style="font-size: 1.15rem;">lock_open</span>
                                     <span class="btn-text-normal">Banned</span>
                                     <span class="btn-text-hover">Unban</span>
@@ -150,11 +150,11 @@
                             </form>
                         </c:when>
                         <c:otherwise>
-                            <!-- Tài khoản đang hoạt động, nhấn vào sẽ Ban (ban=true) -->
-                            <form action="<c:url value='/admin/customers/ban'/>" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn chặn tài khoản khách hàng này? Người dùng sẽ không thể đăng nhập hoặc đặt lịch!')">
+                            <!-- Active account, click to Ban -->
+                            <form action="<c:url value='/admin/customers/ban'/>" method="POST" onsubmit="return confirm('Are you sure you want to ban this customer account? The user will not be able to log in or book appointments!')">
                                 <input type="hidden" name="customerId" value="${customer.id}">
                                 <input type="hidden" name="ban" value="true">
-                                <button type="submit" class="btn-ban-action state-unbanned" title="Bấm để chặn tài khoản">
+                                <button type="submit" class="btn-ban-action state-unbanned" title="Click to ban account">
                                     <span class="material-symbols-outlined" style="font-size: 1.15rem;">block</span>
                                     <span>Ban</span>
                                 </button>
@@ -167,14 +167,14 @@
                 <div class="vehicles-section" style="margin-top: 1.5rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem;">
                     <h3 class="vehicles-title" style="margin-bottom: 0.75rem;">
                         <span class="material-symbols-outlined" style="font-size: 1.25rem; color: #EF4444;">lock_open</span>
-                        Mật khẩu khách hàng
+                        Customer Password
                     </h3>
-                    <form action="<c:url value='/admin/customers/reset-password'/>" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục mật khẩu khách hàng này về mặc định (123456)?')">
+                    <form action="<c:url value='/admin/customers/reset-password'/>" method="POST" onsubmit="return confirm('Are you sure you want to reset this customer password to default (123456)?')">
                         <input type="hidden" name="customerId" value="${customer.id}">
                         <button type="submit" class="btn-admin-secondary" 
                                 style="width: 100%; justify-content: center; background-color: #EF4444; color: #ffffff; border: none; padding: 0.6rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; text-decoration: none;">
                             <span class="material-symbols-outlined" style="font-size: 1.15rem;">lock_reset</span>
-                            Khôi phục mật khẩu (123456)
+                            Reset Password (123456)
                         </button>
                     </form>
                 </div>
@@ -187,19 +187,19 @@
             <div class="stats-cards-row">
                 <!-- Lifetime Spent -->
                 <div class="detail-stats-card">
-                    <span class="detail-stats-label">Tổng chi tiêu</span>
+                    <span class="detail-stats-label">Total Spent</span>
                     <div class="detail-stats-value" style="color: #10B981;">
                         <fmt:formatNumber value="${stats.lifetimeSpent}" type="number" groupingUsed="true"/> ₫
                     </div>
                 </div>
                 <!-- Wash Count -->
                 <div class="detail-stats-card">
-                    <span class="detail-stats-label">Lượt rửa xe</span>
+                    <span class="detail-stats-label">Wash Count</span>
                     <div class="detail-stats-value"><c:out value="${stats.totalWashes}"/></div>
                 </div>
                 <!-- Loyalty Points -->
                 <div class="detail-stats-card">
-                    <span class="detail-stats-label">Điểm tích lũy</span>
+                    <span class="detail-stats-label">Loyalty Points</span>
                     <div class="detail-stats-value" style="color: var(--primary);">
                         <fmt:formatNumber value="${stats.pointsBalance}" type="number" groupingUsed="true"/> pts
                     </div>
@@ -210,18 +210,18 @@
             <div class="detail-section-card">
                 <h3 class="detail-section-title">
                     <span class="material-symbols-outlined" style="color: var(--primary);">schedule</span>
-                    Lịch đặt sắp tới
+                    Upcoming Bookings
                 </h3>
                 <div style="overflow-x: auto;">
                     <table class="booking-table" style="font-size: 0.875rem;">
                         <thead>
                             <tr>
-                                <th>Dịch vụ</th>
-                                <th>Biển số</th>
-                                <th>Thời gian rửa</th>
-                                <th style="text-align: right;">Chi phí</th>
-                                <th style="text-align: center;">Trạng thái</th>
-                                <th style="text-align: center;">Thao tác</th>
+                                <th>Service</th>
+                                <th>License Plate</th>
+                                <th>Schedule</th>
+                                <th style="text-align: right;">Amount</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -245,7 +245,7 @@
                                             </span>
                                         </td>
                                         <td style="text-align: center;">
-                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="btn-detail-icon" title="Xem chi tiết đơn">
+                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="btn-detail-icon" title="View booking details">
                                                 <span class="material-symbols-outlined" style="font-size: 1.15rem;">arrow_forward</span>
                                             </a>
                                         </td>
@@ -254,7 +254,7 @@
                             </c:forEach>
                             <c:if test="${!hasUpcoming}">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; color: #94A3B8; padding: 2rem; font-style: italic;">Không có lịch đặt sắp tới.</td>
+                                    <td colspan="6" style="text-align: center; color: #94A3B8; padding: 2rem; font-style: italic;">No upcoming bookings.</td>
                                 </tr>
                             </c:if>
                         </tbody>
@@ -266,18 +266,18 @@
             <div class="detail-section-card">
                 <h3 class="detail-section-title">
                     <span class="material-symbols-outlined" style="color: #10B981;">history</span>
-                    Lịch sử rửa xe
+                    Wash History
                 </h3>
                 <div style="overflow-x: auto;">
                     <table class="booking-table" style="font-size: 0.875rem;">
                         <thead>
                             <tr>
-                                <th>Dịch vụ</th>
-                                <th>Biển số</th>
-                                <th>Thời gian rửa</th>
-                                <th style="text-align: right;">Chi phí</th>
-                                <th style="text-align: center;">Trạng thái</th>
-                                <th style="text-align: center;">Thao tác</th>
+                                <th>Service</th>
+                                <th>License Plate</th>
+                                <th>Schedule</th>
+                                <th style="text-align: right;">Amount</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -301,7 +301,7 @@
                                             </span>
                                         </td>
                                         <td style="text-align: center;">
-                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="btn-detail-icon" title="Xem chi tiết đơn">
+                                            <a href="<c:url value='/admin/bookings/detail?id=${b.id}'/>" class="btn-detail-icon" title="View booking details">
                                                 <span class="material-symbols-outlined" style="font-size: 1.15rem;">arrow_forward</span>
                                             </a>
                                         </td>
@@ -310,7 +310,7 @@
                             </c:forEach>
                             <c:if test="${!hasHistory}">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; color: #94A3B8; padding: 2rem; font-style: italic;">Chưa có lịch sử rửa xe.</td>
+                                    <td colspan="6" style="text-align: center; color: #94A3B8; padding: 2rem; font-style: italic;">No wash history.</td>
                                 </tr>
                             </c:if>
                         </tbody>
