@@ -83,7 +83,7 @@ public class Booking {
 
     public boolean isCustomerCancellable() { return customerCancellable; }
     public void setCustomerCancellable(boolean customerCancellable) {
-        this.customerCancellable = customerCancellable;
+        this.customerCancellable= customerCancellable;
     }
 
     public boolean isCustomerPayable() { return customerPayable; }

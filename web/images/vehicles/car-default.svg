@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title description">
+  <title id="title">Default vehicle image</title>
+  <desc id="description">A simple blue car placeholder</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eaf2ff"/>
+      <stop offset="1" stop-color="#c9dcff"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2878e8"/>
+      <stop offset="1" stop-color="#0b50c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#background)"/>
+  <ellipse cx="600" cy="475" rx="430" ry="38" fill="#9ab4dc" opacity=".45"/>
+  <path d="M250 365h58l86-132c20-31 55-50 92-50h228c41 0 78 21 99 56l76 126h61c50 0 90 40 90 90v18H160v-18c0-50 40-90 90-90z"
+        fill="url(#body)"/>
+  <path d="M438 237h142v128H350l78-119c3-5 7-9 10-9zm191 0h83c17 0 33 9 42 24l62 104H629V237z"
+        fill="#d9ecff"/>
+  <rect x="180" y="390" width="840" height="83" rx="34" fill="#0b50c7"/>
+  <rect x="198" y="409" width="95" height="24" rx="12" fill="#f8fbff"/>
+  <rect x="907" y="409" width="95" height="24" rx="12" fill="#ffdb68"/>
+  <circle cx="345" cy="472" r="73" fill="#172033"/>
+  <circle cx="345" cy="472" r="36" fill="#9fb3cd"/>
+  <circle cx="855" cy="472" r="73" fill="#172033"/>
+  <circle cx="855" cy="472" r="36" fill="#9fb3cd"/>
+  <path d="M537 408h126" stroke="#9ec5ff" stroke-width="12" stroke-linecap="round"/>
+  <text x="600" y="110" text-anchor="middle" fill="#174a95"
+        font-family="Arial, sans-serif" font-size="38" font-weight="700">SMART CAR WASH</text>
+</svg>
