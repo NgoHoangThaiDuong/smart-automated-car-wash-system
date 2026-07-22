@@ -7,7 +7,7 @@ import java.util.List;
 
 public class WashServiceService {
 
-    private final WashServiceDAO washServiceDAO = new WashServiceDAO();
+    private WashServiceDAO washServiceDAO = new WashServiceDAO();
 
 
     public List<WashService> getActiveServices() {

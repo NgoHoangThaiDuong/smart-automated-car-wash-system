@@ -16,7 +16,7 @@ import java.io.IOException;
 @WebServlet("/auth/*")
 public class AuthServlet extends HttpServlet {
 
-    private final AuthService authService = new AuthService();
+    private AuthService authService = new AuthService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

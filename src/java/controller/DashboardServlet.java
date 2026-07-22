@@ -16,8 +16,8 @@ import java.io.IOException;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-    private final UserService userService = new UserService();
-    private final BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private BookingService bookingService = new BookingService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

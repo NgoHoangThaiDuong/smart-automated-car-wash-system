@@ -9,9 +9,9 @@ import model.LoyaltyTier;
 import java.util.List;
 
 public class UserService {
-    private final UserDAO userDAO = new UserDAO();
-    private final LoyaltyTierDAO loyaltyTierDAO = new LoyaltyTierDAO();
-    private final CustomerDashboardDAO dashboardDAO = new CustomerDashboardDAO();
+    private UserDAO userDAO = new UserDAO();
+    private LoyaltyTierDAO loyaltyTierDAO = new LoyaltyTierDAO();
+    private CustomerDashboardDAO dashboardDAO = new CustomerDashboardDAO();
 
 
     public dto.PageResult<User> getCustomersPage(String search, Integer tierId, String sortBy, int page, int pageSize) {

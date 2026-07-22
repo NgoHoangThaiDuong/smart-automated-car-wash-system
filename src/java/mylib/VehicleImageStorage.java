@@ -9,11 +9,11 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.UUID;
 
-public final class VehicleImageStorage {
+public class VehicleImageStorage {
 
-    public static final long MAX_FILE_SIZE = 5L * 1024L * 1024L;
-    private static final String URL_PREFIX = "/vehicle-images/";
-    private static final String FILE_PATTERN =
+    public static long MAX_FILE_SIZE = 5L * 1024L * 1024L;
+    private static String URL_PREFIX = "/vehicle-images/";
+    private static String FILE_PATTERN =
             "^[0-9a-fA-F-]{36}\\.(jpg|png|webp)$";
 
     private VehicleImageStorage() {

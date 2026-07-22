@@ -23,10 +23,10 @@ import java.sql.Date;
 })
 public class PromotionServlet extends HttpServlet {
 
-    private final PromotionService promotionService
+    private PromotionService promotionService
             = new PromotionService();
 
-    private final UserService userService
+    private UserService userService
             = new UserService();
 
     @Override

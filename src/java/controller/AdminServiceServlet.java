@@ -15,7 +15,7 @@ import java.util.List;
 @WebServlet({"/admin/services", "/admin/services/*"})
 public class AdminServiceServlet extends HttpServlet {
 
-    private final WashServiceService washServiceService = new WashServiceService();
+    private WashServiceService washServiceService = new WashServiceService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

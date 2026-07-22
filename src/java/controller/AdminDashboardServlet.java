@@ -16,9 +16,9 @@ import java.util.List;
 @WebServlet({"/admin", "/admin/dashboard"})
 public class AdminDashboardServlet extends HttpServlet {
 
-    private final BookingService bookingService = new BookingService();
-    private final UserService userService = new UserService();
-    private final dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
+    private BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

@@ -21,9 +21,9 @@ import java.util.List;
 @WebServlet({"/admin/customers", "/admin/customers/*"})
 public class AdminCustomerServlet extends HttpServlet {
 
-    private final UserService userService = new UserService();
-    private final VehicleService vehicleService = new VehicleService();
-    private final BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private VehicleService vehicleService = new VehicleService();
+    private BookingService bookingService = new BookingService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

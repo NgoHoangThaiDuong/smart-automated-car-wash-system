@@ -21,10 +21,10 @@ import java.util.List;
 @WebServlet({"/admin/bookings", "/admin/bookings/*"})
 public class AdminBookingServlet extends HttpServlet {
 
-    private final BookingService bookingService = new BookingService();
-    private final UserService userService = new UserService();
-    private final PaymentService paymentService = new PaymentService();
-    private final dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
+    private BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
+    private PaymentService paymentService = new PaymentService();
+    private dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {

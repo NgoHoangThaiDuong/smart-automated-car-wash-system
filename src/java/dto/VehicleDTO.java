@@ -38,7 +38,7 @@ public class VehicleDTO {
         return dto;
     }
 
-    private static final String LICENSE_PLATE_PATTERN =
+    private static String LICENSE_PLATE_PATTERN =
             "^[0-9]{2}[A-Z]{1,2}-([0-9]{4,5}|[0-9]{3}\\.[0-9]{2})$";
 
     public String validate() {

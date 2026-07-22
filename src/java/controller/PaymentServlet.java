@@ -16,9 +16,9 @@ import service.UserService;
 @WebServlet({"/payment", "/payment/*"})
 public class PaymentServlet extends HttpServlet {
 
-    private final PaymentService paymentService = new PaymentService();
-    private final BookingService bookingService = new BookingService();
-    private final UserService userService = new UserService();
+    private PaymentService paymentService = new PaymentService();
+    private BookingService bookingService = new BookingService();
+    private UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

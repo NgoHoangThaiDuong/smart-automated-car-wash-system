@@ -10,9 +10,9 @@ import model.User;
 
 public class PaymentService {
 
-    private final PaymentDAO paymentDAO = new PaymentDAO();
-    private final BookingDAO bookingDAO = new BookingDAO();
-    private final UserDAO userDAO = new UserDAO();
+    private PaymentDAO paymentDAO = new PaymentDAO();
+    private BookingDAO bookingDAO = new BookingDAO();
+    private UserDAO userDAO = new UserDAO();
 
     public PaymentDetail getPaymentDetail(int bookingId) {
         return paymentDAO.getPaymentDetail(bookingId);

@@ -23,7 +23,7 @@ import java.io.IOException;
 )
 public class VehicleServlet extends HttpServlet {
 
-    private final VehicleService vehicleService = new VehicleService();
+    private VehicleService vehicleService = new VehicleService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
