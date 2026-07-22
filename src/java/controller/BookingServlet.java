@@ -5,7 +5,6 @@ import model.User;
 import service.BookingService;
 import service.UserService;
 import dto.BookingDTO;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-
 @WebServlet({"/booking", "/booking/*", "/wash-history"})
 public class BookingServlet extends HttpServlet {
 
@@ -21,12 +19,9 @@ public class BookingServlet extends HttpServlet {
     private UserService userService = new UserService();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         User currentUser = getCurrentCustomer(req, res);
-        if (currentUser == null) {
-            return;
-        }
+        if (currentUser == null) return;
 
         String servletPath = req.getServletPath();
         if ("/wash-history".equals(servletPath)) {
@@ -43,16 +38,12 @@ public class BookingServlet extends HttpServlet {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
         User currentUser = getCurrentCustomer(req, res);
-        if (currentUser == null) {
-            return;
-        }
+        if (currentUser == null) return;
 
         String path = req.getPathInfo();
         if ("/create".equals(path)) {
@@ -67,10 +58,8 @@ public class BookingServlet extends HttpServlet {
     private void showBookingList(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session != null) {
-            moveFlashMessage(session, req, "bookingMessage");
-            moveFlashMessage(session, req, "bookingError");
-        }
+        moveFlashMessage(session, req, "bookingMessage");
+        moveFlashMessage(session, req, "bookingError");
 
         req.setAttribute("bookings", bookingService.getBookingsByUser(currentUser.getId()));
         req.setAttribute("activePage", "booking");
@@ -80,19 +69,26 @@ public class BookingServlet extends HttpServlet {
     private void showWashHistory(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session != null) {
-            moveFlashMessage(session, req, "bookingMessage");
-            moveFlashMessage(session, req, "bookingError");
-        }
+        moveFlashMessage(session, req, "bookingMessage");
+        moveFlashMessage(session, req, "bookingError");
 
         req.setAttribute("bookings", bookingService.getRecentWashHistory(currentUser.getId(), 100));
         req.setAttribute("activePage", "wash-history");
         req.getRequestDispatcher("/WEB-INF/view/customer/wash-history.jsp").forward(req, res);
     }
 
+
     private void showBookingForm(HttpServletRequest req, HttpServletResponse res, User currentUser)
             throws ServletException, IOException {
-        prepareBookingForm(req, currentUser);
+        BookingDTO context = bookingService.prepareBookingFormContext(
+                currentUser.getId(),
+                req.getParameter("vehicleId"),
+                req.getParameter("serviceId"),
+                req.getParameter("bookingDate"),
+                req.getParameter("time")
+        );
+        context.putIntoRequest(req);
+        req.setAttribute("activePage", "booking");
         req.getRequestDispatcher("/WEB-INF/view/customer/booking-form.jsp").forward(req, res);
     }
 
@@ -100,10 +96,10 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
         BookingDTO formDTO = BookingDTO.fromRequest(req);
         String validationError = formDTO.validate();
+
         if (validationError != null) {
             req.setAttribute("bookingError", validationError);
-            prepareBookingForm(req, currentUser);
-            req.getRequestDispatcher("/WEB-INF/view/customer/booking-form.jsp").forward(req, res);
+            showBookingForm(req, res, currentUser);
             return;
         }
 
@@ -112,18 +108,16 @@ public class BookingServlet extends HttpServlet {
             res.sendRedirect(req.getContextPath() + "/payment?bookingId=" + bookingId);
         } catch (IllegalArgumentException e) {
             req.setAttribute("bookingError", e.getMessage());
-            prepareBookingForm(req, currentUser);
-            req.getRequestDispatcher("/WEB-INF/view/customer/booking-form.jsp").forward(req, res);
+            showBookingForm(req, res, currentUser);
         } catch (Exception e) {
             log("Cannot create customer booking", e);
             req.setAttribute("bookingError", "Không thể tạo booking lúc này. Vui lòng thử lại.");
-            prepareBookingForm(req, currentUser);
-            req.getRequestDispatcher("/WEB-INF/view/customer/booking-form.jsp").forward(req, res);
+            showBookingForm(req, res, currentUser);
         }
     }
 
-    private void cancelBooking(HttpServletRequest req, HttpServletResponse res, User currentUser)
-            throws IOException {
+
+    private void cancelBooking(HttpServletRequest req, HttpServletResponse res, User currentUser) throws IOException {
         HttpSession session = req.getSession();
         try {
             int bookingId = Integer.parseInt(req.getParameter("bookingId"));
@@ -140,22 +134,10 @@ public class BookingServlet extends HttpServlet {
         res.sendRedirect(req.getContextPath() + "/booking");
     }
 
-    private void prepareBookingForm(HttpServletRequest req, User currentUser) {
-        dto.BookingDTO context = bookingService.prepareBookingFormContext(
-                currentUser.getId(),
-                req.getParameter("vehicleId"),
-                req.getParameter("serviceId"),
-                req.getParameter("bookingDate"),
-                req.getParameter("time")
-        );
-
-        context.putIntoRequest(req);
-        req.setAttribute("activePage", "booking");
-    }
-
     private User getCurrentCustomer(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HttpSession session = req.getSession(false);
-        User sessionUser = session == null ? null : (User) session.getAttribute("currentUser");
+        User sessionUser = (session == null) ? null : (User) session.getAttribute("currentUser");
+
         if (sessionUser == null) {
             res.sendRedirect(req.getContextPath() + "/auth/login");
             return null;
@@ -177,6 +159,7 @@ public class BookingServlet extends HttpServlet {
     }
 
     private void moveFlashMessage(HttpSession session, HttpServletRequest req, String name) {
+        if (session == null) return;
         Object value = session.getAttribute(name);
         if (value != null) {
             req.setAttribute(name, value);
@@ -184,3 +167,4 @@ public class BookingServlet extends HttpServlet {
         }
     }
 }
+

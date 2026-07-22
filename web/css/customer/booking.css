@@ -150,7 +150,9 @@ body {
 }
 
 .choice-card.selected,
-.service-card.selected {
+.service-card.selected,
+.choice-card:has(input[type="radio"]:checked),
+.service-card:has(input[type="radio"]:checked) {
     border: 2px solid var(--booking-blue);
     background: var(--booking-blue-light);
 }
@@ -181,7 +183,7 @@ body {
     gap: 25px;
 }
 
-.service-card > span {
+.service-card>span {
     display: flex;
     flex-direction: column;
     gap: 9px;
@@ -326,7 +328,7 @@ body {
     align-items: center;
 }
 
-.booking-item > div {
+.booking-item>div {
     display: flex;
     flex-direction: column;
     gap: 7px;
@@ -350,7 +352,7 @@ body {
     border-left: 1px solid #e5e7eb;
 }
 
-.booking-status-box > div {
+.booking-status-box>div {
     display: flex;
     gap: 8px;
 }
