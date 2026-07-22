@@ -25,5 +25,6 @@
 </div>
 <div class="vehicle-preview-wrapper">
     <img id="addImagePreview" src="${addDefaultVehicleImage}"
-         alt="Vehicle preview" class="vehicle-preview-image">
+         alt="Vehicle preview" class="vehicle-preview-image"
+         onerror="this.onerror=null;this.src='${addDefaultVehicleImage}';">
 </div>
