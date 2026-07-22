@@ -60,7 +60,6 @@ public class VehicleImageStorage {
                 Files.deleteIfExists(file);
             }
         } catch (IOException ignored) {
-            // File cleanup must not hide the main database result.
         }
     }
 

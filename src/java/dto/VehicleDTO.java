@@ -28,7 +28,6 @@ public class VehicleDTO {
             try {
                 dto.setId(Integer.parseInt(idStr));
             } catch (NumberFormatException e) {
-                // Ignore
             }
         }
         dto.setLicensePlate(req.getParameter("licensePlate"));

@@ -51,7 +51,6 @@ public class PaymentServlet extends HttpServlet {
             return;
         }
 
-        // Security check: only the booking owner can access this payment checkout page
         Booking booking = bookingService.getBookingById(bookingId);
         if (booking == null || booking.getUserId() != currentUser.getId()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập trang thanh toán này.");
@@ -97,7 +96,6 @@ public class PaymentServlet extends HttpServlet {
             return;
         }
 
-        // Security check: verify booking ownership
         Booking booking = bookingService.getBookingById(bookingId);
         if (booking == null || booking.getUserId() != currentUser.getId()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền thanh toán cho booking này.");

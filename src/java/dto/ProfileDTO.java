@@ -4,19 +4,16 @@ import model.User;
 import model.LoyaltyTier;
 
 public class ProfileDTO {
-    // For rendering profile view
     private User user;
     private LoyaltyTier nextTier;
     private double remainingSpend;
     private double progressPercent;
 
-    // For updating profile
     private String fullname;
     private String phone;
 
     public ProfileDTO() {}
 
-    // Constructor for rendering view
     public ProfileDTO(User user, LoyaltyTier nextTier, double remainingSpend, double progressPercent) {
         this.user = user;
         this.nextTier = nextTier;
@@ -24,7 +21,6 @@ public class ProfileDTO {
         this.progressPercent = progressPercent;
     }
 
-    // Constructor for updates
     public ProfileDTO(String fullname, String phone) {
         this.fullname = fullname;
         this.phone = phone;
