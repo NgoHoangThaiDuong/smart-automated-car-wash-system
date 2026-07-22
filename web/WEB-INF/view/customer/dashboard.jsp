@@ -72,14 +72,6 @@
             </article>
 
             <div class="dashboard-side">
-                <article class="small-card vehicle-summary">
-                    <div class="small-card-icon">▣</div>
-                    <div>
-                        <span>Registered Vehicles</span>
-                        <strong>${dashboard.vehicleCount}</strong>
-                        <a href="<c:url value='/profile'/>">Manage Garage →</a>
-                    </div>
-                </article>
 
                 <article class="small-card upcoming-booking">
                     <c:choose>
@@ -146,7 +138,7 @@
                                             <c:out value="${booking.vehicle.model}"/>
                                             (<c:out value="${booking.vehicle.licensePlate}"/>)
                                         </td>
-                                        <td><fmt:formatNumber value="${booking.payment.amount1}" type="number"/> VND</td>
+                                        <td><fmt:formatNumber value="${booking.payment.amount}" type="number"/> points</td>
                                         <td><span class="completed-badge"><c:out value="${booking.bookingStatus}"/></span></td>
                                     </tr>
                                 </c:forEach>

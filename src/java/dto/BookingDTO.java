@@ -28,7 +28,6 @@ public class BookingDTO {
 
     public BookingDTO() {}
 
-    // Constructor for rendering view
     public BookingDTO(List<Vehicle> vehicles, List<WashService> services,
                       Integer selectedVehicleId, Integer selectedServiceId,
                       Vehicle selectedVehicle, WashService selectedService,
@@ -105,7 +104,6 @@ public class BookingDTO {
         req.setAttribute("maxBookingDate", maxBookingDate);
     }
 
-    // Getters & Setters
     public List<Vehicle> getVehicles() { return vehicles; }
     public void setVehicles(List<Vehicle> vehicles) { this.vehicles = vehicles; }
 
