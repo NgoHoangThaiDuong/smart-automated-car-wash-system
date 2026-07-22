@@ -6,6 +6,7 @@ DELETE FROM bookings;
 DELETE FROM vehicles;
 DELETE FROM users;
 DELETE FROM wash_services;
+DELETE FROM booking_statuses;
 DELETE FROM tiers;
 GO
 
@@ -18,6 +19,8 @@ DBCC CHECKIDENT ('payments', RESEED, 0);
 GO
 
 INSERT INTO tiers (name, point_multiplier, booking_window_days, min_washes, min_spend) VALUES ('Member', 1.00, 7, 0, 0), ('Silver', 1.10, 10, 5, 2000), ('Gold', 1.20, 12, 10, 4000), ('Platinum', 1.30, 14, 15, 9000);
+
+INSERT INTO booking_statuses (name) VALUES ('CONFIRMED'), ('IN_PROGRESS'), ('COMPLETED'), ('CANCELLED'), ('NO_SHOW');
 GO
 
 INSERT INTO users (username, password, fullname, phone, role, tier_id, points_balance, total_washes, lifetime_spent) VALUES ('admin@gmail.com', '$2a$10$PyQGSM5ISXUsH3P7VPqpSu8J89yCQg2P6ydQHZ.bYXojx6SB0Mzvi', N'Admin', '0900000000', 'ADMIN', (SELECT id FROM tiers WHERE name='Member'), 0, 0, 0);

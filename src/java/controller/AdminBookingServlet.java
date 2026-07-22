@@ -17,23 +17,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import java.util.LinkedList;
 
 @WebServlet({"/admin/bookings", "/admin/bookings/*"})
 public class AdminBookingServlet extends HttpServlet {
 
-    public static final List<String> BOOKING_STATUSES = new LinkedList<>();
-    static {
-        BOOKING_STATUSES.add("CONFIRMED");
-        BOOKING_STATUSES.add("IN_PROGRESS");
-        BOOKING_STATUSES.add("COMPLETED");
-        BOOKING_STATUSES.add("CANCELLED");
-        BOOKING_STATUSES.add("NO_SHOW");
-    }
-
     private final BookingService bookingService = new BookingService();
     private final UserService userService = new UserService();
     private final PaymentService paymentService = new PaymentService();
+    private final dao.BookingStatusDAO bookingStatusDAO = new dao.BookingStatusDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -99,7 +90,7 @@ public class AdminBookingServlet extends HttpServlet {
         req.setAttribute("selectedStatus", status);
         req.setAttribute("date", date);
         req.setAttribute("sortBy", sortBy);
-        req.setAttribute("bookingStatuses", BOOKING_STATUSES);
+        req.setAttribute("bookingStatuses", bookingStatusDAO.findAll());
         req.setAttribute("currentPage", pageResult.getCurrentPage());
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("totalEntries", pageResult.getTotalEntries());
