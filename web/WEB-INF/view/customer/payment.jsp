@@ -227,7 +227,6 @@
                         flex-shrink: 0;
                     }
 
-                    /* Form styling */
                     .payment-methods-title {
                         font-size: 18px;
                         font-weight: 700;
@@ -313,7 +312,6 @@
                         transform: translateY(1px);
                     }
 
-                    /* Success screen styling */
                     .success-screen {
                         text-align: center;
                         padding: 24px 0;
@@ -437,7 +435,6 @@
                         background-color: #f1f5f9;
                     }
 
-                    /* Alert Box */
                     .alert {
                         border-radius: 12px;
                         padding: 16px;
